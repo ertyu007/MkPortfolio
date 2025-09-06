@@ -16,10 +16,10 @@ const Contact = () => {
 
     emailjs
       .send(
-        'YOUR_SERVICE_ID',   // 📌 Service ID
-        'YOUR_TEMPLATE_ID',  // 📌 Template ID
+        'service_br88esb',   // 📌 Service ID
+        'template_loffs5u',  // 📌 Template ID
         form,
-        'YOUR_PUBLIC_KEY'    // 📌 Public Key
+        'eeZHKjTMxrFyznOzR'    // 📌 Public Key
       )
       .then(
         () => {
