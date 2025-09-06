@@ -1,35 +1,65 @@
-import React from 'react';
-import { FaUser, FaCode, FaBriefcase, FaNewspaper, FaEnvelope, FaAward } from 'react-icons/fa'; // ✅ เพิ่ม FaAward
+import React, { useState } from 'react';
+import { FaUser, FaCode, FaBriefcase, FaAward, FaNewspaper, FaEnvelope, FaBars, FaTimes } from 'react-icons/fa';
 
 const Navbar = ({ scrollToSection }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const navItems = [
     { label: "เกี่ยวกับ", icon: <FaUser />, ref: scrollToSection.aboutRef },
     { label: "ทักษะ", icon: <FaCode />, ref: scrollToSection.skillsRef },
     { label: "ผลงาน", icon: <FaBriefcase />, ref: scrollToSection.portfolioRef },
-    { label: "ประกาศนียบัตร", icon: <FaAward />, ref: scrollToSection.certificatesRef }, // ✅ ใช้ได้แล้ว
+    { label: "ประกาศนียบัตร", icon: <FaAward />, ref: scrollToSection.certificatesRef },
     { label: "บทความ", icon: <FaNewspaper />, ref: scrollToSection.blogRef },
     { label: "ติดต่อ", icon: <FaEnvelope />, ref: scrollToSection.contactRef },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow-md">
+    <nav className="sticky top-0 z-40 glass-card backdrop-blur-xl bg-white/30 dark:bg-gray-900/30 border-b border-white/20 dark:border-gray-700/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">My Portfolio</div>
-          <div className="hidden md:flex space-x-6">
+          <div className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            My Portfolio
+          </div>
+
+          <div className="hidden md:flex space-x-1">
             {navItems.map((item, idx) => (
               <button
                 key={idx}
-                onClick={() => item.ref?.current?.scrollIntoView({ behavior: 'smooth' })}
-                className="flex items-center space-x-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
-                aria-label={item.label}
+                onClick={() => {
+                  item.ref?.current?.scrollIntoView({ behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
+                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all"
               >
-                <span>{item.icon}</span>
-                <span className="hidden lg:inline">{item.label}</span>
+                {item.label}
               </button>
             ))}
           </div>
+
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-white/50 dark:hover:bg-gray-800/50"
+          >
+            {isOpen ? <FaTimes className="text-gray-700 dark:text-gray-300" /> : <FaBars className="text-gray-700 dark:text-gray-300" />}
+          </button>
         </div>
+
+        {isOpen && (
+          <div className="md:hidden py-4 border-t border-white/20 dark:border-gray-700/40">
+            {navItems.map((item, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  item.ref?.current?.scrollIntoView({ behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
+                className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-all"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </nav>
   );

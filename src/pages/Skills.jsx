@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react'; // ✅ เพิ่ม useMemo
+import React, { useState, useEffect, useMemo } from 'react';
 import { TagCloud } from 'react-tagcloud';
 import { aiRecommendation } from '../utils/ai';
 
 const Skills = () => {
-  // ✅ ใช้ useMemo — เพื่อให้ skills มี reference เดิมถ้าไม่มีการเปลี่ยนแปลง
   const skills = useMemo(() => [
     { name: "JavaScript", level: 90 },
     { name: "React", level: 85 },
@@ -12,16 +11,13 @@ const Skills = () => {
     { name: "PostgreSQL", level: 70 },
     { name: "Tailwind CSS", level: 85 },
     { name: "AI/ML", level: 60 },
-  ], []); // ✅ dependencies ว่าง — สร้างแค่ครั้งเดียว
+  ], []);
 
   const [recommendation, setRecommendation] = useState("กำลังวิเคราะห์ทักษะของคุณ...");
 
   useEffect(() => {
     const fetchRecommendation = async () => {
       try {
-        if (!skills?.length) {
-          throw new Error("No skills data");
-        }
         const rec = await aiRecommendation(skills);
         setRecommendation(rec);
       } catch (err) {
@@ -30,23 +26,22 @@ const Skills = () => {
       }
     };
     fetchRecommendation();
-  }, [skills]); // ✅ ตอนนี้ปลอดภัย — skills ไม่เปลี่ยนทุก render
+  }, [skills]);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8 text-center">ทักษะของฉัน</h1>
+    <div className="max-w-4xl mx-auto px-6 py-20">
+      <h1 className="section-title">ทักษะของฉัน</h1>
 
-      {/* Progress Bars */}
-      <div className="mb-12">
+      <div className="mb-12 space-y-6">
         {skills.map((skill, idx) => (
-          <div key={idx} className="mb-4" data-aos="fade-up">
-            <div className="flex justify-between mb-1">
-              <span>{skill.name}</span>
+          <div key={idx} className="pulse-on-hover" data-aos="fade-right" data-aos-delay={idx * 100}>
+            <div className="flex justify-between mb-2">
+              <span className="font-medium">{skill.name}</span>
               <span>{skill.level}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
               <div
-                className="bg-indigo-600 h-2.5 rounded-full"
+                className="h-3 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
                 style={{ width: `${skill.level}%` }}
               ></div>
             </div>
@@ -54,17 +49,16 @@ const Skills = () => {
         ))}
       </div>
 
-      {/* Tag Cloud */}
-      <div className="mb-12 p-6 bg-white dark:bg-gray-800 rounded-lg shadow" data-aos="zoom-in">
-        <h2 className="text-xl font-semibold mb-4">เมฆคำทักษะ</h2>
+      <div className="mb-12 p-8 glass-card" data-aos="zoom-in">
+        <h2 className="text-xl font-semibold mb-4 text-center">เมฆคำทักษะ</h2>
         <div style={{ height: '200px' }}>
           <TagCloud
-            minSize={14}
-            maxSize={36}
+            minSize={16}
+            maxSize={40}
             tags={skills.map(s => ({ value: s.name, count: s.level }))}
             onClick={tag => console.log(`Selected: ${tag.value}`)}
             style={{
-              fontFamily: 'sans-serif',
+              fontFamily: 'Inter, sans-serif',
               width: '100%',
               height: '100%',
               padding: '10px',
@@ -73,10 +67,9 @@ const Skills = () => {
         </div>
       </div>
 
-      {/* AI Recommendation */}
-      <div className="p-6 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg" data-aos="fade-up">
-        <h3 className="font-bold text-lg mb-2">💡 AI แนะนำทักษะถัดไป:</h3>
-        <p>{recommendation}</p>
+      <div className="p-8 glass-card bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20" data-aos="fade-up">
+        <h3 className="font-bold text-lg mb-2 text-indigo-600 dark:text-indigo-400">💡 AI แนะนำทักษะถัดไป:</h3>
+        <p className="text-gray-700 dark:text-gray-300">{recommendation}</p>
       </div>
     </div>
   );

@@ -1,94 +1,89 @@
 // src/utils/ai.js
+let genAI, model;
 
-export const callHuggingFace = async (model, inputs, options = {}) => {
-  const response = await fetch(
-    `https://api-inference.huggingface.co/models/${model}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inputs, ...options }),
-    }
-  );
-
-  if (!response.ok) {
-    const error = await response.json();
-    console.error("Hugging Face Error:", error);
-    throw new Error(`Hugging Face Error: ${error.error || response.statusText}`);
-  }
-
-  return await response.json();
-};
-
-// ✅ ใช้โมเดลที่ไม่ต้อง Token — สำหรับสรุปบทความ
-export const aiSummarize = async (text) => {
-  if (!text) return "ไม่มีเนื้อหาให้สรุป";
-
+// ✅ ตั้งค่า Gemini ถ้ามี API Key
+if (process.env.REACT_APP_GEMINI_API_KEY) {
   try {
-    // ✅ ใช้โมเดลที่ไม่ต้อง Token — สำหรับภาษาอังกฤษ
-    const result = await callHuggingFace(
-      "sshleifer/distilbart-cnn-12-6",
-      text.slice(0, 1024),
-      { parameters: { max_length: 50 } }
-    );
-
-    if (Array.isArray(result) && result[0]?.summary_text) {
-      return result[0].summary_text;
-    }
-
-    return "บทความนี้มีเนื้อหาที่น่าสนใจ — แนะนำให้อ่านเต็ม ๆ ครับ!";
+    const { GoogleGenerativeAI } = require("@google/generative-ai");
+    genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
+    model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    console.log("✅ Gemini API พร้อมใช้งาน");
   } catch (err) {
-    console.error("Summarize Error:", err);
-    // ✅ fallback — ไม่ใช้ AI
-    return text.split('。')[0] + "。" || text.slice(0, 100) + "...";
+    console.error("❌ โหลด @google/generative-ai ไม่ได้:", err);
+  }
+} else {
+  console.warn("⚠️ ไม่มี REACT_APP_GEMINI_API_KEY — ใช้โหมด fallback");
+}
+
+// ✅ ฟังก์ชันหลัก — ใช้ Gemini ถ้ามี — ไม่งั้นใช้ fallback
+export const aiChatResponse = async (prompt, context = "") => {
+  if (model) {
+    try {
+      const fullPrompt = `
+คุณเป็นผู้ช่วย AI ส่วนตัวของนักพัฒนา "[ชื่อคุณ]" ผู้เชี่ยวชาญด้าน React, AI และ Full Stack
+${context}
+
+ให้ตอบคำถามต่อไปนี้อย่างเป็นมิตร สั้นกระชับ ภายใน 1-2 ประโยค:
+
+"${prompt}"
+`;
+
+      const result = await model.generateContent(fullPrompt);
+      const response = result.response;
+      return response.text().trim();
+    } catch (err) {
+      console.error("❌ Gemini Error:", err);
+      return enhancedFallback(prompt);
+    }
+  } else {
+    return enhancedFallback(prompt);
   }
 };
 
-// ✅ ใช้ fallback แบบง่าย — สำหรับ Chatbot และ Recommendation
-export const aiChatResponse = async (prompt) => {
-  // ✅ ไม่ใช้ Hugging Face — ใช้ rule-based แทน
+// ✅ fallback ที่ฉลาดขึ้น — ตอบตามคำถามจริง
+const enhancedFallback = (prompt) => {
   const lowerPrompt = prompt.toLowerCase();
 
   if (lowerPrompt.includes("สวัสดี") || lowerPrompt.includes("hi") || lowerPrompt.includes("hello")) {
-    return "สวัสดีครับ! 😊 ฉันคือผู้ช่วย AI — มีอะไรให้ช่วยไหม?";
+    return "สวัสดีครับ! 😊 ผมคือผู้ช่วย AI ของ [ชื่อคุณ] — มีอะไรให้ช่วยไหม?";
   }
 
-  if (lowerPrompt.includes("ทำอะไรได้บ้าง") || lowerPrompt.includes("ความสามารถ")) {
-    return "ฉันช่วยตอบคำถามเกี่ยวกับผลงาน เทคโนโลยี และให้คำแนะนำเบื้องต้นครับ!";
-  }
-
-  if (lowerPrompt.includes("react") || lowerPrompt.includes("เรียน")) {
-    return "แนะนำเริ่มจาก React Docs + ทำโปรเจกต์เล็ก ๆ อย่าง Todo List ครับ!";
+  if (lowerPrompt.includes("น่าสนใจ") || lowerPrompt.includes("interesting") || lowerPrompt.includes("แนะนำ")) {
+    return "ลองดูผลงาน 'ระบบจัดการงานด้วย AI' — ใช้ React + OpenAI API ช่วยวิเคราะห์งานอัตโนมัติ น่าสนใจมาก!";
   }
 
   if (lowerPrompt.includes("ผลงาน") || lowerPrompt.includes("project")) {
-    return "มีผลงานหลายชิ้น เช่น ระบบจัดการงานด้วย AI และแอปจองห้องประชุมครับ!";
+    return "มีผลงานหลายชิ้น เช่น 'ระบบจัดการงานด้วย AI' และ 'แอปจองห้องประชุม' — กดดูในส่วน Portfolio ได้เลย!";
   }
 
-  return "ขอบคุณที่ถามครับ — ฉันกำลังเรียนรู้เพิ่มเติมเพื่อตอบคุณให้ดีขึ้น!";
+  if (lowerPrompt.includes("ทักษะ") || lowerPrompt.includes("skill")) {
+    return "มีทักษะหลากหลาย เช่น React, Node.js, Python — ดูรายละเอียดในส่วน Skills ได้เลย!";
+  }
+
+  if (lowerPrompt.includes("react") || lowerPrompt.includes("เรียน")) {
+    return "แนะนำเริ่มจาก React Docs + ทำโปรเจกต์เล็ก ๆ อย่าง Todo List — ฝึกบ่อย ๆ จะเก่งเอง!";
+  }
+
+  return "ขอบคุณที่ถามครับ — ผมกำลังเรียนรู้เพิ่มเติมเพื่อตอบคุณให้ดีขึ้น!";
 };
 
-// ✅ ใช้ fallback — สำหรับแนะนำทักษะ
+// ✅ สรุปบทความ
+export const aiSummarize = async (text) => {
+  if (!text) return "ไม่มีเนื้อหาให้สรุป";
+  return await aiChatResponse(`สรุปบทความต่อไปนี้เป็นภาษาไทย ไม่เกิน 3 บรรทัด:\n\n${text}`);
+};
+
+// ✅ แนะนำทักษะ
 export const aiRecommendation = async (skills) => {
-  if (!skills?.length) return "ลองเรียนรู้ TypeScript, Next.js หรือ Docker เพื่อพัฒนาทักษะขั้นสูง!";
-
-  const hasReact = skills.some(s => s.name.toLowerCase().includes("react"));
-  const hasNode = skills.some(s => s.name.toLowerCase().includes("node"));
-
-  if (hasReact && hasNode) {
-    return "แนะนำให้เรียนรู้ Next.js หรือ NestJS เพื่อพัฒนา Full Stack ขั้นสูง!";
-  }
-
-  if (hasReact) {
-    return "ลองเรียนรู้ Zustand หรือ React Query เพื่อจัดการ state ให้มีประสิทธิภาพ!";
-  }
-
-  return "ลองเรียนรู้ JavaScript ES6+ และ React เพื่อเริ่มต้นเป็นนักพัฒนาเว็บ!";
+  const skillText = skills.map(s => `${s.name}`).join(', ');
+  return await aiChatResponse(`จากทักษะ: ${skillText} — ควรเรียนรู้อะไรต่อไป? ตอบเป็นภาษาไทย ไม่เกิน 1 ประโยค`);
 };
 
-// ✅ ใช้ keyword matching — สำหรับค้นหาผลงาน
+// ✅ ค้นหาผลงาน
 export const aiSearch = async (query, projects) => {
   if (!query || !projects?.length) return projects || [];
 
+  // ใช้ fallback — keyword matching
   return projects.filter(p =>
     p.title.toLowerCase().includes(query.toLowerCase()) ||
     p.description?.toLowerCase().includes(query.toLowerCase()) ||

@@ -18,7 +18,7 @@ const ProjectCard = ({ project, onLike }) => {
   return (
     <>
       <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden cursor-pointer hover:shadow-lg transition"
+        className="glass-card pulse-on-hover overflow-hidden cursor-pointer"
         onClick={() => setModalIsOpen(true)}
         data-aos="fade-up"
       >
