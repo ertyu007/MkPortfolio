@@ -42,7 +42,7 @@ const ProjectCard = ({ project, onLike }) => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleLike();
+                handleLike(); // เรียก likeProject จริง
               }}
               className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm"
             >

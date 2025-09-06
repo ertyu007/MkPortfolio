@@ -1,23 +1,37 @@
+// src/hooks/useProjects.js
 import { useState, useEffect } from 'react';
-import { mockProjects } from '../data/projects';
+import { getProjects, likeProject } from '../utils/api';
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setProjects(mockProjects);
-    }, 300);
-    return () => clearTimeout(timer);
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects();
+        setProjects(data);
+      } catch (err) {
+        console.error("Failed to fetch projects:", err);
+        // Fallback to mock data
+        setProjects([
+          { id: 1, title: "Fallback Project", like_count: 0 }
+        ]);
+      }
+    };
+    fetchProjects();
   }, []);
 
-  const likeProject = (id) => {
-    setProjects(prev =>
-      prev.map(p =>
-        p.id === id ? { ...p, like_count: (p.like_count || 0) + 1 } : p
-      )
-    );
+  const likeProjectById = async (id) => {
+    try {
+      const { like_count } = await likeProject(id);
+      setProjects(prev =>
+        prev.map(p => p.id === id ? { ...p, like_count } : p)
+      );
+    } catch (err) {
+      console.error("Like failed:", err);
+      alert("ไม่สามารถกด Like ได้ในขณะนี้");
+    }
   };
 
-  return { projects, likeProject };
+  return { projects, likeProject: likeProjectById };
 };

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/components/CertificateCard.jsx
+import React from 'react'; // ✅ ลบ ", { useState }" ออก
 import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
