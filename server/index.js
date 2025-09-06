@@ -62,7 +62,26 @@ app.post('/api/projects/:id/like', async (req, res) => {
   }
 });
 
+// ✅ API: Dislike project
+app.post('/api/projects/:id/dislike', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'UPDATE projects SET dislike_count = COALESCE(dislike_count, 0) + 1 WHERE id = $1 RETURNING dislike_count',
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+    res.json({ dislike_count: result.rows[0].dislike_count });
+  } catch (err) {
+    console.error("Dislike Error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

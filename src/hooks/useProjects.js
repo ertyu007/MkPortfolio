@@ -1,21 +1,28 @@
-// src/hooks/useProjects.js
 import { useState, useEffect } from 'react';
-import { getProjects, likeProject } from '../utils/api';
+import { getProjects, likeProject, dislikeProject } from '../utils/api';
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        setLoading(true);
         const data = await getProjects();
-        setProjects(data);
+        // ✅ เพิ่ม dislike_count ถ้ายังไม่มี
+        const projectsWithDislike = data.map(p => ({
+          ...p,
+          dislike_count: p.dislike_count || 0
+        }));
+        setProjects(projectsWithDislike);
       } catch (err) {
         console.error("Failed to fetch projects:", err);
-        // Fallback to mock data
         setProjects([
-          { id: 1, title: "Fallback Project", like_count: 0 }
+          { id: 1, title: "Fallback Project", like_count: 0, dislike_count: 0 }
         ]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProjects();
@@ -33,5 +40,17 @@ export const useProjects = () => {
     }
   };
 
-  return { projects, likeProject: likeProjectById };
+  const dislikeProjectById = async (id) => {
+    try {
+      const { dislike_count } = await dislikeProject(id);
+      setProjects(prev =>
+        prev.map(p => p.id === id ? { ...p, dislike_count } : p)
+      );
+    } catch (err) {
+      console.error("Dislike failed:", err);
+      alert("ไม่สามารถกด Dislike ได้ในขณะนี้");
+    }
+  };
+
+  return { projects, likeProject: likeProjectById, dislikeProject: dislikeProjectById, loading };
 };

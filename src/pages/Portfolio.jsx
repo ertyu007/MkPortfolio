@@ -1,86 +1,89 @@
-import React, { useState, useEffect, useCallback } from 'react'; // ✅ เพิ่ม useCallback
+import React, { useState, useEffect, useCallback } from 'react';
 import { useProjects } from '../hooks/useProjects';
-import { aiSearch } from '../utils/ai';
 import ProjectCard from '../components/ProjectCard';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { motion } from 'framer-motion';
 
 const Portfolio = () => {
-  const { projects, likeProject } = useProjects();
+  const { projects, likeProject, dislikeProject, loading } = useProjects();
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
-  const [isAISearch, setIsAISearch] = useState(false);
 
   useEffect(() => {
     setFiltered(projects);
   }, [projects]);
 
-  // ✅ ห่อ handleSearch ด้วย useCallback — เพื่อควบคุม dependencies
-  const handleSearch = useCallback(async () => {
+  const handleSearch = useCallback(() => {
     if (!search.trim()) {
       setFiltered(projects);
       return;
     }
 
-    if (isAISearch) {
-      try {
-        const results = await aiSearch(search, projects);
-        setFiltered(results);
-      } catch (err) {
-        console.error("AI Search Error:", err);
-        setFiltered(projects);
-      }
-    } else {
-      const results = projects.filter(p =>
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
-      );
-      setFiltered(results);
-    }
-  }, [search, isAISearch, projects]); // ✅ dependencies ครบ
+    const results = projects.filter(p =>
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.description?.toLowerCase().includes(search.toLowerCase()) ||
+      p.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
+    );
+    setFiltered(results);
+  }, [search, projects]);
 
-  // ✅ useEffect ที่เรียก handleSearch — dependencies ครบ
   useEffect(() => {
     handleSearch();
-  }, [handleSearch]); // ✅ ใส่ handleSearch เป็น dependency
+  }, [handleSearch]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8 text-center">ผลงานของฉัน</h1>
+    <div className="max-w-6xl mx-auto px-6 py-20">
+      <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-8 text-center">
+        ผลงานของฉัน
+      </h1>
 
-      <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
+      {/* Search Bar */}
+      <div className="mb-12 flex flex-col sm:flex-row gap-4 items-center justify-center">
         <input
           type="text"
           placeholder="ค้นหาผลงาน..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-4 py-2 border rounded-lg w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
         />
         <button
-          onClick={() => setIsAISearch(!isAISearch)}
-          className={`px-4 py-2 rounded-lg ${isAISearch ? 'bg-indigo-600 text-white' : 'bg-gray-200'}`}
-        >
-          {isAISearch ? 'AI Search (ON)' : 'Keyword Search'}
-        </button>
-        <button
           onClick={handleSearch}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-full hover:shadow-lg transition-all duration-300"
         >
           ค้นหา
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filtered.map(project => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            onLike={() => likeProject(project.id)}
-          />
-        ))}
-      </div>
-
-      <ToastContainer />
+      {/* Loading Animation */}
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+      ) : (
+        <>
+          {filtered.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filtered.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <ProjectCard
+                    project={project}
+                    onLike={() => likeProject(project.id)}
+                    onDislike={() => dislikeProject(project.id)}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">ไม่พบผลงานที่ตรงกับคำค้นหา</p>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
