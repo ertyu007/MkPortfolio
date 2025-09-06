@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // ✅ เพิ่ม useMemo
 import { TagCloud } from 'react-tagcloud';
 import { aiRecommendation } from '../utils/ai';
 
 const Skills = () => {
-  // ✅ ประกาศ skills นอก useEffect — เพื่อใช้เป็น dependency
-  const skills = [
+  // ✅ ใช้ useMemo — เพื่อให้ skills มี reference เดิมถ้าไม่มีการเปลี่ยนแปลง
+  const skills = useMemo(() => [
     { name: "JavaScript", level: 90 },
     { name: "React", level: 85 },
     { name: "Node.js", level: 75 },
@@ -12,7 +12,7 @@ const Skills = () => {
     { name: "PostgreSQL", level: 70 },
     { name: "Tailwind CSS", level: 85 },
     { name: "AI/ML", level: 60 },
-  ];
+  ], []); // ✅ dependencies ว่าง — สร้างแค่ครั้งเดียว
 
   const [recommendation, setRecommendation] = useState("กำลังวิเคราะห์ทักษะของคุณ...");
 
@@ -30,7 +30,7 @@ const Skills = () => {
       }
     };
     fetchRecommendation();
-  }, [skills]); // ✅ เพิ่ม skills เป็น dependency
+  }, [skills]); // ✅ ตอนนี้ปลอดภัย — skills ไม่เปลี่ยนทุก render
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
