@@ -3,6 +3,7 @@ import { TagCloud } from 'react-tagcloud';
 import { aiRecommendation } from '../utils/ai';
 
 const Skills = () => {
+  // ✅ ประกาศ skills นอก useEffect — เพื่อใช้เป็น dependency
   const skills = [
     { name: "JavaScript", level: 90 },
     { name: "React", level: 85 },
@@ -25,12 +26,11 @@ const Skills = () => {
         setRecommendation(rec);
       } catch (err) {
         console.error("AI Recommendation Error:", err);
-        // ✅ fallback ที่ดูดี
         setRecommendation("ลองเรียนรู้ TypeScript, Next.js หรือ Docker เพื่อพัฒนาทักษะขั้นสูง!");
       }
     };
     fetchRecommendation();
-  }, []);
+  }, [skills]); // ✅ เพิ่ม skills เป็น dependency
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // ✅ เพิ่ม useCallback
 import { useProjects } from '../hooks/useProjects';
 import { aiSearch } from '../utils/ai';
 import ProjectCard from '../components/ProjectCard';
@@ -15,6 +15,7 @@ const Portfolio = () => {
     setFiltered(projects);
   }, [projects]);
 
+  // ✅ ห่อ handleSearch ด้วย useCallback — เพื่อควบคุม dependencies
   const handleSearch = useCallback(async () => {
     if (!search.trim()) {
       setFiltered(projects);
@@ -38,13 +39,10 @@ const Portfolio = () => {
     }
   }, [search, isAISearch, projects]); // ✅ dependencies ครบ
 
+  // ✅ useEffect ที่เรียก handleSearch — dependencies ครบ
   useEffect(() => {
     handleSearch();
-  }, [handleSearch]); // ✅ ใส่ handleSearch ใน dependency array
-
-  useEffect(() => {
-    handleSearch();
-  }, [search, isAISearch, projects]);
+  }, [handleSearch]); // ✅ ใส่ handleSearch เป็น dependency
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
