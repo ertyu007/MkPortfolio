@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useProjects } from '../hooks/useProjects';
 import { aiChatResponse } from '../utils/ai';
+import { initializeEmbeddings } from '../utils/embedding'; // ✅ Import แล้ว
 
 const AIChatbot = () => {
   const [input, setInput] = useState('');
@@ -9,22 +10,28 @@ const AIChatbot = () => {
   const [hasGreeted, setHasGreeted] = useState(false);
   const { projects } = useProjects();
 
-  // ✅ ทักทายอัตโนมัติ
+  // ✅ สร้าง embeddings ครั้งแรก
   useEffect(() => {
-    if (!hasGreeted) {
-      setIsOpen(true);
-      setMessages([{
-        text: "สวัสดี! 😊 ผมคือผู้ช่วย AI ของ Thanaphat — ถามอะไรก็ได้นะ!",
-        sender: 'bot'
-      }]);
-      setHasGreeted(true);
+    const initEmbeddings = async () => {
+      const storedEmbeddings = localStorage.getItem('embeddings');
+      if (!storedEmbeddings && projects.length > 0) {
+        // ✅ สร้างข้อมูล skills — ตรงกับ Skills.jsx
+        const skills = [
+          { name: "JavaScript", level: 90 },
+          { name: "React", level: 85 },
+          { name: "Node.js", level: 75 },
+          { name: "Python", level: 80 },
+          { name: "PostgreSQL", level: 70 },
+          { name: "Tailwind CSS", level: 85 },
+          { name: "AI/ML", level: 60 },
+        ];
 
-      const timer = setTimeout(() => {
-        setIsOpen(false);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [hasGreeted]);
+        // ✅ เรียก initializeEmbeddings — พร้อมส่ง projects, skills, []
+        await initializeEmbeddings(projects, skills, []);
+      }
+    };
+    initEmbeddings();
+  }, [projects]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,18 +40,13 @@ const AIChatbot = () => {
     const userMessage = { text: input, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
 
-    // ✅ ส่ง context จริง — รายชื่อผลงาน
-    const projectContext = projects?.length > 0
-      ? `มีผลงานเหล่านี้: ${projects.map(p => `"${p.title}"`).join(', ')}`
-      : 'ยังไม่มีผลงาน';
-
     try {
-      const response = await aiChatResponse(input, projectContext);
+      const response = await aiChatResponse(input, projects);
       setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
     } catch (err) {
       console.error("AI Chatbot Error:", err);
       setMessages(prev => [...prev, {
-        text: `ขอโทษครับ — ระบบขัดข้องชั่วคราว กรุณาลองใหม่อีกครั้ง`,
+        text: "ขอโทษครับ — ระบบขัดข้องชั่วคราว",
         sender: 'bot'
       }]);
     }
