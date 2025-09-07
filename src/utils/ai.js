@@ -6,8 +6,12 @@ export const callHuggingFace = async (model, inputs, options = {}) => {
     `https://api-inference.huggingface.co/models/${model}`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.HF_API_KEY}` // ✅ ต้องใส่ token
+      },
       body: JSON.stringify({ inputs, ...options }),
+
     }
   );
 
