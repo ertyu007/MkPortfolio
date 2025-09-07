@@ -10,6 +10,7 @@ export const useProjects = () => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
+        console.log('📥 Fetching projects from API...');
         const data = await getProjects();
         
         // ✅ ดึงสถานะ Like/Dislike จาก localStorage
@@ -17,14 +18,17 @@ export const useProjects = () => {
           const saved = localStorage.getItem(`project_${p.id}`);
           if (saved) {
             const { isLiked, isDisliked } = JSON.parse(saved);
+            console.log(`💾 Loaded state for project ${p.id}:`, { isLiked, isDisliked });
             return { ...p, isLiked: isLiked || false, isDisliked: isDisliked || false };
           }
+          console.log(`🆕 New project ${p.id}: default state`);
           return { ...p, isLiked: false, isDisliked: false };
         });
         
         setProjects(enhancedProjects);
+        console.log('✅ Projects loaded:', enhancedProjects);
       } catch (err) {
-        console.error("Failed to fetch projects:", err);
+        console.error("❌ Failed to fetch projects:", err);
         // Fallback
         setProjects([
           { 
@@ -46,11 +50,13 @@ export const useProjects = () => {
     fetchProjects();
   }, []);
 
-  // ✅ Like Project
+  // ✅ Like Project — พร้อม console.log
   const likeProjectById = async (id, isLike) => {
     try {
+      console.log('🚀 Like project:', { id, isLike });
       const action = isLike ? 'like' : 'unlike';
       const { like_count } = await likeProject(id, action);
+      console.log('✅ Like API response:', { like_count });
 
       setProjects(prev => {
         const updatedProjects = prev.map(p => {
@@ -58,6 +64,7 @@ export const useProjects = () => {
             let updated = { ...p, like_count, isLiked: isLike };
             // ✅ ถ้า Like — ต้องยกเลิก Dislike
             if (isLike) {
+              console.log('🔄 Auto-unlike Dislike');
               updated = { ...updated, isDisliked: false };
             }
             // ✅ บันทึกสถานะลง localStorage
@@ -65,23 +72,27 @@ export const useProjects = () => {
               isLiked: updated.isLiked, 
               isDisliked: updated.isDisliked 
             }));
+            console.log('💾 Saved state:', { id, isLiked: updated.isLiked, isDisliked: updated.isDisliked });
             return updated;
           }
           return p;
         });
+        console.log('✅ Projects updated after like:', updatedProjects);
         return updatedProjects;
       });
     } catch (err) {
-      console.error("Like toggle failed:", err);
+      console.error("❌ Like toggle failed:", err);
       alert("ไม่สามารถกด Like ได้ในขณะนี้");
     }
   };
 
-  // ✅ Dislike Project
+  // ✅ Dislike Project — พร้อม console.log
   const dislikeProjectById = async (id, isDislike) => {
     try {
+      console.log('🚀 Dislike project:', { id, isDislike });
       const action = isDislike ? 'dislike' : 'undislike';
       const { dislike_count } = await dislikeProject(id, action);
+      console.log('✅ Dislike API response:', { dislike_count });
 
       setProjects(prev => {
         const updatedProjects = prev.map(p => {
@@ -89,6 +100,7 @@ export const useProjects = () => {
             let updated = { ...p, dislike_count, isDisliked: isDislike };
             // ✅ ถ้า Dislike — ต้องยกเลิก Like
             if (isDislike) {
+              console.log('🔄 Auto-unlike Like');
               updated = { ...updated, isLiked: false };
             }
             // ✅ บันทึกสถานะลง localStorage
@@ -96,14 +108,16 @@ export const useProjects = () => {
               isLiked: updated.isLiked, 
               isDisliked: updated.isDisliked 
             }));
+            console.log('💾 Saved state:', { id, isLiked: updated.isLiked, isDisliked: updated.isDisliked });
             return updated;
           }
           return p;
         });
+        console.log('✅ Projects updated after dislike:', updatedProjects);
         return updatedProjects;
       });
     } catch (err) {
-      console.error("Dislike toggle failed:", err);
+      console.error("❌ Dislike toggle failed:", err);
       alert("ไม่สามารถกด Dislike ได้ในขณะนี้");
     }
   };

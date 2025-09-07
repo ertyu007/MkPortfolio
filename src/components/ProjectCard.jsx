@@ -8,24 +8,40 @@ Modal.setAppElement('#root');
 const ProjectCard = ({ project, onLike, onDislike }) => {
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
-  // ✅ ฟังก์ชัน Like — ยกเลิก Dislike ถ้ามี
+  // ✅ ฟังก์ชัน Like — พร้อม console.log
   const handleLike = () => {
+    console.log('❤️ Like clicked:', { 
+      projectId: project.id, 
+      currentIsLiked: project.isLiked, 
+      currentIsDisliked: project.isDisliked 
+    });
+
     if (project.isDisliked) {
-      // ถ้าเคย Dislike → ยกเลิก Dislike ก่อน
+      console.log('🔄 Auto-unlike Dislike first');
       onDislike(project.id, false);
     }
-    // สลับสถานะ Like
-    onLike(project.id, !project.isLiked);
+    
+    const newIsLiked = !project.isLiked;
+    console.log('✅ Setting like:', { id: project.id, isLiked: newIsLiked });
+    onLike(project.id, newIsLiked);
   };
 
-  // ✅ ฟังก์ชัน Dislike — ยกเลิก Like ถ้ามี
+  // ✅ ฟังก์ชัน Dislike — พร้อม console.log
   const handleDislike = () => {
+    console.log('👎 Dislike clicked:', { 
+      projectId: project.id, 
+      currentIsLiked: project.isLiked, 
+      currentIsDisliked: project.isDisliked 
+    });
+
     if (project.isLiked) {
-      // ถ้าเคย Like → ยกเลิก Like ก่อน
+      console.log('🔄 Auto-unlike Like first');
       onLike(project.id, false);
     }
-    // สลับสถานะ Dislike
-    onDislike(project.id, !project.isDisliked);
+    
+    const newIsDisliked = !project.isDisliked;
+    console.log('✅ Setting dislike:', { id: project.id, isDisliked: newIsDisliked });
+    onDislike(project.id, newIsDisliked);
   };
 
   return (
