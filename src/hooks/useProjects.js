@@ -31,19 +31,12 @@ export const useProjects = () => {
     fetchProjects();
   }, []);
 
+  // ✅ ใน useProjects.js
   const likeProjectById = async (id, isLike) => {
     try {
-      if (isLike) {
-        await likeProject(id, 'like');
-      } else {
-        await likeProject(id, 'unlike');
-      }
+      const { like_count } = await likeProject(id, isLike ? 'like' : 'unlike');
       setProjects(prev =>
-        prev.map(p =>
-          p.id === id
-            ? { ...p, isLiked: isLike, like_count: isLike ? p.like_count + 1 : p.like_count - 1 }
-            : p
-        )
+        prev.map(p => p.id === id ? { ...p, like_count, isLiked: isLike } : p)
       );
     } catch (err) {
       console.error("Like toggle failed:", err);
@@ -52,17 +45,9 @@ export const useProjects = () => {
 
   const dislikeProjectById = async (id, isDislike) => {
     try {
-      if (isDislike) {
-        await dislikeProject(id, 'dislike');
-      } else {
-        await dislikeProject(id, 'undislike');
-      }
+      const { dislike_count } = await dislikeProject(id, isDislike ? 'dislike' : 'undislike');
       setProjects(prev =>
-        prev.map(p =>
-          p.id === id
-            ? { ...p, isDisliked: isDislike, dislike_count: isDislike ? p.dislike_count + 1 : p.dislike_count - 1 }
-            : p
-        )
+        prev.map(p => p.id === id ? { ...p, dislike_count, isDisliked: isDislike } : p)
       );
     } catch (err) {
       console.error("Dislike toggle failed:", err);

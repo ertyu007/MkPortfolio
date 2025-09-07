@@ -27,7 +27,7 @@ app.get('/api/projects', async (req, res) => {
   }
 });
 
-// API: Like project
+// ✅ API: Like project
 app.post('/api/projects/:id/like', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
@@ -45,7 +45,7 @@ app.post('/api/projects/:id/like', async (req, res) => {
         [id]
       );
     } else {
-      return res.status(400).json({ error: "Invalid action. Use 'like' or 'unlike'" });
+      return res.status(400).json({ error: "Invalid action" });
     }
 
     if (result.rows.length === 0) {
@@ -58,7 +58,7 @@ app.post('/api/projects/:id/like', async (req, res) => {
   }
 });
 
-// ✅ API: Dislike project — เพิ่มหลังจาก endpoint /like
+// ✅ API: Dislike project
 app.post('/api/projects/:id/dislike', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
@@ -76,7 +76,7 @@ app.post('/api/projects/:id/dislike', async (req, res) => {
         [id]
       );
     } else {
-      return res.status(400).json({ error: "Invalid action. Use 'dislike' or 'undislike'" });
+      return res.status(400).json({ error: "Invalid action" });
     }
 
     if (result.rows.length === 0) {

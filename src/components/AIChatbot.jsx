@@ -119,6 +119,7 @@ const AIChatbot = () => {
   };
 
   // ✅ ระบบ Like/Dislike
+  // ✅ แก้ handleReaction — ให้เพิ่มค่าเมื่อกดครั้งแรก
   const handleReaction = (index, reactionType) => {
     setMessages(prev => prev.map((msg, i) => {
       if (i !== index || msg.sender !== 'bot') return msg;
@@ -128,8 +129,10 @@ const AIChatbot = () => {
 
       if (reactionType === 'like') {
         if (current.userLiked) {
+          // ✅ กดซ้ำ — ยกเลิก Like — ลดค่า
           newReactions = { ...newReactions, like: Math.max(0, current.like - 1), userLiked: false };
         } else {
+          // ✅ กดครั้งแรก — เพิ่ม Like — ยกเลิก Dislike ถ้ามี
           newReactions = { ...newReactions, like: current.like + 1, userLiked: true };
           if (current.userDisliked) {
             newReactions = { ...newReactions, dislike: Math.max(0, current.dislike - 1), userDisliked: false };
@@ -137,8 +140,10 @@ const AIChatbot = () => {
         }
       } else if (reactionType === 'dislike') {
         if (current.userDisliked) {
+          // ✅ กดซ้ำ — ยกเลิก Dislike — ลดค่า
           newReactions = { ...newReactions, dislike: Math.max(0, current.dislike - 1), userDisliked: false };
         } else {
+          // ✅ กดครั้งแรก — เพิ่ม Dislike — ยกเลิก Like ถ้ามี
           newReactions = { ...newReactions, dislike: current.dislike + 1, userDisliked: true };
           if (current.userLiked) {
             newReactions = { ...newReactions, like: Math.max(0, current.like - 1), userLiked: false };
