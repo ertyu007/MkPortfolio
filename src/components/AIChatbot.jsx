@@ -11,7 +11,7 @@ const AIChatbot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const messagesEndRef = useRef(null);
-  const { projects } = useProjects();
+  const { likeProject, dislikeProject } = useProjects(); // ← ใช้เฉพาะ like/dislike
 
   // ✅ Auto-scroll
   useEffect(() => {
@@ -171,8 +171,8 @@ const AIChatbot = () => {
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xs p-4 rounded-3xl ${msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-none shadow-lg'
-                    : 'bg-white/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 rounded-bl-none shadow-sm backdrop-blur-sm'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-none shadow-lg'
+                  : 'bg-white/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 rounded-bl-none shadow-sm backdrop-blur-sm'
                   }`}>
                   <p className="text-sm leading-relaxed">{msg.text}</p>
                   {msg.sender === 'bot' && msg.type !== 'system' && (

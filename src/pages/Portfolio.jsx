@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useProjects } from '../hooks/useProjects';
 import ProjectCard from '../components/ProjectCard';
 import { motion } from 'framer-motion';

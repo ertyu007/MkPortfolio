@@ -343,15 +343,6 @@ const getRandomPurpose = () => {
   return purposes[Math.floor(Math.random() * purposes.length)];
 };
 
-const getRandomSolution = () => {
-  const solutions = [
-    "ใช้ caching", "ปรับโครงสร้าง database", "เพิ่มการทดสอบ", "ใช้ design pattern ที่เหมาะสม",
-    "optimize code", "เพิ่ม server resources", "ใช้ load balancer", "implement retry mechanism",
-    "refactor codebase", "add monitoring", "improve error handling", "use better algorithms"
-  ];
-  return solutions[Math.floor(Math.random() * solutions.length)];
-};
-
 const getRandomMotivation = () => {
   const motivations = [
     "อยากแก้ปัญหาให้ผู้ใช้งาน", "สนใจเทคโนโลยีนี้มานาน", "เห็นโอกาสในการพัฒนา",
@@ -388,15 +379,6 @@ const getRandomLesson = () => {
   return lessons[Math.floor(Math.random() * lessons.length)];
 };
 
-const getRandomResource = () => {
-  const resources = [
-    "เอกสารทางการ", "คอร์สออนไลน์", "YouTube Tutorial", "หนังสือเล่มนี้",
-    "Workshop ที่เคยเข้าร่วม", "blog ของ expert", "documentation", "community forum",
-    "official documentation", "online courses", "coding bootcamps", "mentorship programs"
-  ];
-  return resources[Math.floor(Math.random() * resources.length)];
-};
-
 const getRandomProject = () => {
   const projects = [
     "Todo List", "Weather App", "Chat Application", "E-commerce Site",
@@ -422,15 +404,6 @@ const getRandomField = () => {
     "web development", "data science", "cloud computing", "mobile apps"
   ];
   return fields[Math.floor(Math.random() * fields.length)];
-};
-
-const getRandomOutcome = () => {
-  const outcomes = [
-    "ลดเวลาในการทำงานลง 70%", "เพิ่มประสิทธิภาพ 90%", "ลด bug ลง 80%",
-    "เพิ่มความพึงพอใจของผู้ใช้", "ลดต้นทุน 50%", "เพิ่ม revenue 30%", "ได้รับรางวัล",
-    "improved performance by 200%", "increased user engagement by 150%", "reduced costs by 40%"
-  ];
-  return outcomes[Math.floor(Math.random() * outcomes.length)];
 };
 
 const getRandomImpact = () => {
