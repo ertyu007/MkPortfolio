@@ -7,28 +7,20 @@ Modal.setAppElement('#root');
 
 const ProjectCard = ({ project, onLike, onDislike }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [isLiked, setIsLiked] = useState(project.isLiked || false);
-  const [isDisliked, setIsDisliked] = useState(project.isDisliked || false);
 
-  const handleLike = () => {
-    if (!isLiked) {
-      setIsLiked(true);
-      setIsDisliked(false);
-      onLike(project.id, true);
-    } else {
-      setIsLiked(false);
-      onLike(project.id, false);
+  const handleLike = async () => {
+    try {
+      await onLike(project.id);
+    } catch (err) {
+      console.error("Like failed:", err);
     }
   };
 
-  const handleDislike = () => {
-    if (!isDisliked) {
-      setIsDisliked(true);
-      setIsLiked(false);
-      onDislike(project.id, true);
-    } else {
-      setIsDisliked(false);
-      onDislike(project.id, false);
+  const handleDislike = async () => {
+    try {
+      await onDislike(project.id);
+    } catch (err) {
+      console.error("Dislike failed:", err);
     }
   };
 
@@ -71,12 +63,12 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
                 handleLike();
               }}
               className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-300 ${
-                isLiked
+                project.isLiked
                   ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
               }`}
             >
-              <FaThumbsUp className={`text-sm ${isLiked ? 'text-blue-600 dark:text-blue-400' : ''}`} />
+              <FaThumbsUp className={`text-sm ${project.isLiked ? 'text-blue-600 dark:text-blue-400' : ''}`} />
               <span className="text-sm font-medium">{project.like_count || 0}</span>
             </motion.button>
 
@@ -87,12 +79,12 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
                 handleDislike();
               }}
               className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-300 ${
-                isDisliked
+                project.isDisliked
                   ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
               }`}
             >
-              <FaThumbsDown className={`text-sm ${isDisliked ? 'text-red-600 dark:text-red-400' : ''}`} />
+              <FaThumbsDown className={`text-sm ${project.isDisliked ? 'text-red-600 dark:text-red-400' : ''}`} />
               <span className="text-sm font-medium">{project.dislike_count || 0}</span>
             </motion.button>
           </div>
@@ -126,7 +118,7 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
             whileTap={{ scale: 0.95 }}
             onClick={handleLike}
             className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
-              isLiked
+              project.isLiked
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
             }`}
@@ -138,7 +130,7 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
             whileTap={{ scale: 0.95 }}
             onClick={handleDislike}
             className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
-              isDisliked
+              project.isDisliked
                 ? 'bg-red-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
             }`}

@@ -10,50 +10,27 @@ if (!API_BASE) {
 
 // ฟังก์ชันดึง Projects
 export const getProjects = async () => {
-  if (!API_BASE) {
-    // ✅ mock data เวลา dev หรือ .env ไม่ถูกตั้งค่า
-    return [
-      { id: 1, title: "Demo Project", description: "This is mock project data", likes: 10, dislikes: 0 },
-      { id: 2, title: "Portfolio Website", description: "React + Tailwind + API", likes: 20, dislikes: 1 },
-    ];
-  }
-
-  const url = `${API_BASE}/api/projects`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch projects: ${res.status} ${res.statusText}`);
+  const res = await fetch(`${API_BASE}/api/projects`);
+  if (!res.ok) throw new Error("Failed to fetch projects");
   return res.json();
 };
 
-// ฟังก์ชันกด Like
 export const likeProject = async (id, action) => {
-  if (!API_BASE) {
-    console.warn("⚠️ likeProject เรียกในโหมด mock → จะไม่ส่งจริง");
-    return { success: true, id, action };
-  }
-
-  const url = `${API_BASE}/api/projects/${id}/like`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const res = await fetch(`${API_BASE}/api/projects/${id}/like`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action }),
   });
-  if (!res.ok) throw new Error(`Failed to like project: ${res.status} ${res.statusText}`);
+  if (!res.ok) throw new Error("Failed to like project");
   return res.json();
 };
 
-// ฟังก์ชันกด Dislike
 export const dislikeProject = async (id, action) => {
-  if (!API_BASE) {
-    console.warn("⚠️ dislikeProject เรียกในโหมด mock → จะไม่ส่งจริง");
-    return { success: true, id, action };
-  }
-
-  const url = `${API_BASE}/api/projects/${id}/dislike`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const res = await fetch(`${API_BASE}/api/projects/${id}/dislike`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action }),
   });
-  if (!res.ok) throw new Error(`Failed to dislike project: ${res.status} ${res.statusText}`);
+  if (!res.ok) throw new Error("Failed to dislike project");
   return res.json();
 };

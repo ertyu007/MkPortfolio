@@ -54,6 +54,7 @@ app.post('/api/projects/:id/like', async (req, res) => {
   }
 });
 
+// ✅ API: Dislike project
 app.post('/api/projects/:id/dislike', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
