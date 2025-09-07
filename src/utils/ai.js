@@ -1,4 +1,5 @@
 // src/utils/ai.js
+
 import axios from 'axios';
 
 // ✅ ตั้งค่า DeepSeek API
