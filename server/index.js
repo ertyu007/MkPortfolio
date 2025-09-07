@@ -14,23 +14,6 @@ const pool = new Pool({
   },
 });
 
-async function createTable() {
-  const query = `
-    CREATE TABLE IF NOT EXISTS projects (
-      id SERIAL PRIMARY KEY,
-      title VARCHAR(255) NOT NULL,
-      description TEXT,
-      tags TEXT[],
-      like_count INTEGER DEFAULT 0,
-      dislike_count INTEGER DEFAULT 0,
-      image_url TEXT
-    );
-  `;
-  await pool.query(query);
-  console.log("✅ Table 'projects' is ready");
-}
-createTable();
-
 app.get('/api/projects', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM projects ORDER BY id ASC');
