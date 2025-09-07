@@ -1,33 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { motion } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 
 Modal.setAppElement('#root');
 
-const ProjectCard = ({ project, onLike, onDislike }) => {
+const ProjectCard = ({ project, onLike, onDislike, openModal = false, onModalClose }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(project.isLiked || false);
   const [isDisliked, setIsDisliked] = useState(project.isDisliked || false);
 
+  // ✅ เปิด Modal จากภายนอก
+  useEffect(() => {
+    if (openModal) {
+      setModalIsOpen(true);
+    }
+  }, [openModal]);
+
   const handleLike = () => {
     if (isDisliked) {
-      // ถ้าเคย Dislike → ต้องยกเลิก Dislike ก่อน
       setIsDisliked(false);
-      onDislike(project.id, false); // ส่ง false = ยกเลิก
+      onDislike(project.id, false);
     }
     setIsLiked(!isLiked);
-    onLike(project.id, !isLiked); // ส่ง true/false = like/unlike
+    onLike(project.id, !isLiked);
   };
 
   const handleDislike = () => {
     if (isLiked) {
-      // ถ้าเคย Like → ต้องยกเลิก Like ก่อน
       setIsLiked(false);
       onLike(project.id, false);
     }
     setIsDisliked(!isDisliked);
     onDislike(project.id, !isDisliked);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+    if (onModalClose) onModalClose();
   };
 
   return (
@@ -37,16 +47,15 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
         onClick={() => setModalIsOpen(true)}
         data-aos="fade-up"
       >
-        {/* Thumbnail */}
         <div className="relative overflow-hidden">
           <img
             src={project.image || "https://via.placeholder.com/400x200?text=Project"}
             alt={project.title}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           />
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
         </div>
 
-        {/* Content */}
         <div className="p-4">
           <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
             {project.title}
@@ -55,56 +64,58 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
             {project.description}
           </p>
 
-          {/* Like/Dislike Buttons - YouTube Style */}
-          <div className="mt-4 flex items-center space-x-2">
-            {/* Like Button */}
+          <div className="mt-3 flex flex-wrap gap-1">
+            {project.tags?.slice(0, 3).map((tag, i) => (
+              <span key={i} className="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-xs text-indigo-800 dark:text-indigo-300 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-4 flex items-center space-x-3">
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
                 e.stopPropagation();
                 handleLike();
               }}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-200 ${
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-300 ${
                 isLiked
-                  ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
+                  ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
               }`}
-              title={isLiked ? "Unlike" : "Like"}
             >
-              <FaThumbsUp className="text-sm" />
+              <FaThumbsUp className={`text-sm ${isLiked ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
               <span className="text-sm font-medium">{project.like_count || 0}</span>
             </motion.button>
 
-            {/* Dislike Button */}
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
                 e.stopPropagation();
                 handleDislike();
               }}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-200 ${
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-300 ${
                 isDisliked
                   ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
               }`}
-              title={isDisliked ? "Remove Dislike" : "Dislike"}
             >
-              <FaThumbsDown className="text-sm" />
+              <FaThumbsDown className={`text-sm ${isDisliked ? 'text-red-600 dark:text-red-400' : ''}`} />
               <span className="text-sm font-medium">{project.dislike_count || 0}</span>
             </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Modal - เหมือนเดิม */}
       <Modal
         isOpen={modalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
+        onRequestClose={closeModal}
         className="fixed inset-4 bg-white dark:bg-gray-900 p-6 rounded-lg max-w-4xl mx-auto mt-20 shadow-lg overflow-auto max-h-[90vh] z-50"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50"
       >
         <button
-          onClick={() => setModalIsOpen(false)}
+          onClick={closeModal}
           className="float-right text-2xl font-bold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
           &times;
@@ -123,25 +134,25 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleLike}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
               isLiked
-                ? 'bg-blue-600 text-white'
+                ? 'bg-indigo-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            <FaThumbsUp className="text-sm" />
+            <FaThumbsUp className={`text-sm ${isLiked ? 'text-white' : ''}`} />
             <span className="font-medium">{project.like_count || 0} Likes</span>
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleDislike}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
               isDisliked
                 ? 'bg-red-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            <FaThumbsDown className="text-sm" />
+            <FaThumbsDown className={`text-sm ${isDisliked ? 'text-white' : ''}`} />
             <span className="font-medium">{project.dislike_count || 0} Dislikes</span>
           </motion.button>
         </div>

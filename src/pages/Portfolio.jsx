@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useProjects } from '../hooks/useProjects';
-import { aiSearch } from '../utils/ai';
 import ProjectCard from '../components/ProjectCard';
 import { motion } from 'framer-motion';
 
@@ -8,40 +7,41 @@ const Portfolio = () => {
   const { projects, likeProject, dislikeProject, loading } = useProjects();
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
+  const [modalProject, setModalProject] = useState(null);
+
+  // ✅ รับ event จาก AI Chatbot
+  useEffect(() => {
+    const handleOpenModal = (e) => {
+      setModalProject(e.detail);
+    };
+    window.addEventListener('openProjectModal', handleOpenModal);
+    return () => window.removeEventListener('openProjectModal', handleOpenModal);
+  }, []);
 
   useEffect(() => {
     setFiltered(projects);
   }, [projects]);
 
-  const handleSearch = useCallback(async () => {
+  const handleSearch = useCallback(() => {
     if (!search.trim()) {
       setFiltered(projects);
       return;
     }
 
-    try {
-      const results = await aiSearch(search, projects);
-      setFiltered(results);
-    } catch (err) {
-      console.warn("AI Search failed, using keyword search:", err);
-      const keywordResults = projects.filter(p =>
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.description?.toLowerCase().includes(search.toLowerCase()) ||
-        p.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
-      );
-      setFiltered(keywordResults);
-    }
+    const results = projects.filter(p =>
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.description?.toLowerCase().includes(search.toLowerCase()) ||
+      p.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
+    );
+    setFiltered(results);
   }, [search, projects]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      handleSearch();
-    }, 300);
-    return () => clearTimeout(timer);
+    handleSearch();
   }, [handleSearch]);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-20">
+    <div id="portfolio" className="max-w-6xl mx-auto px-6 py-20">
       <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-8 text-center">
         ผลงานของฉัน
       </h1>
@@ -49,11 +49,17 @@ const Portfolio = () => {
       <div className="mb-12 flex flex-col sm:flex-row gap-4 items-center justify-center">
         <input
           type="text"
-          placeholder="ค้นหาผลงาน... (พิมพ์อะไรก็ได้)"
+          placeholder="ค้นหาผลงาน..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white text-sm"
+          className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
         />
+        <button
+          onClick={handleSearch}
+          className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-full hover:shadow-lg transition-all duration-300"
+        >
+          ค้นหา
+        </button>
       </div>
 
       {loading ? (
@@ -75,6 +81,8 @@ const Portfolio = () => {
                     project={project}
                     onLike={() => likeProject(project.id)}
                     onDislike={() => dislikeProject(project.id)}
+                    openModal={modalProject?.id === project.id}
+                    onModalClose={() => setModalProject(null)}
                   />
                 </motion.div>
               ))}

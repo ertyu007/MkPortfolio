@@ -61,3 +61,30 @@
 .animation-delay-4000 {
     animation-delay: 4s;
 }
+
+/* เพิ่ม CSS นี้ในไฟล์ global CSS ของคุณ */
+.cursor-follower {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.7);
+  pointer-events: none;
+  z-index: 9999;
+  transition: 
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    background 0.3s ease;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.cursor-follower:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+
+/* สำหรับอุปกรณ์มือถือ */
+@media (max-width: 768px) {
+  .cursor-follower {
+    display: none;
+  }
+}

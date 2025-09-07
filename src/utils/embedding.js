@@ -1,82 +1,36 @@
 // src/utils/embedding.js
-import * as use from '@tensorflow-models/universal-sentence-encoder';
+import { portfolioContext } from '../data/context'; // ✅ แก้จาก './ai' → '../data/context'
+import { getEmbedding, cosineSimilarity } from './transformers';
 
-let model;
-let embeddings = [];
-let documents = [];
+export const initializeEmbeddings = async () => {
+  console.log("⏳ กำลังโหลดโมเดล AI...");
 
-// ✅ โหลดโมเดล
-export const loadModel = async () => {
-  if (!model) {
-    model = await use.load();
-  }
-  return model;
-};
+  const embeddings = [];
+  const documents = portfolioContext;
 
-// ✅ สร้าง embedding จาก text
-export const getEmbedding = async (text) => {
-  const model = await loadModel();
-  const embedding = await model.embed([text]);
-  return Array.from(embedding.dataSync());
-};
-
-// ✅ คำนวณ cosine similarity
-export const cosineSimilarity = (vecA, vecB) => {
-  let dotProduct = 0;
-  let normA = 0;
-  let normB = 0;
-  for (let i = 0; i < vecA.length; i++) {
-    dotProduct += vecA[i] * vecB[i];
-    normA += vecA[i] * vecA[i];
-    normB += vecB[i] * vecB[i];
-  }
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-};
-
-// ✅ สร้าง embeddings สำหรับ projects, skills
-export const initializeEmbeddings = async (projects, skills, blogPosts = []) => {
-  // ✅ รวม projects และ skills
-  const allDocs = [
-    ...projects.map(p => ({
-      type: 'project',
-      content: `${p.title} ${p.description} ${p.tags?.join(' ') || ''}`,
-      data: p
-    })),
-    ...skills.map(s => ({
-      type: 'skill',
-      content: s.name,
-      data: s
-    })),
-  ];
-
-  embeddings = [];
-  documents = [];
-
-  // ✅ สร้าง embedding สำหรับแต่ละ document
-  for (const doc of allDocs) {
-    try {
-      const embedding = await getEmbedding(doc.content);
-      embeddings.push(embedding);
-      documents.push(doc);
-    } catch (err) {
-      console.error("❌ Error creating embedding for:", doc.content, err);
-    }
+  for (let i = 0; i < documents.length; i++) {
+    const doc = documents[i];
+    const text = doc.context || doc.title || doc.name;
+    console.log(`กำลังสร้าง embedding สำหรับ: ${text.substring(0, 30)}...`);
+    const embedding = await getEmbedding(text);
+    embeddings.push(embedding);
   }
 
-  // ✅ เก็บใน localStorage
   localStorage.setItem('embeddings', JSON.stringify(embeddings));
   localStorage.setItem('documents', JSON.stringify(documents));
 
-  console.log("✅ สร้าง embeddings สำเร็จ — เก็บใน localStorage");
+  console.log("✅ AI พร้อมใช้งาน — ตอบคำถามได้แม่นยำ!");
 };
 
-// ✅ ค้นหา context ที่ใกล้เคียงที่สุด
 export const retrieveContext = async (query, topK = 3) => {
+  console.log(`กำลังค้นหา context สำหรับ: ${query}`);
+  
   const queryEmbedding = await getEmbedding(query);
   const storedEmbeddings = JSON.parse(localStorage.getItem('embeddings') || '[]');
   const storedDocuments = JSON.parse(localStorage.getItem('documents') || '[]');
 
   if (storedEmbeddings.length === 0) {
+    console.log('ไม่พบ embeddings ใน localStorage');
     return [];
   }
 
@@ -87,8 +41,13 @@ export const retrieveContext = async (query, topK = 3) => {
   }));
 
   // ✅ เรียงตาม score — เอา topK
-  return similarities
+  const results = similarities
     .sort((a, b) => b.score - a.score)
     .slice(0, topK)
-    .map(item => item.doc);
+    .map(item => {
+      console.log(`พบ context: ${item.doc.title || item.doc.name} (score: ${item.score.toFixed(4)})`);
+      return item.doc;
+    });
+
+  return results;
 };

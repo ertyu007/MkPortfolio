@@ -12,17 +12,17 @@ const Certificates = () => {
     {
       id: 1,
       title: "AWS Certified Developer",
-      image: "https://picsum.photos/600/400?random=4" // ✅ ใช้ picsum.photos
+      image: "https://via.placeholder.com/600x400?text=AWS+Certified4"
     },
     {
       id: 2,
       title: "React Advanced Certification",
-      image: "https://picsum.photos/600/400?random=5" // ✅ ใช้ picsum.photos
+      image: "https://via.placeholder.com/600x400?text=AWS+Certified5"
     },
     {
       id: 3,
       title: "Full Stack Web Development",
-      image: "https://picsum.photos/600/400?random=6" // ✅ ใช้ picsum.photos
+      image: "https://via.placeholder.com/600x400?text=AWS+Certified6"
     },
   ];
 
