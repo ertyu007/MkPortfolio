@@ -1,6 +1,5 @@
 // src/utils/embedding.js
 import * as use from '@tensorflow-models/universal-sentence-encoder';
-import * as tf from '@tensorflow/tfjs';
 
 let model;
 let embeddings = [];

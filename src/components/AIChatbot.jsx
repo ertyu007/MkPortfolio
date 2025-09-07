@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useProjects } from '../hooks/useProjects';
 import { aiChatResponse } from '../utils/ai';
-import { initializeEmbeddings } from '../utils/embedding'; // ✅ Import แล้ว
+import { initializeEmbeddings } from '../utils/embedding';
 
 const AIChatbot = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [hasGreeted, setHasGreeted] = useState(false);
+  // ❌ ลบ hasGreeted และ setHasGreeted ออก — เพราะไม่ได้ใช้
   const { projects } = useProjects();
 
-  // ✅ สร้าง embeddings ครั้งแรก
+  // ✅ เริ่มต้นสร้าง embeddings
   useEffect(() => {
     const initEmbeddings = async () => {
       const storedEmbeddings = localStorage.getItem('embeddings');
       if (!storedEmbeddings && projects.length > 0) {
-        // ✅ สร้างข้อมูล skills — ตรงกับ Skills.jsx
         const skills = [
           { name: "JavaScript", level: 90 },
           { name: "React", level: 85 },
@@ -25,8 +24,6 @@ const AIChatbot = () => {
           { name: "Tailwind CSS", level: 85 },
           { name: "AI/ML", level: 60 },
         ];
-
-        // ✅ เรียก initializeEmbeddings — พร้อมส่ง projects, skills, []
         await initializeEmbeddings(projects, skills, []);
       }
     };
