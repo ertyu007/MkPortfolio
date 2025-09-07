@@ -2,11 +2,11 @@
 const API_BASE = process.env.REACT_APP_API_URL || "";
 
 // ✅ log ให้เห็นชัดเจน
-if (!API_BASE) {
-  console.warn("⚠️ REACT_APP_API_URL ไม่ได้ตั้งค่า — จะใช้โหมด mock data");
-} else {
-  console.log("🌐 API_BASE:", API_BASE);
-}
+// if (!API_BASE) {
+//   console.warn("⚠️ REACT_APP_API_URL ไม่ได้ตั้งค่า — จะใช้โหมด mock data");
+// } else {
+//   console.log("🌐 API_BASE:", API_BASE);
+// }
 
 // ฟังก์ชันดึง Projects
 export const getProjects = async () => {

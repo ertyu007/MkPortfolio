@@ -8,17 +8,29 @@ Modal.setAppElement('#root');
 const ProjectCard = ({ project, onLike, onDislike }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
+  // ✅ ฟังก์ชัน Like — ยกเลิก Dislike ถ้ามี
   const handleLike = async () => {
     try {
-      await onLike(project.id);
+      // ✅ ถ้าเคย Dislike อยู่ — ต้องยกเลิก Dislike ก่อน
+      if (project.isDisliked) {
+        await onDislike(project.id, false); // ยกเลิก Dislike
+      }
+      // ✅ สลับสถานะ Like
+      await onLike(project.id, !project.isLiked);
     } catch (err) {
       console.error("Like failed:", err);
     }
   };
 
+  // ✅ ฟังก์ชัน Dislike — ยกเลิก Like ถ้ามี
   const handleDislike = async () => {
     try {
-      await onDislike(project.id);
+      // ✅ ถ้าเคย Like อยู่ — ต้องยกเลิก Like ก่อน
+      if (project.isLiked) {
+        await onLike(project.id, false); // ยกเลิก Like
+      }
+      // ✅ สลับสถานะ Dislike
+      await onDislike(project.id, !project.isDisliked);
     } catch (err) {
       console.error("Dislike failed:", err);
     }

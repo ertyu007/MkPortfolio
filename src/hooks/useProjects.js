@@ -10,7 +10,6 @@ export const useProjects = () => {
       try {
         setLoading(true);
         const data = await getProjects();
-        // ✅ ดึงค่า isLiked/isDisliked จาก localStorage — ถ้ามี
         const enhancedProjects = data.map(p => {
           const saved = localStorage.getItem(`project_${p.id}`);
           if (saved) {
@@ -32,22 +31,21 @@ export const useProjects = () => {
     fetchProjects();
   }, []);
 
-  const likeProjectById = async (id) => {
+  const likeProjectById = async (id, isLike) => {
     try {
-      // ✅ ดึง project ปัจจุบัน
       const currentProject = projects.find(p => p.id === id);
-      const newIsLiked = !currentProject.isLiked;
-      const action = newIsLiked ? 'like' : 'unlike';
+      const action = isLike ? 'like' : 'unlike';
 
-      // ✅ อัปเดต server
       const { like_count } = await likeProject(id, action);
 
-      // ✅ อัปเดต state
       const updatedProjects = projects.map(p => {
         if (p.id === id) {
-          const updated = { ...p, like_count, isLiked: newIsLiked };
-          // ✅ บันทึกใน localStorage
-          localStorage.setItem(`project_${id}`, JSON.stringify({ isLiked: newIsLiked, isDisliked: p.isDisliked }));
+          let updated = { ...p, like_count, isLiked: isLike };
+          // ✅ ถ้า Like — ต้องยกเลิก Dislike
+          if (isLike) {
+            updated = { ...updated, isDisliked: false };
+          }
+          localStorage.setItem(`project_${id}`, JSON.stringify({ isLiked: updated.isLiked, isDisliked: updated.isDisliked }));
           return updated;
         }
         return p;
@@ -59,22 +57,21 @@ export const useProjects = () => {
     }
   };
 
-  const dislikeProjectById = async (id) => {
+  const dislikeProjectById = async (id, isDislike) => {
     try {
-      // ✅ ดึง project ปัจจุบัน
       const currentProject = projects.find(p => p.id === id);
-      const newIsDisliked = !currentProject.isDisliked;
-      const action = newIsDisliked ? 'dislike' : 'undislike';
+      const action = isDislike ? 'dislike' : 'undislike';
 
-      // ✅ อัปเดต server
       const { dislike_count } = await dislikeProject(id, action);
 
-      // ✅ อัปเดต state
       const updatedProjects = projects.map(p => {
         if (p.id === id) {
-          const updated = { ...p, dislike_count, isDisliked: newIsDisliked };
-          // ✅ บันทึกใน localStorage
-          localStorage.setItem(`project_${id}`, JSON.stringify({ isLiked: p.isLiked, isDisliked: newIsDisliked }));
+          let updated = { ...p, dislike_count, isDisliked: isDislike };
+          // ✅ ถ้า Dislike — ต้องยกเลิก Like
+          if (isDislike) {
+            updated = { ...updated, isLiked: false };
+          }
+          localStorage.setItem(`project_${id}`, JSON.stringify({ isLiked: updated.isLiked, isDisliked: updated.isDisliked }));
           return updated;
         }
         return p;
