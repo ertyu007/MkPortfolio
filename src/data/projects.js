@@ -1,30 +1,29 @@
-// src/data/projects.js
 export const mockProjects = [
   {
     id: 1,
     title: "ระบบจัดการงานด้วย AI",
-    description: "พัฒนาด้วย React + Node.js + OpenAI API เพื่อช่วยวิเคราะห์และจัดลำดับความสำคัญของงานอัตโนมัติ",
-    tags: ["React", "AI", "Node.js", "OpenAI"],
+    description: "พัฒนาด้วย React + Node.js + OpenAI API",
+    tags: ["React", "AI", "Node.js"],
     like_count: 12,
     dislike_count: 2,
-    image: "https://via.placeholder.com/400x200?text=AI+Project"
+    image: "https://picsum.photos/400/200?random=1" // ✅ ใช้ picsum.photos
   },
   {
     id: 2,
     title: "แอปจองห้องประชุม",
-    description: "ระบบจองห้องแบบเรียลไทม์ ดูสถานะห้องว่างผ่านปฏิทิน",
-    tags: ["React", "Firebase", "Tailwind", "Calendar"],
+    description: "ระบบจองห้องแบบเรียลไทม์",
+    tags: ["React", "Firebase", "Tailwind"],
     like_count: 8,
     dislike_count: 1,
-    image: "https://via.placeholder.com/400x200?text=AI+Project"
+    image: "https://picsum.photos/400/200?random=2" // ✅ ใช้ picsum.photos
   },
   {
     id: 3,
     title: "เว็บพอร์ตโฟลิโอส่วนตัว",
-    description: "ออกแบบ UI/UX ด้วย Figma + พัฒนาด้วย React 19 + Tailwind CSS",
-    tags: ["React", "Tailwind", "Portfolio", "Design"],
+    description: "ออกแบบ UI/UX + พัฒนาด้วย React 19",
+    tags: ["React", "Tailwind", "Portfolio"],
     like_count: 15,
     dislike_count: 0,
-    image: "https://via.placeholder.com/400x200?text=AI+Project"
+    image: "https://picsum.photos/400/200?random=3" // ✅ ใช้ picsum.photos
   },
 ];

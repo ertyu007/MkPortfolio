@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useProjects } from '../hooks/useProjects';
+import { aiSearch } from '../utils/ai';
 import ProjectCard from '../components/ProjectCard';
 import { motion } from 'framer-motion';
-import { aiSearch } from '../utils/ai';
 
 const Portfolio = () => {
   const { projects, likeProject, dislikeProject, loading } = useProjects();
@@ -13,21 +13,15 @@ const Portfolio = () => {
     setFiltered(projects);
   }, [projects]);
 
-  // ✅ รวม AI + Keyword — ไม่ต้องเลือกโหมด
   const handleSearch = useCallback(async () => {
     if (!search.trim()) {
       setFiltered(projects);
       return;
     }
 
-    // ลองใช้ AI ก่อน — ถ้า error → ใช้ keyword
     try {
-      const aiResults = await aiSearch(search, projects);
-      setFiltered(aiResults.length > 0 ? aiResults : projects.filter(p =>
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.description?.toLowerCase().includes(search.toLowerCase()) ||
-        p.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
-      ));
+      const results = await aiSearch(search, projects);
+      setFiltered(results);
     } catch (err) {
       console.warn("AI Search failed, using keyword search:", err);
       const keywordResults = projects.filter(p =>
@@ -42,8 +36,7 @@ const Portfolio = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       handleSearch();
-    }, 300); // Debounce
-
+    }, 300);
     return () => clearTimeout(timer);
   }, [handleSearch]);
 
@@ -53,7 +46,6 @@ const Portfolio = () => {
         ผลงานของฉัน
       </h1>
 
-      {/* Search Bar */}
       <div className="mb-12 flex flex-col sm:flex-row gap-4 items-center justify-center">
         <input
           type="text"
@@ -81,8 +73,8 @@ const Portfolio = () => {
                 >
                   <ProjectCard
                     project={project}
-                    onLike={likeProject}
-                    onDislike={dislikeProject}
+                    onLike={() => likeProject(project.id)}
+                    onDislike={() => dislikeProject(project.id)}
                   />
                 </motion.div>
               ))}
