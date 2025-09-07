@@ -5,13 +5,11 @@ const { Pool } = require('pg');
 
 const app = express();
 app.use(cors({
-  origin: ['https://thnapazones.netlify.app', 'http://localhost:3000'], // ✅ ใส่ origin ของ frontend
+  origin: ['https://thnapazones.netlify.app', 'http://localhost:3000'],
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
 app.use(express.json());
-
-
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
