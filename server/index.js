@@ -58,7 +58,7 @@ app.post('/api/projects/:id/like', async (req, res) => {
   }
 });
 
-// API: Dislike project
+// ✅ API: Dislike project — เพิ่มหลังจาก endpoint /like
 app.post('/api/projects/:id/dislike', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
