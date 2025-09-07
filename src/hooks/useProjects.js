@@ -10,16 +10,19 @@ export const useProjects = () => {
       try {
         setLoading(true);
         const data = await getProjects();
-        // ✅ เพิ่ม dislike_count ถ้ายังไม่มี
-        const projectsWithDislike = data.map(p => ({
+        // ✅ เพิ่มสถานะ isLiked/isDisliked สำหรับแต่ละ project
+        const enhancedProjects = data.map(p => ({
           ...p,
+          isLiked: false,
+          isDisliked: false,
+          like_count: p.like_count || 0,
           dislike_count: p.dislike_count || 0
         }));
-        setProjects(projectsWithDislike);
+        setProjects(enhancedProjects);
       } catch (err) {
         console.error("Failed to fetch projects:", err);
         setProjects([
-          { id: 1, title: "Fallback Project", like_count: 0, dislike_count: 0 }
+          { id: 1, title: "Fallback Project", like_count: 0, dislike_count: 0, isLiked: false, isDisliked: false }
         ]);
       } finally {
         setLoading(false);
@@ -28,27 +31,41 @@ export const useProjects = () => {
     fetchProjects();
   }, []);
 
-  const likeProjectById = async (id) => {
+  const likeProjectById = async (id, isLike) => {
     try {
-      const { like_count } = await likeProject(id);
+      if (isLike) {
+        await likeProject(id, 'like');
+      } else {
+        await likeProject(id, 'unlike');
+      }
       setProjects(prev =>
-        prev.map(p => p.id === id ? { ...p, like_count } : p)
+        prev.map(p =>
+          p.id === id
+            ? { ...p, isLiked: isLike, like_count: isLike ? p.like_count + 1 : p.like_count - 1 }
+            : p
+        )
       );
     } catch (err) {
-      console.error("Like failed:", err);
-      alert("ไม่สามารถกด Like ได้ในขณะนี้");
+      console.error("Like toggle failed:", err);
     }
   };
 
-  const dislikeProjectById = async (id) => {
+  const dislikeProjectById = async (id, isDislike) => {
     try {
-      const { dislike_count } = await dislikeProject(id);
+      if (isDislike) {
+        await dislikeProject(id, 'dislike');
+      } else {
+        await dislikeProject(id, 'undislike');
+      }
       setProjects(prev =>
-        prev.map(p => p.id === id ? { ...p, dislike_count } : p)
+        prev.map(p =>
+          p.id === id
+            ? { ...p, isDisliked: isDislike, dislike_count: isDislike ? p.dislike_count + 1 : p.dislike_count - 1 }
+            : p
+        )
       );
     } catch (err) {
-      console.error("Dislike failed:", err);
-      alert("ไม่สามารถกด Dislike ได้ในขณะนี้");
+      console.error("Dislike toggle failed:", err);
     }
   };
 

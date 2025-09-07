@@ -7,6 +7,7 @@ Modal.setAppElement('#root');
 const Certificates = () => {
   const [selected, setSelected] = useState(null);
 
+  // src/pages/Certificates.jsx
   const certificates = [
     {
       id: 1,
