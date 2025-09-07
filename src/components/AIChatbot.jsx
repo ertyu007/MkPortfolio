@@ -2,16 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useProjects } from '../hooks/useProjects';
 import { aiChatResponse } from '../utils/ai';
 import { initializeEmbeddings } from '../utils/embedding';
+import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 
 const AIChatbot = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const messagesEndRef = useRef(null);
-  const { likeProject, dislikeProject } = useProjects(); // ← ใช้เฉพาะ like/dislike
+  const { projects } = useProjects();
 
   // ✅ Auto-scroll
   useEffect(() => {
@@ -22,10 +22,29 @@ const AIChatbot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // ✅ ใช้ projects ใน useEffect — เพื่อสร้าง embeddings
+  useEffect(() => {
+    const initEmbeddings = async () => {
+      const storedEmbeddings = localStorage.getItem('embeddings');
+      if (!storedEmbeddings && projects.length > 0) { // ✅ ใช้ projects ตรงนี้
+        const skills = [
+          { name: "JavaScript", level: 90 },
+          { name: "React", level: 85 },
+          { name: "Node.js", level: 75 },
+          { name: "Python", level: 80 },
+          { name: "PostgreSQL", level: 70 },
+          { name: "Tailwind CSS", level: 85 },
+          { name: "AI/ML", level: 60 },
+        ];
+        await initializeEmbeddings(projects, skills, []);
+      }
+    };
+    initEmbeddings();
+  }, [projects]); // ✅ dependencies ถูกต้อง
+
   // ✅ Initialize AI
   useEffect(() => {
     const initAI = async () => {
-      setIsLoading(true);
       const storedEmbeddings = localStorage.getItem('embeddings');
       if (!storedEmbeddings) {
         setMessages([{
@@ -36,7 +55,8 @@ const AIChatbot = () => {
         await initializeEmbeddings();
         setMessages([{
           text: "สวัสดีครับ! 😊 ผมคือผู้ช่วย AI ส่วนตัวของ [ชื่อคุณ]",
-          sender: 'bot'
+          sender: 'bot',
+          reactions: { like: 0, dislike: 0, userLiked: false, userDisliked: false } // ✅ เพิ่ม reactions
         }]);
         setSuggestedQuestions([
           "มีผลงานอะไรน่าสนใจบ้าง?",
@@ -46,7 +66,8 @@ const AIChatbot = () => {
       } else {
         setMessages([{
           text: "สวัสดีครับ! 😊 ผมพร้อมช่วยตอบคำถามแล้ว",
-          sender: 'bot'
+          sender: 'bot',
+          reactions: { like: 0, dislike: 0, userLiked: false, userDisliked: false } // ✅ เพิ่ม reactions
         }]);
         setSuggestedQuestions([
           "ผลงานล่าสุดคืออะไร?",
@@ -54,14 +75,13 @@ const AIChatbot = () => {
           "มีบทความแนะนำไหม?"
         ]);
       }
-      setIsLoading(false);
     };
     initAI();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isTyping) return;
 
     const userMessage = { text: input, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
@@ -72,7 +92,11 @@ const AIChatbot = () => {
     try {
       const response = await aiChatResponse(input);
       setTimeout(() => {
-        setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
+        setMessages(prev => [...prev, {
+          text: response,
+          sender: 'bot',
+          reactions: { like: 0, dislike: 0, userLiked: false, userDisliked: false } // ✅ เพิ่ม reactions
+        }]);
         setIsTyping(false);
 
         // ✅ สร้างคำถามแนะนำตาม context
@@ -82,7 +106,8 @@ const AIChatbot = () => {
       console.error("AI Error:", err);
       setMessages(prev => [...prev, {
         text: "ขอโทษครับ — ผมยังเรียนรู้อยู่ — ลองถามคำถามอื่นดูนะครับ!",
-        sender: 'bot'
+        sender: 'bot',
+        reactions: { like: 0, dislike: 0, userLiked: false, userDisliked: false } // ✅ เพิ่ม reactions
       }]);
       setIsTyping(false);
       setSuggestedQuestions([
@@ -91,6 +116,38 @@ const AIChatbot = () => {
         "เรียนรู้ทักษะพวกนี้มาจากไหน?"
       ]);
     }
+  };
+
+  // ✅ ระบบ Like/Dislike
+  const handleReaction = (index, reactionType) => {
+    setMessages(prev => prev.map((msg, i) => {
+      if (i !== index || msg.sender !== 'bot') return msg;
+
+      const current = msg.reactions || { like: 0, dislike: 0, userLiked: false, userDisliked: false };
+      let newReactions = { ...current };
+
+      if (reactionType === 'like') {
+        if (current.userLiked) {
+          newReactions = { ...newReactions, like: Math.max(0, current.like - 1), userLiked: false };
+        } else {
+          newReactions = { ...newReactions, like: current.like + 1, userLiked: true };
+          if (current.userDisliked) {
+            newReactions = { ...newReactions, dislike: Math.max(0, current.dislike - 1), userDisliked: false };
+          }
+        }
+      } else if (reactionType === 'dislike') {
+        if (current.userDisliked) {
+          newReactions = { ...newReactions, dislike: Math.max(0, current.dislike - 1), userDisliked: false };
+        } else {
+          newReactions = { ...newReactions, dislike: current.dislike + 1, userDisliked: true };
+          if (current.userLiked) {
+            newReactions = { ...newReactions, like: Math.max(0, current.like - 1), userLiked: false };
+          }
+        }
+      }
+
+      return { ...msg, reactions: newReactions };
+    }));
   };
 
   // ✅ สร้างคำถามแนะนำ
@@ -160,7 +217,7 @@ const AIChatbot = () => {
               className="text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white/10"
               aria-label="Close"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" data-jsx="true">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -175,6 +232,35 @@ const AIChatbot = () => {
                   : 'bg-white/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 rounded-bl-none shadow-sm backdrop-blur-sm'
                   }`}>
                   <p className="text-sm leading-relaxed">{msg.text}</p>
+
+                  {msg.sender === 'bot' && (
+                    <div className="flex items-center space-x-4 mt-3 pt-3 border-t border-gray-200/50 dark:border-gray-600/50">
+                      {/* Like Button */}
+                      <button
+                        onClick={() => handleReaction(i, 'like')}
+                        className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-all duration-200 ${msg.reactions?.userLiked
+                          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                          }`}
+                      >
+                        <FaThumbsUp className="text-xs" />
+                        <span className="text-xs font-medium">{msg.reactions?.like || 0}</span>
+                      </button>
+
+                      {/* Dislike Button */}
+                      <button
+                        onClick={() => handleReaction(i, 'dislike')}
+                        className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-all duration-200 ${msg.reactions?.userDisliked
+                          ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                          }`}
+                      >
+                        <FaThumbsDown className="text-xs" />
+                        <span className="text-xs font-medium">{msg.reactions?.dislike || 0}</span>
+                      </button>
+                    </div>
+                  )}
+
                   {msg.sender === 'bot' && msg.type !== 'system' && (
                     <div className="flex items-center space-x-1 mt-2">
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -226,11 +312,11 @@ const AIChatbot = () => {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="ถามผมอะไรก็ได้ครับ..."
                 className="flex-1 px-4 py-3 bg-white/70 dark:bg-gray-700/70 border border-gray-300/50 dark:border-gray-600/50 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white backdrop-blur-sm"
-                disabled={isLoading}
+                disabled={isTyping}
               />
               <button
                 type="submit"
-                disabled={!input.trim() || isLoading}
+                disabled={!input.trim() || isTyping}
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-3 rounded-full hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
