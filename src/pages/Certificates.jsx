@@ -12,17 +12,17 @@ const Certificates = () => {
     {
       id: 1,
       title: "AWS Certified Developer",
-      image: "https://via.placeholder.com/600x400?text=AWS+Certified" // ✅ แก้ตรงนี้
+      image: "https://via.placeholder.com/600x400?text=AWS+Certified"
     },
     {
       id: 2,
       title: "React Advanced Certification",
-      image: "https://via.placeholder.com/600x400?text=React+Advanced" // ✅ แก้ตรงนี้
+      image: "https://via.placeholder.com/600x400?text=AWS+Certified"
     },
     {
       id: 3,
       title: "Full Stack Web Development",
-      image: "https://via.placeholder.com/600x400?text=Full+Stack" // ✅ แก้ตรงนี้
+      image: "https://via.placeholder.com/600x400?text=AWS+Certified"
     },
   ];
 

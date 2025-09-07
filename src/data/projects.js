@@ -7,7 +7,7 @@ export const mockProjects = [
     tags: ["React", "AI", "Node.js", "OpenAI"],
     like_count: 12,
     dislike_count: 2,
-    image: "https://via.placeholder.com/400x200?text=AI+Project" // ✅ แก้ตรงนี้
+    image: "https://via.placeholder.com/400x200?text=AI+Project"
   },
   {
     id: 2,
@@ -16,7 +16,7 @@ export const mockProjects = [
     tags: ["React", "Firebase", "Tailwind", "Calendar"],
     like_count: 8,
     dislike_count: 1,
-    image: "https://via.placeholder.com/400x200?text=Booking+App" // ✅ แก้ตรงนี้
+    image: "https://via.placeholder.com/400x200?text=AI+Project"
   },
   {
     id: 3,
@@ -25,6 +25,6 @@ export const mockProjects = [
     tags: ["React", "Tailwind", "Portfolio", "Design"],
     like_count: 15,
     dislike_count: 0,
-    image: "https://via.placeholder.com/400x200?text=My+Portfolio" // ✅ แก้ตรงนี้
+    image: "https://via.placeholder.com/400x200?text=AI+Project"
   },
 ];
