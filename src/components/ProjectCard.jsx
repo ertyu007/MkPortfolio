@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Modal from 'react-modal';
 import { motion } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
@@ -6,34 +6,26 @@ import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 Modal.setAppElement('#root');
 
 const ProjectCard = ({ project, onLike, onDislike }) => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   // ✅ ฟังก์ชัน Like — ยกเลิก Dislike ถ้ามี
-  const handleLike = async () => {
-    try {
-      // ✅ ถ้าเคย Dislike อยู่ — ต้องยกเลิก Dislike ก่อน
-      if (project.isDisliked) {
-        await onDislike(project.id, false); // ยกเลิก Dislike
-      }
-      // ✅ สลับสถานะ Like
-      await onLike(project.id, !project.isLiked);
-    } catch (err) {
-      console.error("Like failed:", err);
+  const handleLike = () => {
+    if (project.isDisliked) {
+      // ถ้าเคย Dislike → ยกเลิก Dislike ก่อน
+      onDislike(project.id, false);
     }
+    // สลับสถานะ Like
+    onLike(project.id, !project.isLiked);
   };
 
   // ✅ ฟังก์ชัน Dislike — ยกเลิก Like ถ้ามี
-  const handleDislike = async () => {
-    try {
-      // ✅ ถ้าเคย Like อยู่ — ต้องยกเลิก Like ก่อน
-      if (project.isLiked) {
-        await onLike(project.id, false); // ยกเลิก Like
-      }
-      // ✅ สลับสถานะ Dislike
-      await onDislike(project.id, !project.isDisliked);
-    } catch (err) {
-      console.error("Dislike failed:", err);
+  const handleDislike = () => {
+    if (project.isLiked) {
+      // ถ้าเคย Like → ยกเลิก Like ก่อน
+      onLike(project.id, false);
     }
+    // สลับสถานะ Dislike
+    onDislike(project.id, !project.isDisliked);
   };
 
   return (
@@ -67,7 +59,9 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
             ))}
           </div>
 
+          {/* Like/Dislike Buttons */}
           <div className="mt-4 flex items-center space-x-3">
+            {/* Like Button */}
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
@@ -79,11 +73,13 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
                   ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
               }`}
+              aria-label={project.isLiked ? "Unlike" : "Like"}
             >
               <FaThumbsUp className={`text-sm ${project.isLiked ? 'text-blue-600 dark:text-blue-400' : ''}`} />
               <span className="text-sm font-medium">{project.like_count || 0}</span>
             </motion.button>
 
+            {/* Dislike Button */}
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
@@ -95,6 +91,7 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
                   ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
               }`}
+              aria-label={project.isDisliked ? "Remove Dislike" : "Dislike"}
             >
               <FaThumbsDown className={`text-sm ${project.isDisliked ? 'text-red-600 dark:text-red-400' : ''}`} />
               <span className="text-sm font-medium">{project.dislike_count || 0}</span>
@@ -103,6 +100,7 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
         </div>
       </div>
 
+      {/* Modal */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
@@ -112,6 +110,7 @@ const ProjectCard = ({ project, onLike, onDislike }) => {
         <button
           onClick={() => setModalIsOpen(false)}
           className="float-right text-2xl font-bold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+          aria-label="Close"
         >
           &times;
         </button>
