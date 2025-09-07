@@ -5,27 +5,19 @@ import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 
 Modal.setAppElement('#root');
 
-const ProjectCard = ({ project, onLike, onDislike, openModal = false, onModalClose }) => {
+const ProjectCard = ({ project, onLike, onDislike }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(project.isLiked || false);
   const [isDisliked, setIsDisliked] = useState(project.isDisliked || false);
 
-  // ✅ เปิด Modal จากภายนอก
-  useEffect(() => {
-    if (openModal) {
-      setModalIsOpen(true);
-    }
-  }, [openModal]);
-
-  // ✅ ใน ProjectCard.jsx — ต้องมี logic แบบนี้
   const handleLike = () => {
     if (!isLiked) {
       setIsLiked(true);
       setIsDisliked(false);
-      onLike(project.id, true); // ✅ ส่ง true = like
+      onLike(project.id, true);
     } else {
       setIsLiked(false);
-      onLike(project.id, false); // ✅ ส่ง false = unlike
+      onLike(project.id, false);
     }
   };
 
@@ -33,16 +25,11 @@ const ProjectCard = ({ project, onLike, onDislike, openModal = false, onModalClo
     if (!isDisliked) {
       setIsDisliked(true);
       setIsLiked(false);
-      onDislike(project.id, true); // ✅ ส่ง true = dislike
+      onDislike(project.id, true);
     } else {
       setIsDisliked(false);
-      onDislike(project.id, false); // ✅ ส่ง false = undislike
+      onDislike(project.id, false);
     }
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-    if (onModalClose) onModalClose();
   };
 
   return (
@@ -58,7 +45,6 @@ const ProjectCard = ({ project, onLike, onDislike, openModal = false, onModalClo
             alt={project.title}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
         </div>
 
         <div className="p-4">
@@ -84,12 +70,13 @@ const ProjectCard = ({ project, onLike, onDislike, openModal = false, onModalClo
                 e.stopPropagation();
                 handleLike();
               }}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-300 ${isLiked
-                ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                }`}
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-300 ${
+                isLiked
+                  ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+              }`}
             >
-              <FaThumbsUp className={`text-sm ${isLiked ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
+              <FaThumbsUp className={`text-sm ${isLiked ? 'text-blue-600 dark:text-blue-400' : ''}`} />
               <span className="text-sm font-medium">{project.like_count || 0}</span>
             </motion.button>
 
@@ -99,10 +86,11 @@ const ProjectCard = ({ project, onLike, onDislike, openModal = false, onModalClo
                 e.stopPropagation();
                 handleDislike();
               }}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-300 ${isDisliked
-                ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                }`}
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all duration-300 ${
+                isDisliked
+                  ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+              }`}
             >
               <FaThumbsDown className={`text-sm ${isDisliked ? 'text-red-600 dark:text-red-400' : ''}`} />
               <span className="text-sm font-medium">{project.dislike_count || 0}</span>
@@ -113,12 +101,12 @@ const ProjectCard = ({ project, onLike, onDislike, openModal = false, onModalClo
 
       <Modal
         isOpen={modalIsOpen}
-        onRequestClose={closeModal}
+        onRequestClose={() => setModalIsOpen(false)}
         className="fixed inset-4 bg-white dark:bg-gray-900 p-6 rounded-lg max-w-4xl mx-auto mt-20 shadow-lg overflow-auto max-h-[90vh] z-50"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50"
       >
         <button
-          onClick={closeModal}
+          onClick={() => setModalIsOpen(false)}
           className="float-right text-2xl font-bold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
           &times;
@@ -137,23 +125,25 @@ const ProjectCard = ({ project, onLike, onDislike, openModal = false, onModalClo
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleLike}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${isLiked
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-              }`}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
+              isLiked
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+            }`}
           >
-            <FaThumbsUp className={`text-sm ${isLiked ? 'text-white' : ''}`} />
+            <FaThumbsUp className="text-sm" />
             <span className="font-medium">{project.like_count || 0} Likes</span>
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleDislike}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${isDisliked
-              ? 'bg-red-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-              }`}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
+              isDisliked
+                ? 'bg-red-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+            }`}
           >
-            <FaThumbsDown className={`text-sm ${isDisliked ? 'text-white' : ''}`} />
+            <FaThumbsDown className="text-sm" />
             <span className="font-medium">{project.dislike_count || 0} Dislikes</span>
           </motion.button>
         </div>

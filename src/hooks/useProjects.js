@@ -10,7 +10,6 @@ export const useProjects = () => {
       try {
         setLoading(true);
         const data = await getProjects();
-        // ✅ เพิ่มสถานะ isLiked/isDisliked สำหรับแต่ละ project
         const enhancedProjects = data.map(p => ({
           ...p,
           isLiked: false,
@@ -31,7 +30,6 @@ export const useProjects = () => {
     fetchProjects();
   }, []);
 
-  // ✅ ใน useProjects.js
   const likeProjectById = async (id, isLike) => {
     try {
       const { like_count } = await likeProject(id, isLike ? 'like' : 'unlike');

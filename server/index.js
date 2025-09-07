@@ -1,4 +1,3 @@
-// server/index.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -8,7 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ เชื่อม Neon DB
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -16,18 +14,33 @@ const pool = new Pool({
   },
 });
 
-// ✅ API: ดึง projects ทั้งหมด
+async function createTable() {
+  const query = `
+    CREATE TABLE IF NOT EXISTS projects (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      tags TEXT[],
+      like_count INTEGER DEFAULT 0,
+      dislike_count INTEGER DEFAULT 0,
+      image_url TEXT
+    );
+  `;
+  await pool.query(query);
+  console.log("✅ Table 'projects' is ready");
+}
+createTable();
+
 app.get('/api/projects', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM projects ORDER BY id ASC');
     res.json(result.rows);
   } catch (err) {
-    console.error("❌ GET /api/projects:", err);
+    console.error("GET /api/projects Error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// ✅ API: Like project
 app.post('/api/projects/:id/like', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
@@ -45,7 +58,7 @@ app.post('/api/projects/:id/like', async (req, res) => {
         [id]
       );
     } else {
-      return res.status(400).json({ error: "Invalid action" });
+      return res.status(400).json({ error: "Invalid action. Use 'like' or 'unlike'" });
     }
 
     if (result.rows.length === 0) {
@@ -58,7 +71,6 @@ app.post('/api/projects/:id/like', async (req, res) => {
   }
 });
 
-// ✅ API: Dislike project
 app.post('/api/projects/:id/dislike', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
@@ -76,7 +88,7 @@ app.post('/api/projects/:id/dislike', async (req, res) => {
         [id]
       );
     } else {
-      return res.status(400).json({ error: "Invalid action" });
+      return res.status(400).json({ error: "Invalid action. Use 'dislike' or 'undislike'" });
     }
 
     if (result.rows.length === 0) {
@@ -89,9 +101,7 @@ app.post('/api/projects/:id/dislike', async (req, res) => {
   }
 });
 
-// ✅ เริ่ม server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✅ Server ทำงานที่ http://localhost:${PORT}`);
-  console.log(`🚀 ทดสอบ API: http://localhost:${PORT}/api/projects`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
