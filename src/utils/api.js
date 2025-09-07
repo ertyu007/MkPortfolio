@@ -1,9 +1,10 @@
 // src/utils/api.js
-// ✅ ใช้ process.env โดยตรง — ไม่ต้อง fallback ถ้า deploy แล้ว
+// ✅ ใช้ process.env โดยตรง — ไม่ต้อง fallback
 const API_BASE = process.env.REACT_APP_API_URL;
 
 if (!API_BASE) {
-  console.warn("⚠️ REACT_APP_API_URL ไม่ได้ตั้งค่า — ใช้ localhost สำหรับ development");
+  console.error("❌ REACT_APP_API_URL ไม่ได้ตั้งค่า — โปรดตรวจสอบ .env");
+  throw new Error("Missing REACT_APP_API_URL");
 }
 
 export const getProjects = async () => {
@@ -34,4 +35,3 @@ export const dislikeProject = async (id, action) => {
   if (!res.ok) throw new Error(`Failed to dislike project: ${res.status} ${res.statusText}`);
   return res.json();
 };
-
