@@ -33,9 +33,8 @@ export const useProjects = () => {
 
   const likeProjectById = async (id, isLike) => {
     try {
-      const currentProject = projects.find(p => p.id === id);
+      // ✅ ลบ currentProject — เพราะไม่ได้ใช้
       const action = isLike ? 'like' : 'unlike';
-
       const { like_count } = await likeProject(id, action);
 
       const updatedProjects = projects.map(p => {
@@ -59,9 +58,8 @@ export const useProjects = () => {
 
   const dislikeProjectById = async (id, isDislike) => {
     try {
-      const currentProject = projects.find(p => p.id === id);
+      // ✅ ลบ currentProject — เพราะไม่ได้ใช้
       const action = isDislike ? 'dislike' : 'undislike';
-
       const { dislike_count } = await dislikeProject(id, action);
 
       const updatedProjects = projects.map(p => {
