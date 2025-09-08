@@ -2,7 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-const { projectsData } = require('/src/data/projects.js');
+const path = require('path'); // ✅ เพิ่ม path
+const fs = require('fs'); // ✅ เพิ่ม fs
 
 const app = express();
 app.use(cors({
@@ -42,7 +43,9 @@ async function initializeDatabase() {
 
     if (count === 0) {
       console.log("⏳ กำลังใส่ข้อมูลตัวอย่าง...");
-      // ใส่ข้อมูลจาก projectsData
+      const projectsData = getProjectsData(); // ✅ ดึงจาก frontend
+
+      // ใส่ข้อมูล
       for (let project of projectsData) {
         await pool.query(
           `INSERT INTO projects (title, description, tags, like_count, dislike_count, image_url) 
@@ -51,9 +54,9 @@ async function initializeDatabase() {
             project.title,
             project.description,
             project.tags,
-            project.like_count,
-            project.dislike_count,
-            project.image_url
+            project.like_count || 0,
+            project.dislike_count || 0,
+            project.image_url || "https://via.placeholder.com/400x200?text=Project"
           ]
         );
       }
@@ -66,6 +69,42 @@ async function initializeDatabase() {
     process.exit(1);
   }
 }
+
+const getProjectsData = () => {
+  try {
+    // ✅ ใช้ path.resolve — หา path จริงจาก root
+    const frontendPath = path.resolve(__dirname, '..', 'src', 'data', 'projects.js');
+    console.log("🔍 กำลังอ่านไฟล์:", frontendPath);
+
+    // ✅ อ่านไฟล์
+    const fileContent = fs.readFileSync(frontendPath, 'utf8');
+
+    // ✅ แปลงเป็น object — ใช้ eval (เฉพาะใน server — ปลอดภัย)
+    // สมมุติว่าไฟล์ projects.js มีรูปแบบ: export const mockProjects = [...]
+    // eslint-disable-next-line no-eval
+    const projectsData = eval(`
+      const exports = {};
+      ${fileContent}
+      exports.mockProjects;
+    `);
+
+    console.log("✅ ดึงข้อมูลสำเร็จ — มี", projectsData.length, "รายการ");
+    return projectsData;
+  } catch (err) {
+    console.error("❌ ดึงข้อมูลจาก projects.js ไม่สำเร็จ:", err);
+    // ✅ fallback — ใช้ข้อมูล default
+    return [
+      {
+        title: "โปรเจกต์เริ่มต้น",
+        description: "คำอธิบายโปรเจกต์เริ่มต้น",
+        tags: ["React", "Default"],
+        like_count: 0,
+        dislike_count: 0,
+        image_url: "https://via.placeholder.com/400x200?text=Default"
+      }
+    ];
+  }
+};
 
 app.get('/api/projects', async (req, res) => {
   try {
