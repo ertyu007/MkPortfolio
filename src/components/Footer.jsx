@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0">
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              © {currentYear} <span className="font-semibold text-gray-800 dark:text-gray-200">[ชื่อ-นามสกุลของคุณ]</span>. All rights reserved.
+              © {currentYear} <span className="font-semibold text-gray-800 dark:text-gray-200">Thanaphat</span>. All rights reserved.
             </p>
           </div>
           
