@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-const { projectsData } = require('./data/projects.js'); // ✅ เพิ่มบรรทัดนี้
+const { projectsData } = require('./data/projects.js');
 
 const app = express();
 app.use(cors({
@@ -67,7 +67,6 @@ async function initializeDatabase() {
   }
 }
 
-// ✅ API: ดึง projects ทั้งหมด
 app.get('/api/projects', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM projects ORDER BY id ASC');
@@ -78,7 +77,6 @@ app.get('/api/projects', async (req, res) => {
   }
 });
 
-// ✅ API: Like project
 app.post('/api/projects/:id/like', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
@@ -140,7 +138,6 @@ app.post('/api/projects/:id/dislike', async (req, res) => {
   }
 });
 
-// ✅ เริ่ม server + initialize database
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
   await initializeDatabase(); // ✅ เรียกฟังก์ชันนี้ก่อนเริ่ม server
