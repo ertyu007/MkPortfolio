@@ -1,27 +1,26 @@
 import React, { useEffect, useRef } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import ThemeToggle from './components/ThemeToggle';
-import AIChatbot from './components/AIChatbot';
-
 import Home from './pages/Home';
 import About from './pages/About';
 import Skills from './pages/Skills';
 import Portfolio from './pages/Portfolio';
-import Certificates from './pages/Certificates';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
-
 import { ThemeProvider } from './context/ThemeContext';
+import ThemeToggle from './components/ThemeToggle';
+import Footer from './components/Footer';
+import AIChatbot from './components/AIChatbot';
+
+
+
 
 const App = () => {
+  const homeRef = useRef(null);
   const aboutRef = useRef(null);
   const skillsRef = useRef(null);
   const portfolioRef = useRef(null);
-  const certificatesRef = useRef(null);
   const blogRef = useRef(null);
   const contactRef = useRef(null);
 
@@ -36,24 +35,25 @@ const App = () => {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
-        <Navbar scrollToSection={{ 
-          aboutRef, 
-          skillsRef, 
-          portfolioRef, 
-          certificatesRef, 
-          blogRef, 
-          contactRef 
-        }} />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+        <Navbar
+          scrollToSection={{
+            home: homeRef,
+            about: aboutRef,
+            skills: skillsRef,
+            portfolio: portfolioRef,
+            blog: blogRef,
+            contact: contactRef
+          }}
+        />
         <ThemeToggle />
         <AIChatbot />
-
+        
         <main>
-          <Home />
+          <div ref={homeRef} id="home"><Home /></div>
           <div ref={aboutRef} id="about"><About /></div>
           <div ref={skillsRef} id="skills"><Skills /></div>
           <div ref={portfolioRef} id="portfolio"><Portfolio /></div>
-          <div ref={certificatesRef} id="certificates"><Certificates /></div>
           <div ref={blogRef} id="blog"><Blog /></div>
           <div ref={contactRef} id="contact"><Contact /></div>
         </main>

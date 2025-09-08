@@ -1,75 +1,99 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { TagCloud } from 'react-tagcloud';
-import { aiRecommendation } from '../utils/ai';
+import React from 'react';
 
 const Skills = () => {
-  const skills = useMemo(() => [
-    { name: "JavaScript", level: 90 },
-    { name: "React", level: 85 },
-    { name: "Node.js", level: 75 },
-    { name: "Python", level: 80 },
-    { name: "PostgreSQL", level: 70 },
-    { name: "Tailwind CSS", level: 85 },
-    { name: "AI/ML", level: 60 },
-  ], []);
-
-  const [recommendation, setRecommendation] = useState("กำลังวิเคราะห์ทักษะของคุณ...");
-
-  useEffect(() => {
-    const fetchRecommendation = async () => {
-      try {
-        const rec = await aiRecommendation(skills);
-        setRecommendation(rec);
-      } catch (err) {
-        console.error("AI Recommendation Error:", err);
-        setRecommendation("ลองเรียนรู้ TypeScript, Next.js หรือ Docker เพื่อพัฒนาทักษะขั้นสูง!");
-      }
-    };
-    fetchRecommendation();
-  }, [skills]);
+  const categories = [
+    {
+      title: "ทักษะทางเทคนิค",
+      color: "from-blue-500 to-blue-600",
+      textColor: "text-blue-600 dark:text-blue-400",
+      skills: [
+        { name: "HTML / CSS", level: 90, description: "สามารถออกแบบและจัดโครงสร้างเว็บไซต์ได้อย่างมีระบบ" },
+        { name: "JavaScript", level: 70, description: "พัฒนาและปรับปรุงฟังก์ชันการทำงานพื้นฐานของเว็บไซต์ได้" },
+        { name: "PHP", level: 70, description: "เขียนและแก้ไขโค้ดเบื้องต้นสำหรับงานฝั่งเซิร์ฟเวอร์" },
+        { name: "Git", level: 70, description: "ใช้ในการควบคุมเวอร์ชันของโค้ดและการทำงานร่วมทีมได้" },
+        { name: "การจัดการเครือข่าย LAN", level: 95, description: "สามารถวางระบบและแก้ไขปัญหาเครือข่ายได้" },
+        { name: "การเข้าหัวสาย LAN", level: 100, description: "ทำได้อย่างถูกต้อง รวดเร็ว และมีประสิทธิภาพ" }
+      ]
+    },
+    {
+      title: "ทักษะด้านซอฟต์แวร์",
+      color: "from-indigo-500 to-indigo-600",
+      textColor: "text-indigo-600 dark:text-indigo-400",
+      skills: [
+        { name: "Microsoft Word", level: 90, description: "จัดทำรายงานและเอกสารทางการได้คล่องแคล่ว" },
+        { name: "Canva", level: 90, description: "ออกแบบสื่อประชาสัมพันธ์และงานกราฟิกได้อย่างสร้างสรรค์" },
+        { name: "Adobe Photoshop", level: 70, description: "ตกแต่งและปรับปรุงภาพถ่ายได้" },
+        { name: "Adobe Premiere Pro", level: 70, description: "ตัดต่อวิดีโอสำหรับงานนำเสนอและกิจกรรมได้" },
+        { name: "Adobe After Effects", level: 50, description: "สร้างแอนิเมชันและเอฟเฟกต์เบื้องต้น" },
+        { name: "Adobe Lightroom Classic", level: 70, description: "ปรับแต่งภาพถ่ายเพื่อการนำเสนอ" },
+        { name: "NetSetMan, JPerf, XAMPP", level: 70, description: "ใช้งานเพื่อทดสอบเครือข่ายและจำลองเซิร์ฟเวอร์" }
+      ]
+    },
+    {
+      title: "ทักษะด้านสังคม",
+      color: "from-purple-500 to-purple-600",
+      textColor: "text-purple-600 dark:text-purple-400",
+      skills: [
+        { name: "การทำงานเป็นทีม", level: 85, description: "สามารถทำงานร่วมกับผู้อื่นได้อย่างมีประสิทธิภาพ" },
+        { name: "การสื่อสารที่มีประสิทธิภาพ", level: 85, description: "สื่อสารได้ชัดเจนและเข้าใจง่าย" },
+        { name: "การปรับตัวเข้ากับสภาพแวดล้อม", level: 90, description: "สามารถปรับตัวได้ดีในสถานการณ์ต่างๆ" },
+        { name: "ความรับผิดชอบสูง", level: 95, description: "มีความรับผิดชอบต่อหน้าที่และงานที่ได้รับมอบหมาย" },
+        { name: "การทำงานร่วมกับผู้ใหญ่", level: 80, description: "สามารถทำงานร่วมกับผู้ใหญ่และบุคคลต่างวัยได้อย่างราบรื่น" }
+      ]
+    }
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-20">
-      <h1 className="section-title">ทักษะของฉัน</h1>
-
-      <div className="mb-12 space-y-6">
-        {skills.map((skill, idx) => (
-          <div key={idx} className="pulse-on-hover" data-aos="fade-right" data-aos-delay={idx * 100}>
-            <div className="flex justify-between mb-2">
-              <span className="font-medium">{skill.name}</span>
-              <span>{skill.level}%</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-              <div
-                className="h-3 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
-                style={{ width: `${skill.level}%` }}
-              ></div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mb-12 p-8 glass-card" data-aos="zoom-in">
-        <h2 className="text-xl font-semibold mb-4 text-center">เมฆคำทักษะ</h2>
-        <div style={{ height: '200px' }}>
-          <TagCloud
-            minSize={16}
-            maxSize={40}
-            tags={skills.map(s => ({ value: s.name, count: s.level }))}
-            onClick={tag => console.log(`Selected: ${tag.value}`)}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              width: '100%',
-              height: '100%',
-              padding: '10px',
-            }}
-          />
+    <div className="bg-gray-50 dark:bg-gray-900 py-20">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">ทักษะของฉัน</h2>
+          <p className="text-xl text-gray-600 dark:text-gray-400">ทักษะและความสามารถที่ผมมี</p>
         </div>
-      </div>
 
-      <div className="p-8 glass-card bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20" data-aos="fade-up">
-        <h3 className="font-bold text-lg mb-2 text-indigo-600 dark:text-indigo-400">💡 AI แนะนำทักษะถัดไป:</h3>
-        <p className="text-gray-700 dark:text-gray-300">{recommendation}</p>
+        {/* Skills Grid */}
+        <div className="space-y-16">
+          {categories.map((category, categoryIndex) => (
+            <div key={categoryIndex} className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
+              <h3 className={`text-3xl font-bold mb-8 bg-gradient-to-r ${category.color} bg-clip-text text-transparent`}>
+                {category.title}
+              </h3>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {category.skills.map((skill, skillIndex) => (
+                  <div key={skillIndex} className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{skill.name}</h4>
+                      <span className={`font-bold ${category.textColor}`}>{skill.level}%</span>
+                    </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-3">
+                      <div
+                        className={`h-3 rounded-full bg-gradient-to-r ${category.color}`}
+                        style={{ width: `${skill.level}%` }}
+                      ></div>
+                    </div>
+                    
+                    {/* Description */}
+                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {skill.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Recommendation */}
+        <div className="mt-20 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-3xl p-8 text-center">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">💡 คำแนะนำสำหรับคุณ:</h3>
+          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+            แนะนำให้เรียนรู้ Python, Linux, และ CCNA เพื่อเตรียมความพร้อมสำหรับการสอบเข้าคณะวิศวกรรมศาสตร์ สาขาเครือข่าย
+          </p>
+        </div>
       </div>
     </div>
   );

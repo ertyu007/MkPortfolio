@@ -31,7 +31,7 @@ export const aiChatResponse = async (prompt) => {
 // ✅ ตรวจสอบคำถามทั่วไป
 const isGeneralQuestion = (prompt) => {
   const generalKeywords = [
-    'สวัสดี', 'hi', 'hello', 'hey', 'หวัดดี', 'how are you',
+    'สวัสดี', 'สวัดดี', 'hi', 'hello', 'hey', 'หวัดดี', 'how are you',
     'ทำอะไรได้บ้าง', 'ความสามารถ', 'ทำอะไร', 'what can you do',
     'แนะนำตัว', 'เกี่ยวกับคุณ', 'คุณคือใคร', 'who are you',
     'ติดต่อ', 'contact', 'email', 'โทร', 'phone',
