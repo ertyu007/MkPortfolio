@@ -6,7 +6,7 @@ export const mockProjects = [
     tags: ["React", "AI", "Node.js"],
     like_count: 0,
     dislike_count: 0,
-    image: "https://via.placeholder.com/400x200?text=AI+Project1"
+    image: "https://picsum.photos/seed/picsum/200/300"
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ export const mockProjects = [
     tags: ["React", "Firebase", "Tailwind"],
     like_count: 0,
     dislike_count: 0,
-    image: "https://via.placeholder.com/400x200?text=AI+Project2"
+    image: "https://picsum.photos/seed/picsum/200/300"
   },
   {
     id: 3,
@@ -24,6 +24,24 @@ export const mockProjects = [
     tags: ["React", "Tailwind", "Portfolio"],
     like_count: 0,
     dislike_count: 0,
-    image: "https://via.placeholder.com/400x200?text=AI+Project3"
+    image: "https://picsum.photos/seed/picsum/200/300"
   },
+  {
+    id: 4,
+    title: "Chatbot สั่งอาหาร",
+    description: "พัฒนา chatbot สั่งอาหารผ่าน LINE",
+    tags: ["React", "Dialogflow", "LINE"],
+    like_count: 0,
+    dislike_count: 0,
+    image: "https://picsum.photos/seed/picsum/200/300"
+    },
+    {
+    id: 5,
+    title: "ระบบซื้อขาย NFT",
+    description: "พัฒนา Smart Contract + React",
+    tags: ["React", "Solidity", "NFT"],
+    like_count: 0,
+    dislike_count: 0,
+    image: "https://picsum.photos/seed/picsum/200/300"
+    }
 ];

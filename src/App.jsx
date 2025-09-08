@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Skills from './pages/Skills';
 import Portfolio from './pages/Portfolio';
+import Certificates from './pages/Certificates';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import { ThemeProvider } from './context/ThemeContext';
@@ -21,6 +22,7 @@ const App = () => {
   const aboutRef = useRef(null);
   const skillsRef = useRef(null);
   const portfolioRef = useRef(null);
+  const CertificatesRef = useRef(null);
   const blogRef = useRef(null);
   const contactRef = useRef(null);
 
@@ -54,6 +56,7 @@ const App = () => {
           <div ref={aboutRef} id="about"><About /></div>
           <div ref={skillsRef} id="skills"><Skills /></div>
           <div ref={portfolioRef} id="portfolio"><Portfolio /></div>
+          <div ref={CertificatesRef} id="blog"><Certificates /></div>
           <div ref={blogRef} id="blog"><Blog /></div>
           <div ref={contactRef} id="contact"><Contact /></div>
         </main>

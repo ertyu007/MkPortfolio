@@ -54,21 +54,21 @@ const Certificates = () => {
       title: "AWS Certified Developer",
       description: "ผ่านการรับรองความสามารถในการพัฒนาและดูแลแอปพลิเคชันบน AWS",
       date: "มีนาคม 2025",
-      image: "https://via.placeholder.com/600x400?text=AWS+Certified"
+      image: "https://picsum.photos/200/300?random=2"
     },
     {
       id: 2,
       title: "React Advanced Certification",
       description: "ผ่านการรับรองความเชี่ยวชาญในการพัฒนาแอปพลิเคชันด้วย React",
       date: "กุมภาพันธ์ 2025",
-      image: "https://via.placeholder.com/600x400?text=React+Advanced"
+      image: "https://picsum.photos/200/300?random=3"
     },
     {
       id: 3,
       title: "Full Stack Web Development",
       description: "ผ่านการรับรองความสามารถในการพัฒนาเว็บแบบ Full Stack",
       date: "มกราคม 2025",
-      image: "https://via.placeholder.com/600x400?text=Full+Stack"
+      image: "https://picsum.photos/200/300?random=1"
     },
   ];
 

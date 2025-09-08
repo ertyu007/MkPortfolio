@@ -40,7 +40,7 @@ export const useProjects = () => {
             isDisliked: false,
             description: "พัฒนาด้วย React + Node.js + OpenAI API",
             tags: ["React", "AI", "Node.js"],
-            image: "https://via.placeholder.com/400x200?text=AI+Project"
+            image: "https://picsum.photos/200/300?random=1"
           }
         ]);
       } finally {
