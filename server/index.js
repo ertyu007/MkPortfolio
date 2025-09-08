@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-const { projectsData } = require('./data/projects.js');
+const { projectsData } = require('/src/data/projects.js');
 
 const app = express();
 app.use(cors({
