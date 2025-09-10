@@ -35,36 +35,36 @@ const WelcomePopup = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-2xl shadow-2xl backdrop-blur-xl border border-white/20 dark:border-gray-700/40">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl p-1 sm:p-4 max-w-md w-full shadow-2xl backdrop-blur-xl border border-white/20 dark:border-gray-700/40 transform transition-all duration-300">
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
             {steps[currentStep].icon}
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3">
             {steps[currentStep].title}
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+          <p className="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line text-sm sm:text-base">
             {steps[currentStep].content}
           </p>
         </div>
 
-        <div className="flex justify-between items-center mt-8">
+        <div className="flex justify-between items-center mt-6">
           <div className="flex space-x-2">
             {steps.map((_, index) => (
               <div
                 key={index}
-                className={`w-3 h-3 rounded-full ${
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
                   index === currentStep ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
               />
             ))}
           </div>
 
-          <div className="flex space-x-4">
+          <div className="flex space-x-3">
             {currentStep > 0 && (
               <button
                 onClick={() => setCurrentStep(currentStep - 1)}
-                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
+                className="px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors text-sm"
               >
                 ย้อนกลับ
               </button>
@@ -72,14 +72,14 @@ const WelcomePopup = ({ onClose }) => {
 
             <button
               onClick={handleSkip}
-              className="px-4 py-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+              className="px-3 py-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors text-sm"
             >
               ข้าม
             </button>
 
             <button
               onClick={handleNext}
-              className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 font-semibold"
+              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 font-semibold text-sm"
             >
               {currentStep === steps.length - 1 ? 'เริ่มใช้งาน' : 'ถัดไป'}
             </button>

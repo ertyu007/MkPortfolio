@@ -68,6 +68,27 @@ const AIChatbot = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const messagesEndRef = useRef(null);
 
+
+  // ✅ เพิ่ม useEffect สำหรับจัดการแป้นพิมพ์
+  useEffect(() => {
+    if (isOpen && typeof window !== 'undefined' && window.visualViewport) {
+      const adjustHeight = () => {
+        const viewport = window.visualViewport;
+        if (viewport) {
+          document.body.style.paddingBottom = `${viewport.height < window.innerHeight ? viewport.height * 0.3 : 0}px`;
+        }
+      };
+
+      window.visualViewport.addEventListener('resize', adjustHeight);
+      adjustHeight();
+
+      return () => {
+        window.visualViewport.removeEventListener('resize', adjustHeight);
+        document.body.style.paddingBottom = '0';
+      };
+    }
+  }, [isOpen]);
+
   // ✅ แสดง Onboarding ครั้งแรก
   useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
@@ -362,14 +383,14 @@ const AIChatbot = () => {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="p-2 border-t border-gray-200/20 dark:border-gray-700/40 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-            <div className="flex space-x-2">
+          <form onSubmit={handleSubmit} className="p-1 border-t border-gray-200/20 dark:border-gray-700/40 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+            <div className="flex space-x-1">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="ถามผมอะไรก็ได้ครับ..."
-                className="flex-1 px-2 py-4 bg-white/70 dark:bg-gray-700/70 border border-gray-300/50 dark:border-gray-600/50 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white text-sm font-medium"
+                className="flex-1 px-2 py-3 sm:py-1 bg-white/70 dark:bg-gray-700/70 border border-gray-300/50 dark:border-gray-600/50 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white text-sm sm:text-base font-medium min-h-[48px]"
                 disabled={isTyping}
               />
               <button

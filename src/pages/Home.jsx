@@ -156,19 +156,18 @@ const Home = () => {
               variants={imageVariants}
               className="relative flex justify-center lg:justify-end"
             >
-              <div className="relative z-10 w-full max-w-md">
+              <div className="relative z-10 w-80 max-w-md lg:max-w-lg">
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                  <div className="aspect-square bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+                  <div className="aspect-w-3 aspect-h-4 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
                     <motion.img
                       whileHover={{ scale: 1.05 }}
                       src="/assets/images/heroImage.jpg"
-                      // src="https://picsum.photos/seed/picsum/200/300"
                       alt="ธนภัทร การะจักษ์"
                       className="object-cover w-full h-full rounded-2xl shadow-lg"
                     />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent text-white">
-                    <p className="text-sm sm:text-base">ธนภัทร การะจักษ์ - นักเรียนมัธยมปลาย | อนาคตวิศวกรเครือข่าย</p>  
+                    <p className="text-sm sm:text-base">ธนภัทร การะจักษ์ - นักเรียนมัธยมปลาย | อนาคตวิศวกรเครือข่าย</p>
                   </div>
                 </div>
 
