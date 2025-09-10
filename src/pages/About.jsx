@@ -13,7 +13,15 @@ const About = () => {
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Personal Info Card */}
           <div className="lg:col-span-1">
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-8 sticky top-8">
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-8 sticky top-20">
+              {/* Profile Image */}
+              <div className="mt-8 mb-6">
+                <img
+                  src="/assets/images/heroImage.jpg"
+                  alt="Profile"
+                  className="rounded-3xl mx-auto w-48 h-58 object-cover shadow-lg"
+                />
+              </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">ข้อมูลส่วนบุคคล</h3>
               <div className="space-y-4">
                 <div className="flex items-center">
@@ -37,6 +45,7 @@ const About = () => {
                   <div className="flex-1 text-gray-900 dark:text-white">จังหวัดอำนาจเจริญ ประเทศไทย</div>
                 </div>
               </div>
+
             </div>
           </div>
 
@@ -51,7 +60,7 @@ const About = () => {
             </div>
 
             {/* Life Goal */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 shadow-lg">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">เป้าหมายในชีวิต</h3>
               <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6">
                 ผมมีความมุ่งมั่นที่จะพัฒนาทักษะด้าน <strong className="text-blue-600 dark:text-blue-400">วิศวกรรมเครือข่าย</strong> เพื่อสร้างความมั่นคงให้แก่ครอบครัว เนื่องจากผมเติบโตมาท่ามกลางความยากลำบาก จึงตระหนักถึงความสำคัญของความมั่นคงในชีวิต และเชื่อมั่นว่า “การศึกษา” คือกุญแจสำคัญในการเปลี่ยนแปลงอนาคต
@@ -62,7 +71,7 @@ const About = () => {
             </div>
 
             {/* Motto */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-8">
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-3">
               <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">คติประจำใจ</h3>
               <blockquote className="text-2xl italic text-gray-900 dark:text-white">
                 <span className="text-blue-600 dark:text-blue-400">“</span>
@@ -72,7 +81,7 @@ const About = () => {
             </div>
 
             {/* Interests */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 shadow-lg">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">ความสนใจ</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">

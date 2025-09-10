@@ -1,49 +1,63 @@
 import React, { useState, useEffect, useRef } from 'react';
-// import { useProjects } from '../hooks/useProjects';
 import { aiChatResponse } from '../utils/ai';
 
-// SVG Icons
 const BotIcon = () => (
-  <svg width="30" height="30" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="32" cy="32" r="30" stroke="currentColor" strokeWidth="4" strokeDasharray="4 4" >
-      <animateTransform
-        attributeName="transform"
-        type="rotate"
-        from="0 32 32"
-        to="360 32 32"
-        dur="3s"
-        repeatCount="indefinite"
-      />
-    </circle>
-    <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="20" fontWeight="bold" fill="currentColor">AI</text>
-  </svg>
+  <img src="/Message-icon.gif" alt="Bot Icon" width="150" height="150" />
 );
 
+
 const SendIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor" />
   </svg>
 );
 
 const CloseIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const LikeIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M14 9V5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5V9H7L12 14L17 9H14Z" fill="currentColor" />
     <path d="M19 10V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V10H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
 
 const DislikeIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M10 15V19C10 20.1046 10.8954 21 12 21C13.1046 21 14 20.1046 14 19V15H17L12 10L7 15H10Z" fill="currentColor" />
     <path d="M5 14V4C5 3.46957 5.21071 2.96086 5.58579 2.58579C5.96086 2.21071 6.46957 2 7 2H17C17.5304 2 18.0391 2.21071 18.4142 2.58579C18.7893 2.96086 19 3.46957 19 4V14H5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
+
+// ✅ Component แนะนำการใช้งาน
+const OnboardingTooltip = ({ isVisible, onClose }) => {
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md shadow-2xl">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+            <BotIcon />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">ยินดีต้อนรับ!</h3>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            กดที่ปุ่ม <span className="font-semibold">AI Assistant</span> ด้านล่างขวา เพื่อเริ่มถามคำถามเกี่ยวกับผลงานและทักษะของผม!
+          </p>
+          <button
+            onClick={onClose}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-full font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+          >
+            เข้าใจแล้ว!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AIChatbot = () => {
   const [input, setInput] = useState('');
@@ -51,8 +65,25 @@ const AIChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const messagesEndRef = useRef(null);
-  // const { projects } = useProjects();
+
+  // ✅ แสดง Onboarding ครั้งแรก
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+    if (!hasSeenOnboarding) {
+      const timer = setTimeout(() => {
+        setShowOnboarding(true);
+      }, 2000); // แสดงหลังจากโหลดเว็บ 2 วินาที
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // ✅ ปิด Onboarding
+  const handleOnboardingClose = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('hasSeenOnboarding', 'true');
+  };
 
   // ✅ Auto-scroll
   useEffect(() => {
@@ -62,6 +93,28 @@ const AIChatbot = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // ✅ เปลี่ยน title และ favicon
+  useEffect(() => {
+    const favicon = document.querySelector("link[rel='shortcut icon']");
+
+    if (isOpen) {
+      document.title = "กำลังพูดคุยกับ AI Assistant | ธนภัทร การะจักษ์";
+      document.body.style.overflow = "hidden";
+      if (favicon) favicon.href = "/chat-icon.png?ver=2";
+
+    } else {
+      document.title = "ธนภัทร การะจักษ์ | Network Enthusiast";
+      document.body.style.overflow = "unset";
+      if (favicon) favicon.href = "/favicon.ico";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+      document.title = "ธนภัทร การะจักษ์ | Network Enthusiast";
+      if (favicon) favicon.href = "/favicon.ico";
+    };
+  }, [isOpen]);
 
   // ✅ ตั้งค่าเริ่มต้น
   useEffect(() => {
@@ -199,11 +252,15 @@ const AIChatbot = () => {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Onboarding Tooltip */}
+      <OnboardingTooltip isVisible={showOnboarding} onClose={handleOnboardingClose} />
+
+      {/* Floating Button — ปรับให้ใหญ่ขึ้น + pulse animation */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg z-50 flex items-center justify-center hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 hover:scale-110"
+          className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-2xl z-50 flex items-center justify-center hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 hover:scale-110 animate-pulse"
+          style={{ animation: 'pulse 2s infinite' }}
           aria-label="Open AI Assistant"
         >
           <BotIcon />
@@ -216,7 +273,7 @@ const AIChatbot = () => {
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
                 <BotIcon />
               </div>
               <div>
@@ -237,37 +294,34 @@ const AIChatbot = () => {
           <div className="flex-1 p-4 overflow-y-auto space-y-4">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs sm:max-w-sm p-3 sm:p-4 rounded-2xl ${
-                  msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-none shadow-lg'
-                    : 'bg-white/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 rounded-bl-none shadow-sm backdrop-blur-sm'
-                }`}>
+                <div className={`max-w-xs sm:max-w-sm p-4 rounded-2xl ${msg.sender === 'user'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-none shadow-lg'
+                  : 'bg-white/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 rounded-bl-none shadow-sm backdrop-blur-sm'
+                  }`}>
                   <p className="text-sm sm:text-base leading-relaxed">{msg.text}</p>
 
                   {msg.sender === 'bot' && (
-                    <div className="flex items-center space-x-2 mt-3 pt-2 border-t border-gray-200/50 dark:border-gray-600/50">
+                    <div className="flex items-center space-x-3 mt-4 pt-3 border-t border-gray-200/50 dark:border-gray-600/50">
                       <button
                         onClick={() => handleReaction(i, 'like')}
-                        className={`flex items-center space-x-1 px-2 py-1 rounded-full transition-all duration-200 ${
-                          msg.reactions?.userLiked
-                            ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                        }`}
+                        className={`flex items-center space-x-2 px-3 py-2 rounded-full transition-all duration-300 transform hover:scale-105 ${msg.reactions?.userLiked
+                          ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                          }`}
                       >
                         <LikeIcon />
-                        <span className="text-xs font-medium">{msg.reactions?.like || 0}</span>
+                        <span className="text-sm font-medium">{msg.reactions?.like || 0}</span>
                       </button>
 
                       <button
                         onClick={() => handleReaction(i, 'dislike')}
-                        className={`flex items-center space-x-1 px-2 py-1 rounded-full transition-all duration-200 ${
-                          msg.reactions?.userDisliked
-                            ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                        }`}
+                        className={`flex items-center space-x-2 px-3 py-2 rounded-full transition-all duration-300 transform hover:scale-105 ${msg.reactions?.userDisliked
+                          ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                          }`}
                       >
                         <DislikeIcon />
-                        <span className="text-xs font-medium">{msg.reactions?.dislike || 0}</span>
+                        <span className="text-sm font-medium">{msg.reactions?.dislike || 0}</span>
                       </button>
                     </div>
                   )}
@@ -277,25 +331,25 @@ const AIChatbot = () => {
 
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-white/80 dark:bg-gray-700/80 p-3 sm:p-4 rounded-2xl rounded-bl-none backdrop-blur-sm">
-                  <div className="flex space-x-2">
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-indigo-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                <div className="bg-white/80 dark:bg-gray-700/80 p-4 rounded-2xl rounded-bl-none backdrop-blur-sm">
+                  <div className="flex space-x-3">
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full animate-bounce"></div>
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                   </div>
                 </div>
               </div>
             )}
 
             {suggestedQuestions.length > 0 && !isTyping && (
-              <div className="p-3 bg-gray-50/50 dark:bg-gray-900/30 rounded-2xl">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">ลองถามต่อ:</p>
+              <div className="p-4 bg-gray-50/50 dark:bg-gray-900/30 rounded-2xl">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-semibold">ลองถามคำถามเหล่านี้:</p>
                 <div className="flex flex-wrap gap-2">
                   {suggestedQuestions.map((q, i) => (
                     <button
                       key={i}
                       onClick={() => handleSuggestedQuestion(q)}
-                      className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-xs rounded-full hover:bg-indigo-200 dark:hover:bg-indigo-800/50 transition-colors"
+                      className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-sm rounded-xl hover:bg-indigo-200 dark:hover:bg-indigo-800/50 transition-all duration-300 transform hover:scale-105 font-medium"
                     >
                       {q}
                     </button>
@@ -309,19 +363,19 @@ const AIChatbot = () => {
 
           {/* Input */}
           <form onSubmit={handleSubmit} className="p-2 border-t border-gray-200/20 dark:border-gray-700/40 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-            <div className="flex space-x-1">
+            <div className="flex space-x-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="ถามผมอะไรก็ได้ครับ..."
-                className="flex-1 px-4 py-3 bg-white/70 dark:bg-gray-700/70 border border-gray-300/50 dark:border-gray-600/50 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white text-sm"
+                className="flex-1 px-2 py-4 bg-white/70 dark:bg-gray-700/70 border border-gray-300/50 dark:border-gray-600/50 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white text-sm font-medium"
                 disabled={isTyping}
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isTyping}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-3 rounded-full hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-full hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <SendIcon />
               </button>
@@ -329,6 +383,13 @@ const AIChatbot = () => {
           </form>
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+          50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+        }
+      `}</style>
     </>
   );
 };

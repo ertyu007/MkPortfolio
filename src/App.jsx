@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Navbar from './components/Navbar';
@@ -10,11 +10,9 @@ import Certificates from './pages/Certificates';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import { ThemeProvider } from './context/ThemeContext';
-import ThemeToggle from './components/ThemeToggle';
 import Footer from './components/Footer';
 import AIChatbot from './components/AIChatbot';
-
-
+import WelcomePopup from './components/WelcomePopup';
 
 
 const App = () => {
@@ -26,6 +24,9 @@ const App = () => {
   const blogRef = useRef(null);
   const contactRef = useRef(null);
 
+  const [showWelcome, setShowWelcome] = useState(false);
+
+
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -33,7 +34,21 @@ const App = () => {
       once: true,
       offset: 100,
     });
+
+    // ✅ แสดง WelcomePopup ครั้งแรก
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+    if (!hasSeenWelcome) {
+      const timer = setTimeout(() => {
+        setShowWelcome(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
   }, []);
+
+  const handleWelcomeClose = () => {
+    setShowWelcome(false);
+    localStorage.setItem('hasSeenWelcome', 'true');
+  };
 
   return (
     <ThemeProvider>
@@ -48,9 +63,8 @@ const App = () => {
             contact: contactRef
           }}
         />
-        <ThemeToggle />
         <AIChatbot />
-        
+
         <main>
           <div ref={homeRef} id="home"><Home /></div>
           <div ref={aboutRef} id="about"><About /></div>
@@ -62,6 +76,8 @@ const App = () => {
         </main>
 
         <Footer />
+
+        {showWelcome && <WelcomePopup onClose={handleWelcomeClose} />}
       </div>
     </ThemeProvider>
   );

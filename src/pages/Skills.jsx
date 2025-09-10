@@ -55,14 +55,14 @@ const Skills = () => {
         {/* Skills Grid */}
         <div className="space-y-16">
           {categories.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl">
+            <div key={categoryIndex} className="bg-white dark:bg-gray-800 rounded-3xl p-2 shadow-xl">
               <h3 className={`text-3xl font-bold mb-8 bg-gradient-to-r ${category.color} bg-clip-text text-transparent`}>
                 {category.title}
               </h3>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {category.skills.map((skill, skillIndex) => (
-                  <div key={skillIndex} className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300">
+                  <div key={skillIndex} className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-3 hover:shadow-lg transition-shadow duration-300">
                     <div className="flex justify-between items-start mb-3">
                       <h4 className="font-semibold text-gray-900 dark:text-white">{skill.name}</h4>
                       <span className={`font-bold ${category.textColor}`}>{skill.level}%</span>

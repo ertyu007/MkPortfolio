@@ -75,7 +75,7 @@ const Home = () => {
                 className="space-y-6"
                 variants={containerVariants}
               >
-                <motion.div variants={itemVariants} className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-4">
+                <motion.div variants={itemVariants} className="inline-flex items-center px-2 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-4 mt-4">
                   <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
                   นักเรียนมัธยมปลาย | อนาคตวิศวกรเครือข่าย
                 </motion.div>
@@ -161,10 +161,10 @@ const Home = () => {
                   <div className="aspect-square bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
                     <motion.img
                       whileHover={{ scale: 1.05 }}
-                      // src="/assets/images/heroImage.jpg"
-                      src="https://picsum.photos/seed/picsum/200/300"
+                      src="/assets/images/heroImage.jpg"
+                      // src="https://picsum.photos/seed/picsum/200/300"
                       alt="ธนภัทร การะจักษ์"
-                      className="object-cover w-full h-full"
+                      className="object-cover w-full h-full rounded-2xl shadow-lg"
                     />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent text-white">
@@ -181,14 +181,14 @@ const Home = () => {
       </section>
 
       {/* Quote Section */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-24 px-3 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true }}
-            className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-2xl p-8 sm:p-12 shadow-lg border border-gray-100 dark:border-gray-700"
+            className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-2xl p-3 sm:p-12 shadow-lg border border-gray-100 dark:border-gray-700"
           >
             <blockquote className="text-xl sm:text-2xl md:text-3xl text-center italic text-gray-700 dark:text-gray-300 font-light">
               <span className="text-blue-600 dark:text-blue-400 text-4xl">"</span>
@@ -208,7 +208,7 @@ const Home = () => {
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.3 }}
               viewport={{ once: true }}
-              className="mt-8 text-center text-gray-600 dark:text-gray-400 text-lg"
+              className="mt-6 text-center text-gray-600 dark:text-gray-400 text-lg"
             >
               ผมเป็นนักเรียนที่มีความกระตือรือร้นในการแสวงหาความรู้ใหม่ ๆ
               และมุ่งมั่นที่จะเก็บเกี่ยวประสบการณ์ที่หลากหลายอยู่เสมอ

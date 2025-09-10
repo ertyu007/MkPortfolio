@@ -1,79 +1,86 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
+import { FaUser, FaCode, FaBriefcase, FaAward, FaNewspaper, FaEnvelope, FaBars, FaTimes, FaMoon, FaSun } from 'react-icons/fa';
 
 const Navbar = ({ scrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const navItems = [
-    { label: "หน้าหลัก", section: "home" },
-    { label: "เกี่ยวกับฉัน", section: "about" },
-    { label: "ทักษะ", section: "skills" },
-    { label: "ผลงาน", section: "portfolio" },
-    { label: "บทความ", section: "blog" },
-    { label: "ติดต่อ", section: "contact" },
+    { label: "เกี่ยวกับ", icon: <FaUser />, ref: scrollToSection.aboutRef },
+    { label: "ทักษะ", icon: <FaCode />, ref: scrollToSection.skillsRef },
+    { label: "ผลงาน", icon: <FaBriefcase />, ref: scrollToSection.portfolioRef },
+    { label: "ประกาศนียบัตร", icon: <FaAward />, ref: scrollToSection.certificatesRef },
+    { label: "บทความ", icon: <FaNewspaper />, ref: scrollToSection.blogRef },
+    { label: "ติดต่อ", icon: <FaEnvelope />, ref: scrollToSection.contactRef },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex justify-between items-center h-16">
-          <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
-            Portfolio
+    <nav className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-b border-white/20 dark:border-gray-700/40">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
+          <div className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            My Portfolio
           </div>
-          
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex space-x-1">
+
+          {/* Desktop Menu + Theme Toggle */}
+          <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => {
-                  const element = document.getElementById(item.section);
-                  element?.scrollIntoView({ behavior: 'smooth' });
+                  item.ref?.current?.scrollIntoView({ behavior: 'smooth' });
+                  setIsOpen(false);
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all"
+                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all"
               >
                 {item.label}
               </button>
             ))}
+            {/* ✅ Theme Toggle ใน Navbar */}
+            <button
+              onClick={toggleDarkMode}
+              className="ml-4 p-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all"
+              aria-label="Toggle theme"
+            >
+              {darkMode ? <FaSun className="text-yellow-400" /> : <FaMoon />}
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
+          <div className="md:hidden flex items-center space-x-2">
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all"
+              aria-label="Toggle theme"
+            >
+              {darkMode ? <FaSun className="text-yellow-400" /> : <FaMoon />}
+            </button>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50"
+            >
+              {isOpen ? <FaTimes /> : <FaBars />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="lg:hidden py-4 border-t border-gray-200 dark:border-gray-700"
-          >
+          <div className="md:hidden py-4 border-t border-white/20 dark:border-gray-700/40">
             {navItems.map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => {
+                  item.ref?.current?.scrollIntoView({ behavior: 'smooth' });
                   setIsOpen(false);
-                  const element = document.getElementById(item.section);
-                  element?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="block w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
+                className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-all"
               >
                 {item.label}
               </button>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </nav>
