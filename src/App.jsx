@@ -24,7 +24,7 @@ const App = () => {
   const contactRef = useRef(null);
 
   const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeInitialized, setWelcomeInitialized] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
     AOS.init({
@@ -34,16 +34,20 @@ const App = () => {
       offset: 100,
     });
 
-    // ✅ แสดง WelcomePopup ครั้งแรกเท่านั้น
-    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
-    if (!hasSeenWelcome && !welcomeInitialized) {
-      const timer = setTimeout(() => {
-        setShowWelcome(true);
-        setWelcomeInitialized(true);
-      }, 1000);
-      return () => clearTimeout(timer);
+    // ✅ ตรวจสอบว่าเคยแสดงป๊อปอัพแล้วหรือยัง (รันครั้งเดียวเท่านั้น)
+    if (!hasInitialized) {
+      const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+      if (!hasSeenWelcome) {
+        const timer = setTimeout(() => {
+          setShowWelcome(true);
+          setHasInitialized(true);
+        }, 1000);
+        
+        return () => clearTimeout(timer);
+      }
+      setHasInitialized(true);
     }
-  }, [welcomeInitialized]);
+  }, [hasInitialized]); // ใส่ dependency ที่ถูกต้อง
 
   const handleWelcomeClose = () => {
     setShowWelcome(false);

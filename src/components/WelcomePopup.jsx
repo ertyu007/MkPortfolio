@@ -3,13 +3,15 @@ import React, { useState, useEffect } from 'react';
 const WelcomePopup = ({ onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // เพิ่ม animation เมื่อ component ถูก mount
-    const timer = setTimeout(() => {
+    // เปิดป๊อปอัพด้วย animation
+    const openTimer = setTimeout(() => {
       setIsVisible(true);
-    }, 100);
-    return () => clearTimeout(timer);
+    }, 50);
+    
+    return () => clearTimeout(openTimer);
   }, []);
 
   const steps = [
@@ -30,6 +32,18 @@ const WelcomePopup = ({ onClose }) => {
     }
   ];
 
+  const handleClose = () => {
+    if (isClosing) return; // ป้องกันการกดปุ่มซ้ำ
+    
+    setIsClosing(true);
+    setIsVisible(false);
+    
+    // รอให้ animation ปิดเสร็จก่อนเรียก onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -38,20 +52,17 @@ const WelcomePopup = ({ onClose }) => {
     }
   };
 
-  const handleClose = () => {
-    setIsVisible(false);
-    // รอให้ animation เสร็จสิ้นก่อนเรียก onClose
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
-
   const handleSkip = () => {
     handleClose();
   };
 
+  // ถ้ากำลังปิดอยู่ ไม่ต้องแสดงอะไร
+  if (isClosing) {
+    return null;
+  }
+
   return (
-    <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+    <div className={`fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <div className={`bg-white dark:bg-gray-800 rounded-3xl p-1 sm:p-4 max-w-md w-full shadow-2xl backdrop-blur-xl border border-white/20 dark:border-gray-700/40 transform transition-all duration-300 ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
