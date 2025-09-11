@@ -7,13 +7,21 @@ const Navbar = ({ scrollToSection }) => {
   const { darkMode, toggleDarkMode } = useTheme();
 
   const navItems = [
-    { label: "เกี่ยวกับ", icon: <FaUser />, ref: scrollToSection.aboutRef },
-    { label: "ทักษะ", icon: <FaCode />, ref: scrollToSection.skillsRef },
-    { label: "ผลงาน", icon: <FaBriefcase />, ref: scrollToSection.portfolioRef },
-    { label: "ประกาศนียบัตร", icon: <FaAward />, ref: scrollToSection.certificatesRef },
-    { label: "บทความ", icon: <FaNewspaper />, ref: scrollToSection.blogRef },
-    { label: "ติดต่อ", icon: <FaEnvelope />, ref: scrollToSection.contactRef },
+    { label: "เกี่ยวกับ", icon: <FaUser />, section: "about" },
+    { label: "ทักษะ", icon: <FaCode />, section: "skills" },
+    { label: "ผลงาน", icon: <FaBriefcase />, section: "portfolio" },
+    { label: "ประกาศนียบัตร", icon: <FaAward />, section: "certificates" },
+    { label: "บทความ", icon: <FaNewspaper />, section: "blog" },
+    { label: "ติดต่อ", icon: <FaEnvelope />, section: "contact" },
   ];
+
+  const handleNavClick = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-b border-white/20 dark:border-gray-700/40">
@@ -28,10 +36,7 @@ const Navbar = ({ scrollToSection }) => {
             {navItems.map((item, idx) => (
               <button
                 key={idx}
-                onClick={() => {
-                  item.ref?.current?.scrollIntoView({ behavior: 'smooth' });
-                  setIsOpen(false);
-                }}
+                onClick={() => handleNavClick(item.section)}
                 className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all"
               >
                 {item.label}
@@ -71,10 +76,7 @@ const Navbar = ({ scrollToSection }) => {
             {navItems.map((item, idx) => (
               <button
                 key={idx}
-                onClick={() => {
-                  item.ref?.current?.scrollIntoView({ behavior: 'smooth' });
-                  setIsOpen(false);
-                }}
+                onClick={() => handleNavClick(item.section)}
                 className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-all"
               >
                 {item.label}

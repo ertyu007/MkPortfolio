@@ -58,7 +58,7 @@ const Home = () => {
       </div>
 
       {/* Hero Section */}
-      <section className="relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-2 sm:py-12 lg:py-2 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center"
@@ -75,7 +75,7 @@ const Home = () => {
                 className="space-y-6"
                 variants={containerVariants}
               >
-                <motion.div variants={itemVariants} className="inline-flex items-center px-2 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-4 mt-4">
+                <motion.div variants={itemVariants} className="inline-flex items-center px-2 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-1 mt-4">
                   <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
                   นักเรียนมัธยมปลาย | อนาคตวิศวกรเครือข่าย
                 </motion.div>
@@ -96,6 +96,10 @@ const Home = () => {
                 >
                   นักเรียนที่มีความมุ่งมั่นและหลงใหลในเทคโนโลยีระบบเครือข่าย
                   พร้อมก้าวสู่คณะวิศวกรรมศาสตร์ สาขาวิชาวิศวกรรมเครือข่ายและความปลอดภัย
+
+                  <span className='block mt-2 bg-gradient-to-r from-blue-600 to-indigo-400 bg-clip-text text-transparent'>
+                      หากมีอะไรสงสัยสามารถสอบถาม Ai ล่างขวา ได้เลยครับ
+                  </span>
                 </motion.p>
               </motion.div>
 

@@ -6,14 +6,14 @@ Modal.setAppElement('#root');
 // SVG Icons
 const CertificateIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const AwardIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 15C15.866 15 19 11.866 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 11.866 8.13401 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M8.21 13.89L7 23L12 20L17 23L15.79 13.88" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12 15C15.866 15 19 11.866 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 11.866 8.13401 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M8.21 13.89L7 23L12 20L17 23L15.79 13.88" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -26,7 +26,7 @@ const CertificateCard = ({ cert, onClick }) => {
     >
       <div className="relative overflow-hidden">
         <img
-          src={cert.image || "https://via.placeholder.com/600x400?text=Certificate"}
+          src={cert.image}
           alt={cert.title}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
@@ -51,25 +51,81 @@ const Certificates = () => {
   const certificates = [
     {
       id: 1,
-      title: "AWS Certified Developer",
-      description: "ผ่านการรับรองความสามารถในการพัฒนาและดูแลแอปพลิเคชันบน AWS",
-      date: "มีนาคม 2025",
-      image: "https://picsum.photos/200/300?random=2"
+      title: "ค่ายคณิตศาสตร์ (NP MATH CAMP) ครั้งที่ 1",
+      description: "ได้เข้าร่วมกิจกรรม 'ค่ายคณิตศาสตร์ (NP MATH CAMP) ครั้งที่ 1' ณ โรงเรียนน้ำปลีกศึกษา อำเภอเมือง จังหวัดอำนาจเจริญ",
+      date: "25 สิงหาคม 2567",
+      image: "/assets/certificates/Certificate_1.jpg"
     },
     {
       id: 2,
-      title: "React Advanced Certification",
-      description: "ผ่านการรับรองความเชี่ยวชาญในการพัฒนาแอปพลิเคชันด้วย React",
-      date: "กุมภาพันธ์ 2025",
-      image: "https://picsum.photos/200/300?random=3"
+      title: "นักเรียนจิตอาสาดีเด่น",
+      description: "เป็นนักเรียนจิตอาสาดีเด่น เนื่องในกิจกรรมการเดินทางไกลและอยู่ค่ายพักแรม ลูกเสือ - เนตรนารี และผู้บำเพ็ญประโยชน์ ประจำปีการศึกษา 2567",
+      date: "21 กุมภาพันธ์ 2568",
+      image: "/assets/certificates/Certificate_2.jpg"
     },
     {
       id: 3,
-      title: "Full Stack Web Development",
-      description: "ผ่านการรับรองความสามารถในการพัฒนาเว็บแบบ Full Stack",
-      date: "มกราคม 2025",
-      image: "https://picsum.photos/200/300?random=1"
+      title: "รางวัลระดับเหรียญทอง กิจกรรมการแข่งขันหุ่นยนต์",
+      description: "ได้รับรางวัลระดับเหรียญทอง กิจกรรมการแข่งขันหุ่นยนต์ระดับชั้น ม.๔ - ม.๖ งานศิลปหัตถกรรมนักเรียน ระดับเขตพื้นที่การศึกษา ครั้งที่ ๗๑ ประจำปีการศึกษา ๒๕๖๖",
+      date: "๒๓-๒๔ พฤศจิกายน ๒๕๖๖",
+      image: "/assets/certificates/Certificate_3.jpg"
     },
+    {
+      id: 4,
+      title: "แกนนำเยาวชน TO BE NUMBER ONE",
+      description: "ได้เข้าพัฒนาแกนนำเยาวชน TO BE NUMBER ONE เพื่อเป็นต้นแบบการเป็นคนดี คนเก่งและมีคุณภาพ ประจำปีงบประมาณ ๒๕๖๖",
+      date: "๒๑ - ๒๒ ธันวาคม ๒๕๖๖",
+      image: "/assets/certificates/Certificate_4.jpg"
+    },
+    {
+      id: 5,
+      title: "Reunion เยาวชนสร้างชาติ ครั้งที่ 1",
+      description: "ได้ผ่านการอบรมโครงการค่าย Reunion เยาวชนสร้างชาติ ดี เก่ง กล้า จังหวัดอำนาจเจริญ (ครั้งที่ 1) โดยนักศึกษาหลักสูตรนักบริหารระดับสูงเพื่อการสร้างชาติ รุ่นที่ 13",
+      date: "24 มกราคม 2567",
+      image: "/assets/certificates/Certificate_5.jpg"
+    },
+    {
+      id: 6,
+      title: "โครงการฝึกอบรมพัฒนาทักษะชีวิตและทักษะอาชีพ",
+      description: "ได้เข้าร่วมโครงการฝึกอบรมพัฒนาทักษะชีวิตและทักษะอาชีพ เพื่อเตรียมความพร้อมเด็กไทยสู่การเป็นผู้ประกอบการรุ่นเยาว์ รุ่นที่ ๑",
+      date: "๑-๑๔ สิงหาคม ๒๕๖๖",
+      image: "/assets/certificates/Certificate_6.jpg"
+    },
+    {
+      id: 7,
+      title: "การคัดเลือกตัวแทนโรงเรียนไปแข่งขันตอบปัญหากฎหมาย",
+      description: "ได้เข้าร่วมการคัดเลือกตัวแทนโรงเรียน เพื่อไปแข่งขันตอบปัญหากฎหมายเนื่องในวันรพี ชิงทุนการศึกษาพร้อมโล่รางวัล ณ ศาลเยาวชนและครอบครัวจังหวัดอำนาจเจริญ",
+      date: "13 กรกฎาคม 2566",
+      image: "/assets/certificates/Certificate_7.jpg"
+    },
+    {
+      id: 8,
+      title: "คณะกรรมการสภานักเรียน",
+      description: "คณะกรรมการสภานักเรียน ประจำปีการศึกษา ๒๕๖๘ และคณะกรรมการดำเนินงาน ผู้มีความเสียสละ อุทิศเวลา และความสามารถในการร่วมวางแผนและดำเนินการตามกิจกรรม ด้วยความตั้งใจและความรับผิดชอบ เนื่องในพิธีไหว้ครู ประจำปีการศึกษา ๒๕๖๘",
+      date: "๑๒ มิถุนายน พ.ศ. ๒๕๖๘",
+      image: "/assets/certificates/Certificate_8.jpg"
+    },
+    {
+      id: 9,
+      title: "นักเรียนผู้มีจิตอาสาดีเด่น",
+      description: "ได้รับการคัดเลือกให้เป็น นักเรียนผู้มีจิตอาสาดีเด่น ภาคเรียนที่ ๑ ปีการศึกษา ๒๕๖๗",
+      date: "๘ สิงหาคม พ.ศ. ๒๕๖๗",
+      image: "/assets/certificates/Certificate_9.jpg"
+    },
+    {
+      id: 10,
+      title: "โครงการอบรมเชิงปฏิบัติการห้องเรียนพิเศษวิทยาศาสตร์",
+      description: "ได้เข้าร่วมโครงการอบรมเชิงปฏิบัติการห้องเรียนพิเศษวิทยาศาสตร์ ณ คณะวิทยาศาสตร์ มหาวิทยาลัยอุบลราชธานี",
+      date: "19 ตุลาคม 2567",
+      image: "/assets/certificates/Certificate_10.jpg"
+    },
+    {
+      id: 11,
+      title: "ผู้ปฏิบัติตนตรงตามคุณลักษณะอันพึงประสงค์ 'อยู่อย่างพอเพียง'",
+      description: "เป็นผู้ปฏิบัติตนตรงตามคุณลักษณะอันพึงประสงค์ข้อที่ ๔ 'อยู่อย่างพอเพียง' ชั้นมัธยมศึกษาปีที่ ๕/๒ ปีการศึกษา ๒๕๖๗",
+      date: "25 กุมภาพันธ์ 2568",
+      image: "/assets/certificates/Certificate_11.jpg"
+    }
   ];
 
   return (
@@ -82,7 +138,7 @@ const Certificates = () => {
       </div>
 
       <p className="text-center text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto">
-        ประกาศนียบัตรและความสำเร็จที่ได้รับจากการเรียนรู้และพัฒนาทักษะด้านเทคโนโลยี
+        ความสำเร็จและความภาคภูมิใจจากการเข้าร่วมกิจกรรมและโครงการต่าง ๆ
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
