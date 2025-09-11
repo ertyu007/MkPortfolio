@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const WelcomePopup = ({ onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // เพิ่ม animation เมื่อ component ถูก mount
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const steps = [
     {
@@ -25,17 +34,25 @@ const WelcomePopup = ({ onClose }) => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      onClose();
+      handleClose();
     }
   };
 
+  const handleClose = () => {
+    setIsVisible(false);
+    // รอให้ animation เสร็จสิ้นก่อนเรียก onClose
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
   const handleSkip = () => {
-    onClose();
+    handleClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-1 sm:p-4 max-w-md w-full shadow-2xl backdrop-blur-xl border border-white/20 dark:border-gray-700/40 transform transition-all duration-300">
+    <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`bg-white dark:bg-gray-800 rounded-3xl p-1 sm:p-4 max-w-md w-full shadow-2xl backdrop-blur-xl border border-white/20 dark:border-gray-700/40 transform transition-all duration-300 ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
             {steps[currentStep].icon}

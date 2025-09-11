@@ -14,7 +14,6 @@ import Footer from './components/Footer';
 import AIChatbot from './components/AIChatbot';
 import WelcomePopup from './components/WelcomePopup';
 
-
 const App = () => {
   const homeRef = useRef(null);
   const aboutRef = useRef(null);
@@ -25,7 +24,7 @@ const App = () => {
   const contactRef = useRef(null);
 
   const [showWelcome, setShowWelcome] = useState(false);
-
+  const [welcomeInitialized, setWelcomeInitialized] = useState(false);
 
   useEffect(() => {
     AOS.init({
@@ -35,15 +34,16 @@ const App = () => {
       offset: 100,
     });
 
-    // ✅ แสดง WelcomePopup ครั้งแรก
+    // ✅ แสดง WelcomePopup ครั้งแรกเท่านั้น
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
-    if (!hasSeenWelcome) {
+    if (!hasSeenWelcome && !welcomeInitialized) {
       const timer = setTimeout(() => {
         setShowWelcome(true);
+        setWelcomeInitialized(true);
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [welcomeInitialized]);
 
   const handleWelcomeClose = () => {
     setShowWelcome(false);
