@@ -70,7 +70,7 @@ const App = () => {
           <div ref={aboutRef} id="about"><About /></div>
           <div ref={skillsRef} id="skills"><Skills /></div>
           <div ref={portfolioRef} id="portfolio"><Portfolio /></div>
-          <div ref={CertificatesRef} id="blog"><Certificates /></div>
+          <div ref={CertificatesRef} id="certificates"><Certificates /></div>
           <div ref={blogRef} id="blog"><Blog /></div>
           <div ref={contactRef} id="contact"><Contact /></div>
         </main>

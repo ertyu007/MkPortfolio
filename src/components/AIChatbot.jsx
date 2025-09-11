@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { aiChatResponse } from '../utils/ai';
+import { aiChatResponse, aiGenerateQuestions } from '../utils/ai';
 
 const BotIcon = () => (
   <img src="/Message-icon.gif" alt="Bot Icon" width="150" height="150" />
 );
-
 
 const SendIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -66,8 +65,8 @@ const AIChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
   const messagesEndRef = useRef(null);
-
 
   // ✅ เพิ่ม useEffect สำหรับจัดการแป้นพิมพ์
   useEffect(() => {
@@ -95,7 +94,7 @@ const AIChatbot = () => {
     if (!hasSeenOnboarding) {
       const timer = setTimeout(() => {
         setShowOnboarding(true);
-      }, 2000); // แสดงหลังจากโหลดเว็บ 2 วินาที
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -123,7 +122,6 @@ const AIChatbot = () => {
       document.title = "กำลังพูดคุยกับ AI Assistant | ธนภัทร การะจักษ์";
       document.body.style.overflow = "hidden";
       if (favicon) favicon.href = "/chat-icon.png?ver=2";
-
     } else {
       document.title = "ธนภัทร การะจักษ์ | Network Enthusiast";
       document.body.style.overflow = "unset";
@@ -150,7 +148,7 @@ const AIChatbot = () => {
     ]);
   }, []);
 
-  // ✅ ระบบพิมทีละตัว
+  // ✅ ระบบพิมพ์ทีละตัว
   const typeMessage = (fullText, onComplete) => {
     let index = 0;
     const interval = setInterval(() => {
@@ -171,6 +169,83 @@ const AIChatbot = () => {
     }, 30);
   };
 
+  // ✅ ฟังก์ชันตรวจสอบ context type
+  const detectContextType = (userInput, botResponse) => {
+    const lowerInput = userInput.toLowerCase();
+    const lowerResponse = botResponse.toLowerCase();
+    
+    if (lowerInput.includes('ทักษะ') || lowerResponse.includes('ทักษะ') || 
+        lowerInput.includes('skill') || lowerResponse.includes('skill')) {
+      return 'skills';
+    }
+    if (lowerInput.includes('ผลงาน') || lowerResponse.includes('ผลงาน') || 
+        lowerInput.includes('project') || lowerResponse.includes('project')) {
+      return 'projects';
+    }
+    if (lowerInput.includes('ประกาศนียบัตร') || lowerResponse.includes('ประกาศนียบัตร') || 
+        lowerInput.includes('certificate') || lowerResponse.includes('certificate') ||
+        lowerInput.includes('รางวัล') || lowerResponse.includes('รางวัล')) {
+      return 'certificates';
+    }
+    if (lowerInput.includes('บทความ') || lowerResponse.includes('บทความ') || 
+        lowerInput.includes('blog') || lowerResponse.includes('blog')) {
+      return 'blog';
+    }
+    if (lowerInput.includes('การศึกษา') || lowerResponse.includes('การศึกษา') || 
+        lowerInput.includes('เรียน') || lowerResponse.includes('เรียน') ||
+        lowerInput.includes('มหาวิทยาลัย') || lowerResponse.includes('มหาวิทยาลัย')) {
+      return 'education';
+    }
+    if (lowerInput.includes('เครือข่าย') || lowerResponse.includes('เครือข่าย') ||
+        lowerInput.includes('network') || lowerResponse.includes('network')) {
+      return 'network';
+    }
+    return 'general';
+  };
+
+  // ✅ ระบบสร้างคำถามแนะนำแบบ AI
+  const generateSuggestedQuestions = async (userInput, botResponse) => {
+    setIsGeneratingQuestions(true);
+    const contextType = detectContextType(userInput, botResponse);
+    
+    try {
+      const questions = await aiGenerateQuestions(userInput, botResponse, contextType);
+      setSuggestedQuestions(questions);
+    } catch (err) {
+      console.error("Failed to generate questions:", err);
+      // ไม่ใช้ fallback แต่แสดงสถานะว่าง
+      setSuggestedQuestions([]);
+    } finally {
+      setIsGeneratingQuestions(false);
+    }
+  };
+
+  // ✅ ฟังก์ชันสร้าง context ที่เฉพาะเจาะจง
+  const createSpecificContext = (userInput) => {
+    const lowerInput = userInput.toLowerCase();
+    
+    if (lowerInput.includes("ทักษะ") || lowerInput.includes("skill")) {
+      return "ผู้ใช้ถามเกี่ยวกับทักษะของธนภัทร — โปรดตอบตามข้อมูลทักษะที่มีอยู่โดยอ้างอิงจากข้อมูลจริง";
+    }
+    if (lowerInput.includes("ผลงาน") || lowerInput.includes("project")) {
+      return "ผู้ใช้ถามเกี่ยวกับผลงานของธนภัทร — โปรดตอบตามข้อมูลผลงานที่มีอยู่โดยอ้างอิงจากข้อมูลจริง";
+    }
+    if (lowerInput.includes("ประกาศนียบัตร") || lowerInput.includes("certificate") || lowerInput.includes("รางวัล")) {
+      return "ผู้ใช้ถามเกี่ยวกับประกาศนียบัตรและรางวัลของธนภัทร — โปรดตอบตามข้อมูลประกาศนียบัตรที่มีอยู่โดยอ้างอิงจากข้อมูลจริง";
+    }
+    if (lowerInput.includes("บทความ") || lowerInput.includes("blog")) {
+      return "ผู้ใช้ถามเกี่ยวกับบทความของธนภัทร — โปรดตอบตามข้อมูลบทความที่มีอยู่โดยอ้างอิงจากข้อมูลจริง";
+    }
+    if (lowerInput.includes("การศึกษา") || lowerInput.includes("เรียน") || lowerInput.includes("มหาวิทยาลัย")) {
+      return "ผู้ใช้ถามเกี่ยวกับการศึกษาของธนภัทร — โปรดตอบตามข้อมูลการศึกษาที่มีอยู่โดยอ้างอิงจากข้อมูลจริง";
+    }
+    if (lowerInput.includes("เครือข่าย") || lowerInput.includes("network")) {
+      return "ผู้ใช้ถามเกี่ยวกับเครือข่าย — โปรดตอบตามข้อมูลทักษะเครือข่ายของธนภัทรโดยอ้างอิงจากข้อมูลจริง";
+    }
+    
+    return `ผู้ใช้ถามเกี่ยวกับ: ${userInput}. โปรดตอบตามข้อมูล portfolio ของธนภัทรที่มีอยู่โดยอ้างอิงจากข้อมูลจริง`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isTyping) return;
@@ -182,7 +257,9 @@ const AIChatbot = () => {
     setSuggestedQuestions([]);
 
     try {
-      const response = await aiChatResponse(input);
+      const context = createSpecificContext(input);
+      const response = await aiChatResponse(input, context);
+      
       setMessages(prev => [...prev, { text: '', sender: 'bot' }]);
       typeMessage(response, () => {
         setIsTyping(false);
@@ -191,15 +268,11 @@ const AIChatbot = () => {
     } catch (err) {
       console.error("AI Error:", err);
       setMessages(prev => [...prev, {
-        text: "ขอโทษครับ — ผมยังเรียนรู้อยู่ — ลองถามคำถามอื่นดูนะครับ!",
+        text: "ขอโทษครับ — เกิดข้อผิดพลาดในการประมวลผล — ลองถามคำถามอื่นดูนะครับ!",
         sender: 'bot'
       }]);
       setIsTyping(false);
-      setSuggestedQuestions([
-        "เล่าเกี่ยวกับตัวคุณหน่อย?",
-        "มีผลงานที่ภูมิใจที่สุดไหม?",
-        "เรียนรู้ทักษะพวกนี้มาจากไหน?"
-      ]);
+      setSuggestedQuestions([]);
     }
   };
 
@@ -235,34 +308,6 @@ const AIChatbot = () => {
     }));
   };
 
-  // ✅ สร้างคำถามแนะนำ
-  const generateSuggestedQuestions = (userInput, botResponse) => {
-    const questions = [];
-    const lowerInput = userInput.toLowerCase();
-
-    if (lowerInput.includes('ผลงาน') || botResponse.includes('ผลงาน')) {
-      questions.push("ผลงานนี้ใช้เทคโนโลยีอะไรบ้าง?", "มีปัญหาอะไรที่เจอระหว่างพัฒนา?", "ผลลัพธ์ที่ได้คืออะไร?");
-    }
-
-    if (lowerInput.includes('ทักษะ') || botResponse.includes('ทักษะ')) {
-      questions.push("เรียนรู้ทักษะนี้มาจากไหน?", "ใช้ทักษะนี้ในโปรเจกต์ไหนบ้าง?", "มีแผนจะเรียนรู้ทักษะอะไรต่อ?");
-    }
-
-    if (lowerInput.includes('react') || botResponse.includes('react')) {
-      questions.push("ใช้ React Hooks อะไรบ่อยที่สุด?", "เจอปัญหาอะไรกับ React บ้าง?", "ชอบใช้ library อะไรกับ React?");
-    }
-
-    if (questions.length === 0) {
-      questions.push(
-        "มีผลงานที่ใช้ AI ไหม?",
-        "ทักษะที่อยากเรียนรู้ต่อคืออะไร?",
-        "มีแผนจะพัฒนาอะไรต่อ?"
-      );
-    }
-
-    setSuggestedQuestions(questions.slice(0, 3));
-  };
-
   const handleSuggestedQuestion = (question) => {
     setInput(question);
     setTimeout(() => {
@@ -276,7 +321,7 @@ const AIChatbot = () => {
       {/* Onboarding Tooltip */}
       <OnboardingTooltip isVisible={showOnboarding} onClose={handleOnboardingClose} />
 
-      {/* Floating Button — ปรับให้ใหญ่ขึ้น + pulse animation */}
+      {/* Floating Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
@@ -364,18 +409,22 @@ const AIChatbot = () => {
 
             {suggestedQuestions.length > 0 && !isTyping && (
               <div className="p-4 bg-gray-50/50 dark:bg-gray-900/30 rounded-2xl">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-semibold">ลองถามคำถามเหล่านี้:</p>
-                <div className="flex flex-wrap gap-2">
-                  {suggestedQuestions.map((q, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleSuggestedQuestion(q)}
-                      className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-sm rounded-xl hover:bg-indigo-200 dark:hover:bg-indigo-800/50 transition-all duration-300 transform hover:scale-105 font-medium"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-semibold">
+                  {isGeneratingQuestions ? "กำลังสร้างคำถามแนะนำ..." : "ลองถามคำถามเหล่านี้:"}
+                </p>
+                {!isGeneratingQuestions && (
+                  <div className="flex flex-wrap gap-2">
+                    {suggestedQuestions.map((q, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleSuggestedQuestion(q)}
+                        className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-sm rounded-xl hover:bg-indigo-200 dark:hover:bg-indigo-800/50 transition-all duration-300 transform hover:scale-105 font-medium"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

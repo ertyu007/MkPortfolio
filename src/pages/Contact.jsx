@@ -14,7 +14,7 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!form.name || !form.email || !form.message) {
       setError('กรุณากรอกข้อมูลให้ครบถ้วน');
       return;
@@ -50,7 +50,13 @@ const Contact = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 py-20">
+    <motion.div
+      className="bg-white dark:bg-gray-900 py-20"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
@@ -163,6 +169,7 @@ const Contact = () => {
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">ข้อมูลติดต่อ</h3>
 
               <div className="space-y-6">
+                {/* ที่อยู่ */}
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
                     <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,11 +183,11 @@ const Contact = () => {
                   </div>
                 </div>
 
+                {/* อีเมล */}
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center">
                     <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0l4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
                   <div>
@@ -189,6 +196,7 @@ const Contact = () => {
                   </div>
                 </div>
 
+                {/* โทรศัพท์ */}
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
                     <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,38 +216,40 @@ const Contact = () => {
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">ช่องทางโซเชียลมีเดีย</h3>
 
               <div className="grid grid-cols-2 gap-4">
-                <a href="https://github.com/ertyu007" target="_blank" rel="noreferrer" className="group bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
-                  <div className="w-12 h-12 mx-auto mb-2 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition-colors">
+                {/* GitHub */}
+                <a href="https://github.com/ertyu007" target="_blank" rel="noreferrer" className="group bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                  <div className="w-12 h-12 mx-auto mb-2 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-gray-900 transition-colors">
                     <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 22.092 24 17.592 24 12.298c0-6.627-5.373-12-12-12" />
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 22.092 24 17.592 24 12.298c0-6.627-5.373-12-12-12z" />
                     </svg>
                   </div>
                   <div className="text-sm font-medium text-gray-700 dark:text-gray-300">GitHub</div>
                 </a>
 
-                <a href="https://www.youtube.com/@amazingwuji" target="_blank" rel="noreferrer" className="group bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-center hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
+                {/* YouTube */}
+                <a href="https://www.youtube.com/@amazingwuji" target="_blank" rel="noreferrer" className="group bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-center hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                   <div className="w-12 h-12 mx-auto mb-2 bg-red-600 rounded-lg flex items-center justify-center group-hover:bg-red-700 transition-colors">
                     <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C.006 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.872.505 9.377.505 9.377.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C23.994 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
                     </svg>
                   </div>
                   <div className="text-sm font-medium text-gray-700 dark:text-gray-300">YouTube</div>
                 </a>
 
-                <a href="https://www.facebook.com/ertyu.kukre" target="_blank" rel="noreferrer" className="group bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
-                  <div className="w-12 h-12 mx-auto mb-2 bg-blue-700 rounded-lg flex items-center justify-center group-hover:bg-blue-800 transition-colors">
+                {/* Facebook */}
+                <a href="https://www.facebook.com/ertyu.kukre" target="_blank" rel="noreferrer" className="group bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-center hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                  <div className="w-12 h-12 mx-auto mb-2 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition-colors">
                     <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M22.46 6.41l-2.3-2.3c-.3-.3-.79-.3-1.09 0l-1.2 1.2c-.3.3-.3.79 0 1.09l2.3 2.3c.3.3.79.3 1.09 0l1.2-1.2c.3-.3.3-.8 0-1.09zM20 14h-3v6h-3v-6h-3v-3h6v-3h3v6zM4 4h16v2h-16v-2zM4 18h16v2h-16v-2z"/>
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                   </div>
                   <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Facebook</div>
                 </a>
 
-                <a href="https://line.me/ti/p/eUc-v4Xhcb" target="_blank" rel="noreferrer" className="group bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-center hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors">
+                {/* Line - ตัวเลือกตัวอักษร */}
+                <a href="https://line.me/ti/p/eUc-v4Xhcb" target="_blank" rel="noreferrer" className="group bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-center hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors">
                   <div className="w-12 h-12 mx-auto mb-2 bg-green-500 rounded-lg flex items-center justify-center group-hover:bg-green-600 transition-colors">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm0 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm-2 5h4v1h-4v-1zm-2 2h8v1h-8v-1zm-1 2h2v1h-2v-1zm5 0h2v1h-2v-1zm5 0h2v1h-2v-1z"/>
-                    </svg>
+                    <span className="text-white font-bold text-2xl">L</span>
                   </div>
                   <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Line</div>
                 </a>
@@ -248,7 +258,7 @@ const Contact = () => {
           </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

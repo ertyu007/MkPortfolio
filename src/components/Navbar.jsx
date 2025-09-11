@@ -7,6 +7,7 @@ const Navbar = ({ scrollToSection }) => {
   const { darkMode, toggleDarkMode } = useTheme();
 
   const navItems = [
+    { label: "หน้าแรก", icon: <FaUser />, section: "home" },
     { label: "เกี่ยวกับ", icon: <FaUser />, section: "about" },
     { label: "ทักษะ", icon: <FaCode />, section: "skills" },
     { label: "ผลงาน", icon: <FaBriefcase />, section: "portfolio" },

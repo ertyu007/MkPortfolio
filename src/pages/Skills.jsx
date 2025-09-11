@@ -85,7 +85,7 @@ const Skills = () => {
         {/* Skills Grid */}
         <div className="space-y-16">
           {categories.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700/50">
+            <div key={categoryIndex} className="bg-white dark:bg-gray-800 rounded-3xl p-2 shadow-xl border border-gray-100 dark:border-gray-700/50">
               <h3 className={`text-3xl font-bold mb-8 bg-gradient-to-r ${category.color} bg-clip-text text-transparent`}>
                 {category.title}
               </h3>
@@ -94,7 +94,7 @@ const Skills = () => {
                 {category.skills.map((skill, skillIndex) => {
                   const levelStyle = getLevelStyle(skill.level);
                   return (
-                    <div key={skillIndex} className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                    <div key={skillIndex} className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-2 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                       <div className="flex items-center justify-between mb-4">
                         <h4 className="font-semibold text-gray-900 dark:text-white text-lg">{skill.name}</h4>
                         <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${levelStyle.bg} ${levelStyle.text} font-medium`}>
@@ -116,9 +116,9 @@ const Skills = () => {
         </div>
 
         {/* Recommendation */}
-        <div className="mt-20 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-3xl p-8 text-center border border-blue-200 dark:border-blue-800/50">
+        <div className="mt-20 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-3xl p-4 text-center border border-blue-200 dark:border-blue-800/50">
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">💡 คำแนะนำสำหรับคุณ:</h3>
-          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
             แนะนำให้เรียนรู้ Python, Linux, และ CCNA เพื่อเตรียมความพร้อมสำหรับการสอบเข้าคณะวิศวกรรมศาสตร์ สาขาเครือข่าย
           </p>
         </div>
