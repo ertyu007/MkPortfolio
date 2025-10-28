@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { aiChatResponse, aiGenerateQuestions } from '../utils/ai';
 
-// Modern SVG Icons
+// SVG Icons (คงเดิม)
 const BotIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M20 9V7C20 5.35 18.65 4 17 4H7C5.35 4 4 5.35 4 7V9C2.9 9 2 9.9 2 11V16C2 17.1 2.9 18 4 18H5V19C5 19.55 5.45 20 6 20H8C8.55 20 9 19.55 9 19V18H15V19C15 19.55 15.45 20 16 20H18C18.55 20 19 19.55 19 19V18H20C21.1 18 22 17.1 22 16V11C22 9.9 21.1 9 20 9ZM7 6H17C17.55 6 18 6.45 18 7V9H6V7C6 6.45 6.45 6 7 6ZM20 16H4V11H20V16Z" fill="currentColor"/>
@@ -104,7 +104,7 @@ const WelcomeScreen = ({ onStartChat, onClose }) => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={onStartChat}
+          onClick={() => onStartChat()}
           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200"
         >
           เริ่มการสนทนา
@@ -153,7 +153,12 @@ const AIChatbot = () => {
   // Auto-scroll to bottom
   useEffect(() => {
     if (messagesContainerRef.current && isOpen) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      const scrollToBottom = () => {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      };
+      
+      // ใช้ setTimeout เพื่อให้แน่ใจว่า DOM อัพเดทแล้ว
+      setTimeout(scrollToBottom, 100);
     }
   }, [messages, isTyping, isOpen]);
 
@@ -191,6 +196,8 @@ const AIChatbot = () => {
         onComplete();
       }
     }, 20);
+
+    return () => clearInterval(interval);
   };
 
   const generateSuggestedQuestions = async (userInput, botResponse) => {
@@ -206,15 +213,29 @@ const AIChatbot = () => {
     }
   };
 
+  // แก้ไขฟังก์ชัน handleSubmit ให้รองรับทั้งการ submit form และ custom input
   const handleSubmit = async (e, customInput = null) => {
-    e?.preventDefault();
-    const userInput = customInput || input;
+    // ถ้ามี event (มาจาก form) ให้ป้องกัน default behavior
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+
+    // กำหนด userInput จาก customInput หรือจาก state input
+    const userInput = customInput !== null ? customInput : input;
     
-    if (!userInput.trim() || isTyping) return;
+    // ตรวจสอบว่า userInput เป็น string และไม่ว่าง
+    if (!userInput || typeof userInput !== 'string' || !userInput.trim() || isTyping) {
+      return;
+    }
 
     const userMessage = { text: userInput, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    
+    // เคลียร์ input เฉพาะเมื่อไม่ได้ใช้ custom input
+    if (customInput === null) {
+      setInput('');
+    }
+    
     setIsTyping(true);
     setShowWelcome(false);
     setSuggestedQuestions([]);
@@ -236,6 +257,20 @@ const AIChatbot = () => {
       }]);
       setIsTyping(false);
       setSuggestedQuestions([]);
+    }
+  };
+
+  // ฟังก์ชันแยกสำหรับจัดการคำถามแนะนำ
+  const handleSuggestedQuestion = (question) => {
+    handleSubmit(null, question);
+  };
+
+  // ฟังก์ชันแยกสำหรับเริ่มการสนทนา
+  const handleStartChat = (customQuestion = null) => {
+    setShowWelcome(false);
+    if (customQuestion) {
+      // ใช้ setTimeout เพื่อให้ state อัพเดทก่อน
+      setTimeout(() => handleSubmit(null, customQuestion), 100);
     }
   };
 
@@ -264,17 +299,6 @@ const AIChatbot = () => {
 
       return { ...msg, reactions: newReactions };
     }));
-  };
-
-  const handleSuggestedQuestion = (question) => {
-    handleSubmit(null, question);
-  };
-
-  const handleStartChat = (customQuestion = null) => {
-    setShowWelcome(false);
-    if (customQuestion) {
-      setTimeout(() => handleSubmit(null, customQuestion), 300);
-    }
   };
 
   const toggleFullscreen = () => {
@@ -350,8 +374,8 @@ const AIChatbot = () => {
                 border border-gray-200 dark:border-gray-700
                 /* Responsive sizing */
                 ${isFullscreen 
-                  ? 'inset-4 rounded-2xl' 
-                  : 'bottom-4 right-4 left-4 top-20 rounded-2xl md:bottom-auto md:right-8 md:left-auto md:top-1/2 md:transform md:-translate-y-1/2 md:w-96 md:h-[600px]'
+                  ? 'inset-5 rounded-2xl' 
+                  : 'bottom-6 right-5 left-5 top-25 rounded-2xl md:bottom-auto md:right-0 md:left-auto md:transform md:-translate-y-1/2 md:w-96 md:h-[600px]'
                 }
                 overflow-hidden
               `}
@@ -548,7 +572,7 @@ const AIChatbot = () => {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="พิมพ์ข้อความที่นี่..."
-                    className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white text-sm transition-all duration-200"
+                    className="flex-1 px-1 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white text-sm transition-all duration-200"
                     disabled={isTyping}
                   />
                   <motion.button
