@@ -17,7 +17,7 @@ const About = () => {
               {/* Profile Image */}
               <div className="mt-8 mb-6">
                 <img
-                  src="/assets/images/heroImage.jpg"
+                  src="/assets/images/aboutImage.jpg"
                   alt="Profile"
                   className="rounded-3xl mx-auto w-48 h-58 object-cover shadow-lg"
                 />

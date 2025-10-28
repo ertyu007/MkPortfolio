@@ -1,8 +1,9 @@
+// Portfolio.jsx
 import React, { useState, useEffect } from 'react';
 import { useProjects } from '../hooks/useProjects';
 import { aiSearch } from '../utils/ai';
 import ProjectCard from '../components/ProjectCard';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // SVG Icons
 const SearchIcon = () => (
@@ -11,11 +12,32 @@ const SearchIcon = () => (
   </svg>
 );
 
+const CloseIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
 const Portfolio = () => {
   const { projects, likeProject, dislikeProject, loading } = useProjects();
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Lock scroll when modal is open
+  useEffect(() => {
+    if (selectedProject) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedProject]);
 
   // ✅ ค้นหาเมื่อ search หรือ projects เปลี่ยน — ไม่ใช้ setTimeout
   useEffect(() => {
@@ -48,6 +70,19 @@ const Portfolio = () => {
     performSearch();
     setIsSearching(false);
   }, [search, projects]);
+
+  // ฟังก์ชันปิด modal แบบลื่นไหล
+  const handleCloseModal = () => {
+    if (isClosing) return;
+    
+    setIsClosing(true);
+    setSelectedProject(null);
+    
+    // รีเซ็ตสถานะหลังจาก animation เสร็จ
+    setTimeout(() => {
+      setIsClosing(false);
+    }, 300);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 py-12">
@@ -111,20 +146,14 @@ const Portfolio = () => {
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 {filtered.map((project, index) => (
-                  <motion.div
+                  <ProjectCard
                     key={project.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ y: -10, scale: 1.02 }}
-                    className="h-full"
-                  >
-                    <ProjectCard
-                      project={project}
-                      onLike={likeProject}
-                      onDislike={dislikeProject}
-                    />
-                  </motion.div>
+                    project={project}
+                    onLike={likeProject}
+                    onDislike={dislikeProject}
+                    onSelect={setSelectedProject}
+                    index={index}
+                  />
                 ))}
               </motion.div>
             ) : (
@@ -153,6 +182,162 @@ const Portfolio = () => {
             )}
           </>
         )}
+
+        {/* ✅ แก้ไข Modal Overlay - ทำให้ลื่นไหลมากขึ้น */}
+        <AnimatePresence mode="wait">
+          {selectedProject && (
+            <motion.div
+              key="modal-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ 
+                opacity: 0,
+                transition: { 
+                  duration: 0.2,
+                  delay: 0.05 
+                }
+              }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+              onClick={handleCloseModal}
+            >
+              <motion.div
+                key="modal-content"
+                layoutId={`project-${selectedProject.id}`}
+                className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl max-h-[90vh] overflow-y-auto cursor-auto"
+                onClick={(e) => e.stopPropagation()}
+                initial={{ 
+                  scale: 0.85, 
+                  opacity: 0,
+                  y: 10
+                }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1,
+                  y: 0
+                }}
+                exit={{ 
+                  scale: 0.9, 
+                  opacity: 0,
+                  transition: {
+                    duration: 0.15,
+                    ease: "easeIn"
+                  }
+                }}
+                transition={{
+                  type: "spring",
+                  damping: 20,
+                  stiffness: 250
+                }}
+              >
+                {/* Modal Image */}
+                <motion.div layoutId={`image-${selectedProject.id}`} className="relative">
+                  <img
+                    src={selectedProject.image || "https://via.placeholder.com/800x400?text=Project"}
+                    alt={selectedProject.title}
+                    className="w-full h-64 md:h-80 object-cover"
+                  />
+                  <motion.button
+                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.7)' }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleCloseModal}
+                    className="absolute top-4 right-4 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm transition-all duration-200"
+                  >
+                    <CloseIcon />
+                  </motion.button>
+                </motion.div>
+
+                {/* Modal Content */}
+                <div className="p-6 md:p-8">
+                  <motion.h2 
+                    layoutId={`title-${selectedProject.id}`}
+                    className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4"
+                  >
+                    {selectedProject.title}
+                  </motion.h2>
+                  
+                  <motion.p 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6"
+                  >
+                    {selectedProject.description}
+                  </motion.p>
+
+                  {/* Tags */}
+                  {selectedProject.tags && selectedProject.tags.length > 0 && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mb-6"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">เทคโนโลยีที่ใช้:</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.tags.map((tag, index) => (
+                          <span 
+                            key={index}
+                            className="px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300 rounded-full text-sm font-medium"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Like/Dislike Buttons */}
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="flex items-center space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700"
+                  >
+                    {/* Like Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        if (selectedProject.isDisliked) {
+                          dislikeProject(selectedProject.id, false);
+                        }
+                        likeProject(selectedProject.id, !selectedProject.isLiked);
+                      }}
+                      className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ${
+                        selectedProject.isLiked
+                          ? 'bg-blue-600 text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      <span className="text-lg">👍</span>
+                      <span className="font-semibold">{selectedProject.like_count || 0}</span>
+                    </motion.button>
+
+                    {/* Dislike Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        if (selectedProject.isLiked) {
+                          likeProject(selectedProject.id, false);
+                        }
+                        dislikeProject(selectedProject.id, !selectedProject.isDisliked);
+                      }}
+                      className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ${
+                        selectedProject.isDisliked
+                          ? 'bg-red-600 text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      <span className="text-lg">👎</span>
+                      <span className="font-semibold">{selectedProject.dislike_count || 0}</span>
+                    </motion.button>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Stats Section */}
         {!loading && filtered.length > 0 && (

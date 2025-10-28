@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import Modal from 'react-modal';
-
-Modal.setAppElement('#root');
+// Certificates.jsx
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import CertificateCard from '../components/CertificateCard';
 
 // SVG Icons
 const CertificateIcon = () => (
@@ -17,36 +17,41 @@ const AwardIcon = () => (
   </svg>
 );
 
-const CertificateCard = ({ cert, onClick }) => {
-  return (
-    <div
-      onClick={onClick}
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden cursor-pointer group"
-      data-aos="fade-up"
-    >
-      <div className="relative overflow-hidden">
-        <img
-          src={cert.image}
-          alt={cert.title}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      </div>
-      <div className="p-6">
-        <div className="flex items-center space-x-2 mb-2">
-          <AwardIcon className="text-yellow-500" />
-          <h3 className="font-bold text-lg text-gray-900 dark:text-white">{cert.title}</h3>
-        </div>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
-          {cert.date || "ไม่ระบุวันที่"}
-        </p>
-      </div>
-    </div>
-  );
-};
+const CloseIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
 const Certificates = () => {
-  const [selected, setSelected] = useState(null);
+  const [selectedCert, setSelectedCert] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Lock scroll when modal is open
+  useEffect(() => {
+    if (selectedCert) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedCert]);
+
+  // ฟังก์ชันปิด modal แบบลื่นไหล
+  const handleCloseModal = () => {
+    if (isClosing) return;
+    
+    setIsClosing(true);
+    setSelectedCert(null);
+    
+    // รีเซ็ตสถานะหลังจาก animation เสร็จ
+    setTimeout(() => {
+      setIsClosing(false);
+    }, 300);
+  };
 
   const certificates = [
     {
@@ -129,61 +134,167 @@ const Certificates = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-20">
-      <div className="flex items-center justify-center mb-8">
-        <CertificateIcon className="text-blue-600 dark:text-blue-400 mr-3" />
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          ประกาศนียบัตร
-        </h1>
-      </div>
-
-      <p className="text-center text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto">
-        ความสำเร็จและความภาคภูมิใจจากการเข้าร่วมกิจกรรมและโครงการต่าง ๆ
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {certificates.map(cert => (
-          <CertificateCard
-            key={cert.id}
-            cert={cert}
-            onClick={() => setSelected(cert)}
-          />
-        ))}
-      </div>
-
-      {selected && (
-        <Modal
-          isOpen={true}
-          onRequestClose={() => setSelected(null)}
-          className="fixed inset-4 bg-white dark:bg-gray-900 p-6 rounded-xl max-w-4xl mx-auto mt-20 shadow-2xl overflow-auto max-h-[90vh] z-50"
-          overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
         >
-          <button
-            onClick={() => setSelected(null)}
-            className="float-right text-2xl font-bold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            aria-label="Close"
-          >
-            &times;
-          </button>
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <AwardIcon className="text-yellow-500 mr-2" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{selected.title}</h2>
-            </div>
-            <img
-              src={selected.image}
-              alt={selected.title}
-              className="w-full max-h-96 object-contain rounded-lg mx-auto mb-6"
-            />
-            <div className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-              {selected.description}
-            </div>
-            <div className="text-gray-500 dark:text-gray-400 text-sm">
-              <strong>วันที่ได้รับ:</strong> {selected.date}
-            </div>
+          <div className="flex items-center justify-center mb-4">
+            <CertificateIcon className="text-blue-600 dark:text-blue-400 mr-3" />
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              ประกาศนียบัตร
+            </h1>
           </div>
-        </Modal>
-      )}
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            ความสำเร็จและความภาคภูมิใจจากการเข้าร่วมกิจกรรมและโครงการต่าง ๆ
+          </p>
+        </motion.div>
+
+        {/* Certificates Grid */}
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          {certificates.map((cert, index) => (
+            <CertificateCard
+              key={cert.id}
+              cert={cert}
+              onSelect={setSelectedCert}
+              index={index}
+            />
+          ))}
+        </motion.div>
+
+        {/* ✅ แก้ไข Certificate Modal - ทำให้ลื่นไหลมากขึ้น */}
+        <AnimatePresence mode="wait">
+          {selectedCert && (
+            <motion.div
+              key="cert-modal-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ 
+                opacity: 0,
+                transition: { 
+                  duration: 0.2,
+                  delay: 0.05 
+                }
+              }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+              onClick={handleCloseModal}
+            >
+              <motion.div
+                key="cert-modal-content"
+                layoutId={`cert-${selectedCert.id}`}
+                className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl max-h-[90vh] overflow-y-auto cursor-auto"
+                onClick={(e) => e.stopPropagation()}
+                initial={{ 
+                  scale: 0.85, 
+                  opacity: 0,
+                  y: 10
+                }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1,
+                  y: 0
+                }}
+                exit={{ 
+                  scale: 0.9, 
+                  opacity: 0,
+                  transition: {
+                    duration: 0.15,
+                    ease: "easeIn"
+                  }
+                }}
+                transition={{
+                  type: "spring",
+                  damping: 20,
+                  stiffness: 250
+                }}
+              >
+                {/* Modal Image */}
+                <motion.div layoutId={`cert-image-${selectedCert.id}`} className="relative">
+                  <img
+                    src={selectedCert.image}
+                    alt={selectedCert.title}
+                    className="w-full h-64 md:h-80 object-contain bg-gray-100 dark:bg-gray-900"
+                  />
+                  <motion.button
+                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.7)' }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleCloseModal}
+                    className="absolute top-4 right-4 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm transition-all duration-200"
+                  >
+                    <CloseIcon />
+                  </motion.button>
+                </motion.div>
+
+                {/* Modal Content */}
+                <div className="p-6 md:p-8">
+                  <motion.div 
+                    className="flex items-center space-x-3 mb-4"
+                    layoutId={`cert-header-${selectedCert.id}`}
+                  >
+                    <AwardIcon className="text-yellow-500 flex-shrink-0" />
+                    <motion.h2 
+                      className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
+                      layoutId={`cert-title-${selectedCert.id}`}
+                    >
+                      {selectedCert.title}
+                    </motion.h2>
+                  </motion.div>
+                  
+                  <motion.p 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6"
+                  >
+                    {selectedCert.description}
+                  </motion.p>
+
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center space-x-2 text-gray-500 dark:text-gray-400"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="font-medium">วันที่ได้รับ:</span>
+                    <span>{selectedCert.date}</span>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Stats Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-16 text-center"
+        >
+          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg inline-flex items-center space-x-4">
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+            <span className="text-gray-700 dark:text-gray-300 font-medium">
+              พบประกาศนียบัตรทั้งหมด {certificates.length} รายการ
+            </span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Background Decoration */}
+      <div className="fixed top-20 left-10 w-72 h-72 bg-blue-300/20 rounded-full filter blur-3xl -z-10"></div>
+      <div className="fixed bottom-20 right-10 w-72 h-72 bg-purple-300/20 rounded-full filter blur-3xl -z-10"></div>
     </div>
   );
 };
