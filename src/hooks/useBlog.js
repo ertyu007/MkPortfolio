@@ -1,5 +1,7 @@
+// useBlog.js
 import { useState, useEffect } from 'react';
-import { mockBlogPosts } from '../data/blog';
+// ✅ อัปเดต path ให้อ่านจากไฟล์ใหม่
+import { mockBlogPosts } from '../data/blog'; // (ปรับ path ตามโครงสร้างโปรเจกต์ของคุณ)
 
 export const useBlog = () => {
   const [posts, setPosts] = useState([]);
@@ -7,7 +9,7 @@ export const useBlog = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPosts(mockBlogPosts);
-    }, 500);
+    }, 500); // จำลองการโหลดข้อมูล
     return () => clearTimeout(timer);
   }, []);
 

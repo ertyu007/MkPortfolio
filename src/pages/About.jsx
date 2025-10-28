@@ -38,7 +38,7 @@ const About = () => {
                 </div>
                 <div className="flex items-center">
                   <div className="w-24 text-sm font-medium text-gray-500 dark:text-gray-400">อายุ</div>
-                  <div className="flex-1 text-gray-900 dark:text-white">17 ปี (ณ ปี 2567)</div>
+                  <div className="flex-1 text-gray-900 dark:text-white">18 ปี</div>
                 </div>
                 <div className="flex items-start">
                   <div className="w-24 text-sm font-medium text-gray-500 dark:text-gray-400">ที่อยู่</div>
@@ -66,7 +66,7 @@ const About = () => {
                 ผมมีความมุ่งมั่นที่จะพัฒนาทักษะด้าน <strong className="text-blue-600 dark:text-blue-400">วิศวกรรมเครือข่าย</strong> เพื่อสร้างความมั่นคงให้แก่ครอบครัว เนื่องจากผมเติบโตมาท่ามกลางความยากลำบาก จึงตระหนักถึงความสำคัญของความมั่นคงในชีวิต และเชื่อมั่นว่า “การศึกษา” คือกุญแจสำคัญในการเปลี่ยนแปลงอนาคต
               </p>
               <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                เป้าหมายหลักของผมคือการสอบเข้าศึกษาต่อใน <strong className="text-blue-600 dark:text-blue-400">คณะวิศวกรรมศาสตร์ สาขาเครือข่าย ณ มหาวิทยาลัยขอนแก่น</strong> เพื่อสานต่อความสนใจด้านเทคโนโลยีระบบเครือข่ายและโครงสร้างพื้นฐานทางอินเทอร์เน็ต ซึ่งเป็นอาชีพที่มีความสำคัญต่อโลกยุคดิจิทัลและสามารถสร้างความมั่นคงได้ในระยะยาว
+                เป้าหมายหลักของผมคือการสอบเข้าศึกษาต่อใน <strong className="text-blue-600 dark:text-blue-400">คณะวิศวกรรมศาสตร์ สาขาเครือข่าย</strong> เพื่อสานต่อความสนใจด้านเทคโนโลยีระบบเครือข่ายและโครงสร้างพื้นฐานทางอินเทอร์เน็ต ซึ่งเป็นอาชีพที่มีความสำคัญต่อโลกยุคดิจิทัลและสามารถสร้างความมั่นคงได้ในระยะยาว
               </p>
             </div>
 

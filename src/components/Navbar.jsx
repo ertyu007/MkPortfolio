@@ -227,10 +227,12 @@ const Navbar = ({ scrollToSection }) => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
+          {/* CHANGED: h-16 to h-14 (เล็กลง) */}
+          <div className="flex justify-between h-14 items-center">
             {/* Logo */}
             <motion.div 
-              className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
+              /* CHANGED: text-xl to text-lg (เล็กลง) */
+              className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
               variants={logoVariants}
               animate={scrolled ? "scrolled" : "normal"}
               whileHover={{ scale: 1.05 }}
@@ -246,7 +248,8 @@ const Navbar = ({ scrollToSection }) => {
                 <motion.button
                   key={idx}
                   onClick={() => handleNavClick(item.section)}
-                  className="relative px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-colors"
+                  /* CHANGED: px-4 py-2 to px-3 py-1 (กระชับขึ้น) */
+                  className="relative px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-colors"
                   variants={navItemVariants}
                   whileHover="hover"
                   whileTap="tap"
@@ -372,7 +375,8 @@ const Navbar = ({ scrollToSection }) => {
                   <motion.button
                     key={idx}
                     onClick={() => handleNavClick(item.section)}
-                    className="block w-full text-center px-8 py-4 text-xl font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all rounded-lg hover:bg-white/10"
+                    /* CHANGED: py-4 to py-3, text-xl to text-lg (เล็กลง) */
+                    className="block w-full text-center px-8 py-3 text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all rounded-lg hover:bg-white/10"
                     variants={itemVariants}
                     whileHover={{ 
                       scale: 1.05,
@@ -380,11 +384,14 @@ const Navbar = ({ scrollToSection }) => {
                     }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <div className="flex items-center justify-center space-x-4">
-                      <span className="text-indigo-600 dark:text-indigo-400 text-2xl">
+                    {/* CHANGED: space-x-4 to space-x-3 (กระชับขึ้น) */}
+                    <div className="flex items-center justify-center space-x-3">
+                      {/* CHANGED: text-2xl to text-xl (เล็กลง) */}
+                      <span className="text-indigo-600 dark:text-indigo-400 text-xl">
                         {item.icon}
                       </span>
-                      <span className="text-2xl">{item.label}</span>
+                      {/* CHANGED: text-2xl to text-xl (เล็กลง) */}
+                      <span className="text-xl">{item.label}</span>
                     </div>
                   </motion.button>
                 ))}

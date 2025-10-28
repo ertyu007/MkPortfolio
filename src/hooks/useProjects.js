@@ -13,34 +13,47 @@ export const useProjects = () => {
         console.log('📥 Fetching projects from API...');
         const data = await getProjects();
         
-        // ✅ ดึงสถานะ Like/Dislike จาก localStorage
+        // ✅ Map ข้อมูลจากฐานข้อมูลให้ตรงกับ frontend
         const enhancedProjects = data.map(p => {
+          // ✅ แก้ไขตรงนี้: map image_url เป็น image
+          const mappedProject = {
+            ...p,
+            image: p.image_url || p.image, // ใช้ image_url จาก DB เป็น image ใน frontend
+            isLiked: false,
+            isDisliked: false
+          };
+
+          // ✅ ดึงสถานะ Like/Dislike จาก localStorage
           const saved = localStorage.getItem(`project_${p.id}`);
           if (saved) {
             const { isLiked, isDisliked } = JSON.parse(saved);
             console.log(`💾 Loaded state for project ${p.id}:`, { isLiked, isDisliked });
-            return { ...p, isLiked: isLiked || false, isDisliked: isDisliked || false };
+            return { 
+              ...mappedProject, 
+              isLiked: isLiked || false, 
+              isDisliked: isDisliked || false 
+            };
           }
           console.log(`🆕 New project ${p.id}: default state`);
-          return { ...p, isLiked: false, isDisliked: false };
+          return mappedProject;
         });
         
         setProjects(enhancedProjects);
         console.log('✅ Projects loaded:', enhancedProjects);
       } catch (err) {
         console.error("❌ Failed to fetch projects:", err);
-        // Fallback
+        // Fallback - ใช้ mock data ที่มี image property ถูกต้อง
         setProjects([
           { 
             id: 1, 
-            title: "ระบบจัดการงานด้วย AI", 
+            title: "ผมได้เป็นหนึ่งใน สภานักเรียน",
+            description: "ผมได้เป็นหนึ่งใน สภานักเรียน มีหน้าทีช่วยดูแลและรับหน้าที่ จัดการควมคุ้มเครื่องเสียงเนื่องในกิจกรรมต่างๆ และเป็นตากล้องของโรงเรียน และช่วยเหลือครูในงานต่างๆที่เกี่ยวกับ อิเล็กทรอนิกส์ หรือ IT ",
+            tags: ["Student Council", "Sound System", "Photography", "IT Support"],
             like_count: 0, 
             dislike_count: 0, 
             isLiked: false, 
             isDisliked: false,
-            description: "พัฒนาด้วย React + Node.js + OpenAI API",
-            tags: ["React", "AI", "Node.js"],
-            image: "https://picsum.photos/200/300?random=1"
+            image: "/assets/images/works/1740286124834.jpg"
           }
         ]);
       } finally {
