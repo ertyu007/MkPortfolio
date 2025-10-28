@@ -10,7 +10,7 @@ export const useProjects = () => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        console.log('📥 Fetching projects from API...');
+        // console.log('📥 Fetching projects from API...');
         const data = await getProjects();
         
         // ✅ Map ข้อมูลจากฐานข้อมูลให้ตรงกับ frontend
@@ -27,19 +27,19 @@ export const useProjects = () => {
           const saved = localStorage.getItem(`project_${p.id}`);
           if (saved) {
             const { isLiked, isDisliked } = JSON.parse(saved);
-            console.log(`💾 Loaded state for project ${p.id}:`, { isLiked, isDisliked });
+            // console.log(`💾 Loaded state for project ${p.id}:`, { isLiked, isDisliked });
             return { 
               ...mappedProject, 
               isLiked: isLiked || false, 
               isDisliked: isDisliked || false 
             };
           }
-          console.log(`🆕 New project ${p.id}: default state`);
+          // console.log(`🆕 New project ${p.id}: default state`);
           return mappedProject;
         });
         
         setProjects(enhancedProjects);
-        console.log('✅ Projects loaded:', enhancedProjects);
+        // console.log('✅ Projects loaded:', enhancedProjects);
       } catch (err) {
         console.error("❌ Failed to fetch projects:", err);
         // Fallback - ใช้ mock data ที่มี image property ถูกต้อง
@@ -66,10 +66,10 @@ export const useProjects = () => {
   // ✅ Like Project — พร้อม console.log
   const likeProjectById = async (id, isLike) => {
     try {
-      console.log('🚀 Like project:', { id, isLike });
+      // console.log('🚀 Like project:', { id, isLike });
       const action = isLike ? 'like' : 'unlike';
       const { like_count } = await likeProject(id, action);
-      console.log('✅ Like API response:', { like_count });
+      // console.log('✅ Like API response:', { like_count });
 
       setProjects(prev => {
         const updatedProjects = prev.map(p => {
@@ -77,7 +77,7 @@ export const useProjects = () => {
             let updated = { ...p, like_count, isLiked: isLike };
             // ✅ ถ้า Like — ต้องยกเลิก Dislike
             if (isLike) {
-              console.log('🔄 Auto-unlike Dislike');
+              // console.log('🔄 Auto-unlike Dislike');
               updated = { ...updated, isDisliked: false };
             }
             // ✅ บันทึกสถานะลง localStorage
@@ -85,27 +85,27 @@ export const useProjects = () => {
               isLiked: updated.isLiked, 
               isDisliked: updated.isDisliked 
             }));
-            console.log('💾 Saved state:', { id, isLiked: updated.isLiked, isDisliked: updated.isDisliked });
+            // console.log('💾 Saved state:', { id, isLiked: updated.isLiked, isDisliked: updated.isDisliked });
             return updated;
           }
           return p;
         });
-        console.log('✅ Projects updated after like:', updatedProjects);
+        // console.log('✅ Projects updated after like:', updatedProjects);
         return updatedProjects;
       });
     } catch (err) {
-      console.error("❌ Like toggle failed:", err);
-      alert("ไม่สามารถกด Like ได้ในขณะนี้");
+      // console.error("❌ Like toggle failed:", err);
+      // alert("ไม่สามารถกด Like ได้ในขณะนี้");
     }
   };
 
   // ✅ Dislike Project — พร้อม console.log
   const dislikeProjectById = async (id, isDislike) => {
     try {
-      console.log('🚀 Dislike project:', { id, isDislike });
+      // console.log('🚀 Dislike project:', { id, isDislike });
       const action = isDislike ? 'dislike' : 'undislike';
       const { dislike_count } = await dislikeProject(id, action);
-      console.log('✅ Dislike API response:', { dislike_count });
+      // console.log('✅ Dislike API response:', { dislike_count });
 
       setProjects(prev => {
         const updatedProjects = prev.map(p => {
@@ -113,7 +113,7 @@ export const useProjects = () => {
             let updated = { ...p, dislike_count, isDisliked: isDislike };
             // ✅ ถ้า Dislike — ต้องยกเลิก Like
             if (isDislike) {
-              console.log('🔄 Auto-unlike Like');
+              // console.log('🔄 Auto-unlike Like');
               updated = { ...updated, isLiked: false };
             }
             // ✅ บันทึกสถานะลง localStorage
@@ -121,12 +121,12 @@ export const useProjects = () => {
               isLiked: updated.isLiked, 
               isDisliked: updated.isDisliked 
             }));
-            console.log('💾 Saved state:', { id, isLiked: updated.isLiked, isDisliked: updated.isDisliked });
+            // console.log('💾 Saved state:', { id, isLiked: updated.isLiked, isDisliked: updated.isDisliked });
             return updated;
           }
           return p;
         });
-        console.log('✅ Projects updated after dislike:', updatedProjects);
+        // console.log('✅ Projects updated after dislike:', updatedProjects);
         return updatedProjects;
       });
     } catch (err) {

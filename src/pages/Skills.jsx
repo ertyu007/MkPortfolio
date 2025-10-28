@@ -11,7 +11,7 @@ const Skills = () => {
         { name: "JavaScript", level: "กลาง", description: "พัฒนาและปรับปรุงฟังก์ชันการทำงานพื้นฐานของเว็บไซต์ได้" },
         { name: "PHP", level: "กลาง", description: "เขียนและแก้ไขโค้ดเบื้องต้นสำหรับงานฝั่งเซิร์ฟเวอร์" },
         { name: "Git", level: "กลาง", description: "ใช้ในการควบคุมเวอร์ชันของโค้ดและการทำงานร่วมทีมได้" },
-        { name: "การจัดการเครือข่าย LAN", level: "สูง", description: "สามารถวางระบบและแก้ไขปัญหาเครือข่ายได้" },
+        { name: "การจัดการเครือข่าย LAN", level: "กลาง", description: "สามารถวางระบบและแก้ไขปัญหาเครือข่ายได้" },
         { name: "การเข้าหัวสาย LAN", level: "สูง", description: "ทำได้อย่างถูกต้อง รวดเร็ว และมีประสิทธิภาพ" }
       ]
     },
@@ -24,7 +24,7 @@ const Skills = () => {
         { name: "Canva", level: "สูง", description: "ออกแบบสื่อประชาสัมพันธ์และงานกราฟิกได้อย่างสร้างสรรค์" },
         { name: "Adobe Photoshop", level: "กลาง", description: "ตกแต่งและปรับปรุงภาพถ่ายได้" },
         { name: "Adobe Premiere Pro", level: "กลาง", description: "ตัดต่อวิดีโอสำหรับงานนำเสนอและกิจกรรมได้" },
-        { name: "Adobe After Effects", level: "ต่ำ", description: "สร้างแอนิเมชันและเอฟเฟกต์เบื้องต้น" },
+        { name: "Adobe After Effects", level: "กลาง", description: "สร้างแอนิเมชันและเอฟเฟกต์เบื้องต้น" },
         { name: "Adobe Lightroom Classic", level: "กลาง", description: "ปรับแต่งภาพถ่ายเพื่อการนำเสนอ" },
         { name: "NetSetMan, JPerf, XAMPP", level: "กลาง", description: "ใช้งานเพื่อทดสอบเครือข่ายและจำลองเซิร์ฟเวอร์" }
       ]

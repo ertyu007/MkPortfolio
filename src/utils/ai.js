@@ -73,10 +73,10 @@ let PORTFOLIO_CONTEXT = `
 export const updatePortfolioContext = (newData) => {
   if (newData && typeof newData === 'string') {
     PORTFOLIO_CONTEXT = newData;
-    console.log("✅ Portfolio context updated successfully");
+    // console.log("✅ Portfolio context updated successfully");
     return true;
   }
-  console.error("❌ Invalid data format for context update");
+  // console.error("❌ Invalid data format for context update");
   return false;
 };
 

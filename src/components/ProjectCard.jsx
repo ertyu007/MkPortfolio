@@ -7,38 +7,38 @@ const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
   // ✅ ฟังก์ชัน Like — พร้อม console.log
   const handleLike = (e) => {
     e.stopPropagation();
-    console.log('❤️ Like clicked:', { 
-      projectId: project.id, 
-      currentIsLiked: project.isLiked, 
-      currentIsDisliked: project.isDisliked 
-    });
+    // console.log('❤️ Like clicked:', { 
+    //   projectId: project.id, 
+    //   currentIsLiked: project.isLiked, 
+    //   currentIsDisliked: project.isDisliked 
+    // });
 
     if (project.isDisliked) {
-      console.log('🔄 Auto-unlike Dislike first');
+      // console.log('🔄 Auto-unlike Dislike first');
       onDislike(project.id, false);
     }
     
     const newIsLiked = !project.isLiked;
-    console.log('✅ Setting like:', { id: project.id, isLiked: newIsLiked });
+    // console.log('✅ Setting like:', { id: project.id, isLiked: newIsLiked });
     onLike(project.id, newIsLiked);
   };
 
   // ✅ ฟังก์ชัน Dislike — พร้อม console.log
   const handleDislike = (e) => {
     e.stopPropagation();
-    console.log('👎 Dislike clicked:', { 
-      projectId: project.id, 
-      currentIsLiked: project.isLiked, 
-      currentIsDisliked: project.isDisliked 
-    });
+    // console.log('👎 Dislike clicked:', { 
+    //   projectId: project.id, 
+    //   currentIsLiked: project.isLiked, 
+    //   currentIsDisliked: project.isDisliked 
+    // });
 
     if (project.isLiked) {
-      console.log('🔄 Auto-unlike Like first');
+      // console.log('🔄 Auto-unlike Like first');
       onLike(project.id, false);
     }
     
     const newIsDisliked = !project.isDisliked;
-    console.log('✅ Setting dislike:', { id: project.id, isDisliked: newIsDisliked });
+    // console.log('✅ Setting dislike:', { id: project.id, isDisliked: newIsDisliked });
     onDislike(project.id, newIsDisliked);
   };
 
