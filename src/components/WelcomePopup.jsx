@@ -34,7 +34,7 @@ const CloseIcon = () => (
 
 const WelcomePopup = ({ onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const [, setIsVisible] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
