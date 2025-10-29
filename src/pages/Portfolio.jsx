@@ -18,38 +18,99 @@ const CloseIcon = () => (
   </svg>
 );
 
+// Animation Variants
+const modalVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.85,
+    y: 20,
+    transition: {
+      duration: 0.2,
+      ease: "easeIn"
+    }
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      damping: 25,
+      stiffness: 300,
+      mass: 0.8
+    }
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.9,
+    y: -10,
+    transition: {
+      duration: 0.15,
+      ease: "easeOut"
+    }
+  }
+};
+
+const overlayVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: { duration: 0.2 }
+  },
+  exit: { 
+    opacity: 0,
+    transition: { 
+      duration: 0.15,
+      delay: 0.05 
+    }
+  }
+};
+
 const Portfolio = () => {
   const { projects, likeProject, dislikeProject, loading } = useProjects();
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [isClosing, setIsClosing] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Lock scroll when modal is open
   useEffect(() => {
     if (selectedProject) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.paddingRight = '0px';
     } else {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.paddingRight = '0px';
     }
     
     return () => {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.paddingRight = '0px';
     };
   }, [selectedProject]);
 
-  // ✅ ค้นหาเมื่อ search หรือ projects เปลี่ยน — ไม่ใช้ setTimeout
+  // ✅ ค้นหาเมื่อ debouncedSearch หรือ projects เปลี่ยน
   useEffect(() => {
     const performSearch = async () => {
-      if (!search.trim()) {
+      if (!debouncedSearch.trim()) {
         setFiltered(projects);
         return;
       }
 
       setIsSearching(true);
       try {
-        const aiResults = await aiSearch(search, projects);
+        const aiResults = await aiSearch(debouncedSearch, projects);
         if (aiResults.length > 0) {
           setFiltered(aiResults);
           return;
@@ -60,27 +121,30 @@ const Portfolio = () => {
 
       // ✅ Keyword search
       const keywordResults = projects.filter(p =>
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.description?.toLowerCase().includes(search.toLowerCase()) ||
-        p.tags?.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
+        p.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        p.description?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        p.tags?.some(tag => tag.toLowerCase().includes(debouncedSearch.toLowerCase()))
       );
       setFiltered(keywordResults);
+      setIsSearching(false);
     };
 
     performSearch();
-    setIsSearching(false);
-  }, [search, projects]);
+  }, [debouncedSearch, projects]);
 
-  // ฟังก์ชันปิด modal แบบลื่นไหล
+  const handleOpenModal = (project) => {
+    if (isAnimating) return;
+    setSelectedProject(project);
+  };
+
   const handleCloseModal = () => {
-    if (isClosing) return;
+    if (isAnimating || !selectedProject) return;
     
-    setIsClosing(true);
+    setIsAnimating(true);
     setSelectedProject(null);
     
-    // รีเซ็ตสถานะหลังจาก animation เสร็จ
     setTimeout(() => {
-      setIsClosing(false);
+      setIsAnimating(false);
     }, 300);
   };
 
@@ -151,7 +215,7 @@ const Portfolio = () => {
                     project={project}
                     onLike={likeProject}
                     onDislike={dislikeProject}
-                    onSelect={setSelectedProject}
+                    onSelect={handleOpenModal}
                     index={index}
                   />
                 ))}
@@ -169,7 +233,7 @@ const Portfolio = () => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">ไม่พบผลงาน</h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-6">
-                    ไม่พบผลงานที่ตรงกับคำค้นหา "{search}"
+                    {debouncedSearch ? `ไม่พบผลงานที่ตรงกับคำค้นหา "${debouncedSearch}"` : "ไม่พบผลงาน"}
                   </p>
                   <button
                     onClick={() => setSearch('')}
@@ -184,50 +248,26 @@ const Portfolio = () => {
         )}
 
         {/* ✅ แก้ไข Modal Overlay - ทำให้ลื่นไหลมากขึ้น */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           {selectedProject && (
             <motion.div
               key="modal-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ 
-                opacity: 0,
-                transition: { 
-                  duration: 0.2,
-                  delay: 0.05 
-                }
-              }}
+              variants={overlayVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
               onClick={handleCloseModal}
             >
               <motion.div
                 key="modal-content"
                 layoutId={`project-${selectedProject.id}`}
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
                 className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl max-h-[90vh] overflow-y-auto cursor-auto"
                 onClick={(e) => e.stopPropagation()}
-                initial={{ 
-                  scale: 0.85, 
-                  opacity: 0,
-                  y: 10
-                }}
-                animate={{ 
-                  scale: 1, 
-                  opacity: 1,
-                  y: 0
-                }}
-                exit={{ 
-                  scale: 0.9, 
-                  opacity: 0,
-                  transition: {
-                    duration: 0.15,
-                    ease: "easeIn"
-                  }
-                }}
-                transition={{
-                  type: "spring",
-                  damping: 20,
-                  stiffness: 250
-                }}
               >
                 {/* Modal Image */}
                 <motion.div layoutId={`image-${selectedProject.id}`} className="relative">
@@ -275,12 +315,14 @@ const Portfolio = () => {
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">เทคโนโลยีที่ใช้:</h3>
                       <div className="flex flex-wrap gap-2">
                         {selectedProject.tags.map((tag, index) => (
-                          <span 
+                          <motion.span 
                             key={index}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             className="px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300 rounded-full text-sm font-medium"
                           >
                             {tag}
-                          </span>
+                          </motion.span>
                         ))}
                       </div>
                     </motion.div>

@@ -139,7 +139,7 @@ const Home = () => {
                 className="grid grid-cols-3 gap-6 pt-8 border-t border-gray-200 dark:border-gray-800"
               >
                 {[
-                  { value: "17", label: "อายุ (ปี)" },
+                  { value: "18", label: "อายุ (ปี)" },
                   { value: "5+", label: "โครงการ" },
                   { value: "3+", label: "ทักษะหลัก" }
                 ].map((stat, index) => (

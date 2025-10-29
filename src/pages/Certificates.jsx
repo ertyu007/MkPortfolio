@@ -23,33 +23,87 @@ const CloseIcon = () => (
   </svg>
 );
 
+// Animation Variants
+const modalVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.85,
+    y: 20,
+    transition: {
+      duration: 0.2,
+      ease: "easeIn"
+    }
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      damping: 25,
+      stiffness: 300,
+      mass: 0.8
+    }
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.9,
+    y: -10,
+    transition: {
+      duration: 0.15,
+      ease: "easeOut"
+    }
+  }
+};
+
+const overlayVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: { duration: 0.2 }
+  },
+  exit: { 
+    opacity: 0,
+    transition: { 
+      duration: 0.15,
+      delay: 0.05 
+    }
+  }
+};
+
 const Certificates = () => {
   const [selectedCert, setSelectedCert] = useState(null);
-  const [isClosing, setIsClosing] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Lock scroll when modal is open
   useEffect(() => {
     if (selectedCert) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.paddingRight = '0px';
     } else {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.paddingRight = '0px';
     }
     
     return () => {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.paddingRight = '0px';
     };
   }, [selectedCert]);
 
-  // ฟังก์ชันปิด modal แบบลื่นไหล
+  const handleOpenModal = (cert) => {
+    if (isAnimating) return;
+    setSelectedCert(cert);
+  };
+
   const handleCloseModal = () => {
-    if (isClosing) return;
+    if (isAnimating || !selectedCert) return;
     
-    setIsClosing(true);
+    setIsAnimating(true);
     setSelectedCert(null);
     
-    // รีเซ็ตสถานะหลังจาก animation เสร็จ
     setTimeout(() => {
-      setIsClosing(false);
+      setIsAnimating(false);
     }, 300);
   };
 
@@ -165,57 +219,33 @@ const Certificates = () => {
             <CertificateCard
               key={cert.id}
               cert={cert}
-              onSelect={setSelectedCert}
+              onSelect={handleOpenModal}
               index={index}
             />
           ))}
         </motion.div>
 
         {/* ✅ แก้ไข Certificate Modal - ทำให้ลื่นไหลมากขึ้น */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           {selectedCert && (
             <motion.div
               key="cert-modal-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ 
-                opacity: 0,
-                transition: { 
-                  duration: 0.2,
-                  delay: 0.05 
-                }
-              }}
+              variants={overlayVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
               onClick={handleCloseModal}
             >
               <motion.div
                 key="cert-modal-content"
                 layoutId={`cert-${selectedCert.id}`}
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
                 className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl max-h-[90vh] overflow-y-auto cursor-auto"
                 onClick={(e) => e.stopPropagation()}
-                initial={{ 
-                  scale: 0.85, 
-                  opacity: 0,
-                  y: 10
-                }}
-                animate={{ 
-                  scale: 1, 
-                  opacity: 1,
-                  y: 0
-                }}
-                exit={{ 
-                  scale: 0.9, 
-                  opacity: 0,
-                  transition: {
-                    duration: 0.15,
-                    ease: "easeIn"
-                  }
-                }}
-                transition={{
-                  type: "spring",
-                  damping: 20,
-                  stiffness: 250
-                }}
               >
                 {/* Modal Image */}
                 <motion.div layoutId={`cert-image-${selectedCert.id}`} className="relative">

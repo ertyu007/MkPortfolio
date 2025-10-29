@@ -67,16 +67,22 @@ let PORTFOLIO_CONTEXT = `
 - ชอบทำงานเป็นทีมและช่วยเหลือผู้อื่น
 - มีความสนใจในเทคโนโลยีและนวัตกรรม
 - ตั้งใจและมุ่งมั่นในการพัฒนาตนเอง
+
+ลิงก์เว็บไซต์:
+- หน้าแรก: /
+- เกี่ยวกับฉัน: /about
+- ผลงาน: /portfolio
+- ทักษะ: /skills
+- ประกาศนียบัตร: /certificates
+- บทความ: /blog
 `;
 
 // ✅ ฟังก์ชันอัปเดตข้อมูล context
 export const updatePortfolioContext = (newData) => {
   if (newData && typeof newData === 'string') {
     PORTFOLIO_CONTEXT = newData;
-    // console.log("✅ Portfolio context updated successfully");
     return true;
   }
-  // console.error("❌ Invalid data format for context update");
   return false;
 };
 
@@ -88,23 +94,31 @@ export const aiChatResponse = async (prompt, context = "") => {
 
   try {
     const fullPrompt = `
-คุณคือ "AI Assistant" ผู้ช่วยส่วนตัวของ thanaphat 
-ข้อมูลเกี่ยวกับ thanaphat (ใช้เป็นข้อมูลอ้างอิง):
+คุณคือ "AI Assistant" ผู้ช่วยส่วนตัวของธนภัทร การะจักษ์ 
+
+ข้อมูลเกี่ยวกับธนภัทร (ใช้เป็นข้อมูลอ้างอิง):
 ${PORTFOLIO_CONTEXT}
 
 คำแนะนำการตอบคำถาม:
-1. ตอบสั้นๆ กระชับ ภายใน 1-3 ประโยค
-2. หากคำถามเกี่ยวกับ thanaphat ให้ใช้ข้อมูลด้านบนตอบ
-3. หากเป็นคำถามทั่วไป สามารถตอบตามความรู้ทั่วไปได้
-4. ใช้โทนเสียงเป็นมิตร ใจเย็น และเป็นกันเอง
-5. ตอบให้เหมาะสมกับบริบทการสนทนา
-6. สามารถแสดงความคิดเห็นหรือคำแนะนำสั้นๆ ได้
+1. ตอบสั้นๆ กระชับ ภายใน 1-2 ประโยคเท่านั้น
+2. ใช้โทนเสียงเป็นกันเอง เหมือนเพื่อนคุยกัน
+3. ใช้ภาษาไทยที่เข้าใจง่าย ไม่เป็นทางการ
+4. หากคำถามเกี่ยวกับธนภัทร ให้ใช้ข้อมูลด้านบนตอบ
+5. หากเป็นคำถามทั่วไป ตอบสั้นๆ ตามความรู้ทั่วไป
+6. สามารถแนะนำลิงก์ในเว็บไซต์ได้ เช่น:
+   - ถ้าถามผลงาน: "ไปดูผลงานทั้งหมดได้ที่ /portfolio นะ"
+   - ถ้าถามทักษะ: "ดูทักษะทั้งหมดที่ /skills เลย"
+   - ถ้าถามประกาศนียบัตร: "มีประกาศนียบัตรเยอะเลยที่ /certificates"
+   - ถ้าถามเกี่ยวกับตัว: "รู้จักผมมากขึ้นที่ /about"
+   - ถ้าถามบทความ: "อ่านบทความได้ที่ /blog"
 
 Context การสนทนาปัจจุบัน:
 ${context}
 
-คำถาม:
+คำถามของผู้ใช้:
 "${prompt}"
+
+คำตอบ (ตอบสั้นๆ เป็นกันเอง 1-2 ประโยค และแนะนำลิงก์ถ้าจำเป็น):
 `;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -120,13 +134,14 @@ ${context}
             role: "system",
             content: `คุณเป็นผู้ช่วย AI ที่สนทนากับผู้ใช้ได้อย่างเป็นธรรมชาติ 
                       ตอบคำถามเกี่ยวกับธนภัทร การะจักษ์ และคำถามทั่วไปอื่นๆ 
-                      ใช้โทนเสียงเป็นมิตรและเป็นกันเอง 
-                      ตอบสั้นๆ กระชับ 1-3 ประโยค`
+                      ใช้โทนเสียงเป็นมิตรและเป็นกันเองเหมือนเพื่อนคุยกัน
+                      ตอบสั้นๆ กระชับ 1-2 ประโยคเท่านั้น
+                      สามารถแนะนำลิงก์ในเว็บไซต์ได้เมื่อเหมาะสม`
           },
           { role: "user", content: fullPrompt }
         ],
-        max_tokens: 150,
-        temperature: 0.7,
+        max_tokens: 100, // ลด tokens เพื่อให้ตอบสั้น
+        temperature: 0.8, // เพิ่มความสร้างสรรค์เล็กน้อย
         top_p: 0.9,
         stream: false,
       }),
@@ -186,7 +201,7 @@ ${PORTFOLIO_CONTEXT}
           },
           { role: "user", content: prompt }
         ],
-        max_tokens: 100,
+        max_tokens: 80, // ลด tokens เพื่อให้คำถามสั้น
         temperature: 0.8,
         top_p: 1,
         stream: false,
@@ -201,44 +216,42 @@ ${PORTFOLIO_CONTEXT}
     const content = data.choices[0].message.content.trim();
 
     try {
-      // พยายาม parse JSON
       const questions = JSON.parse(content);
       if (Array.isArray(questions) && questions.length > 0) {
         return questions.slice(0, 3).filter(q => q && q.length > 0);
       }
     } catch (e) {
       console.warn("Failed to parse AI response as JSON:", content);
-      // หาก parse ไม่ได้ ให้แยกข้อความด้วยเครื่องหมายต่างๆ
       const extractedQuestions = extractQuestionsFromText(content);
       if (extractedQuestions.length > 0) {
         return extractedQuestions.slice(0, 3);
       }
     }
 
-    // คำถามแนะนำพื้นฐาน
+    // คำถามแนะนำพื้นฐานที่สั้นกว่า
     return [
-      "มีผลงานอะไรน่าสนใจอีกบ้าง?",
-      "ทักษะไหนที่คิดว่าสำคัญที่สุด?",
-      "แผนในอนาคตคืออะไร?"
+      "มีผลงานอะไรน่าสนใจบ้าง?",
+      "ทักษะไหนสำคัญที่สุด?",
+      "แผนในอนาคตคือ?"
     ];
 
   } catch (err) {
     console.error("AI Question Generation Error:", err);
     return [
-      "ชอบทำงานแบบไหนมากกว่ากัน?",
-      "มีโปรเจกต์ใหม่ๆ ในแผนไหม?",
-      "อะไรคือความท้าทายที่เคยเจอ?"
+      "ชอบทำงานแบบไหน?",
+      "มีโปรเจกต์ใหม่ไหม?",
+      "ความท้าทายที่เคยเจอ?"
     ];
   }
 };
 
-// ✅ ฟังก์ชันแยกคำถามจากข้อความ (เวอร์ชันปรับปรุง)
+// ✅ ฟังก์ชันแยกคำถามจากข้อความ
 const extractQuestionsFromText = (text) => {
   const patterns = [
-    /["']([^"']*[?？])["']/g,          // คำถามในเครื่องหมายคำพูด
-    /(\d+\.\s*([^.]*[?？]))/g,        // คำถามที่ขึ้นต้นด้วยตัวเลขและจุด
-    /[-•]\s*([^\n]*[?？])/g,          // คำถามที่ขึ้นต้นด้วย bullet
-    /([^\n?]{5,}[?？])/g              // คำถามทั่วไป (>=5 ตัวก่อน ?)
+    /["']([^"']*[?？])["']/g,
+    /(\d+\.\s*([^.]*[?？]))/g,
+    /[-•]\s*([^\n]*[?？])/g,
+    /([^\n?]{5,}[?？])/g
   ];
 
   const questions = new Set();
@@ -247,13 +260,9 @@ const extractQuestionsFromText = (text) => {
     let match;
     while ((match = pattern.exec(text)) !== null) {
       let question = (match[1] || match[2] || match[0]).trim();
-
-      // 🔹 ตัด prefix เช่น "1. " หรือ "- "
       question = question.replace(/^[0-9.\-•\s]+/, '');
 
-
       if (question && question.includes('?') && question.length > 5) {
-        // 🔹 แตกเพิ่มถ้ามีหลาย ? ในบรรทัดเดียว
         question.split(/(?<=\?)/).forEach(q => {
           q = q.trim();
           if (q.length > 5) questions.add(q);
@@ -264,7 +273,6 @@ const extractQuestionsFromText = (text) => {
 
   return Array.from(questions);
 };
-
 
 // ✅ สรุปบทความ
 export const aiSummarize = async (text) => {

@@ -3,54 +3,66 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { aiChatResponse, aiGenerateQuestions } from '../utils/ai';
 
-// SVG Icons (คงเดิม)
+// SVG Icons (คงเดิมเหมือนเดิม)
 const BotIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20 9V7C20 5.35 18.65 4 17 4H7C5.35 4 4 5.35 4 7V9C2.9 9 2 9.9 2 11V16C2 17.1 2.9 18 4 18H5V19C5 19.55 5.45 20 6 20H8C8.55 20 9 19.55 9 19V18H15V19C15 19.55 15.45 20 16 20H18C18.55 20 19 19.55 19 19V18H20C21.1 18 22 17.1 22 16V11C22 9.9 21.1 9 20 9ZM7 6H17C17.55 6 18 6.45 18 7V9H6V7C6 6.45 6.45 6 7 6ZM20 16H4V11H20V16Z" fill="currentColor"/>
-    <path d="M8 13H10C10.55 13 11 12.55 11 12V12C11 11.45 10.55 11 10 11H8C7.45 11 7 11.45 7 12V12C7 12.55 7.45 13 8 13Z" fill="currentColor"/>
-    <path d="M14 13H16C16.55 13 17 12.55 17 12V12C17 11.45 16.55 11 16 11H14C13.45 11 13 11.45 13 12V12C13 12.55 13.45 13 14 13Z" fill="currentColor"/>
+    <path d="M20 9V7C20 5.35 18.65 4 17 4H7C5.35 4 4 5.35 4 7V9C2.9 9 2 9.9 2 11V16C2 17.1 2.9 18 4 18H5V19C5 19.55 5.45 20 6 20H8C8.55 20 9 19.55 9 19V18H15V19C15 19.55 15.45 20 16 20H18C18.55 20 19 19.55 19 19V18H20C21.1 18 22 17.1 22 16V11C22 9.9 21.1 9 20 9ZM7 6H17C17.55 6 18 6.45 18 7V9H6V7C6 6.45 6.45 6 7 6ZM20 16H4V11H20V16Z" fill="currentColor" />
+    <path d="M8 13H10C10.55 13 11 12.55 11 12V12C11 11.45 10.55 11 10 11H8C7.45 11 7 11.45 7 12V12C7 12.55 7.45 13 8 13Z" fill="currentColor" />
+    <path d="M14 13H16C16.55 13 17 12.55 17 12V12C17 11.45 16.55 11 16 11H14C13.45 11 13 11.45 13 12V12C13 12.55 13.45 13 14 13Z" fill="currentColor" />
   </svg>
 );
 
 const SendIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor" />
   </svg>
 );
 
 const CloseIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+    <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor" />
   </svg>
 );
 
 const LikeIcon = ({ filled = false }) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} xmlns="http://www.w3.org/2000/svg">
-    <path d="M1 21H5V9H1V21ZM23 10C23 8.9 22.1 8 21 8H14.69L15.64 3.43L15.67 3.11C15.67 2.7 15.5 2.32 15.23 2.05L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9V19C7 20.1 7.9 21 9 21H18C18.83 21 19.54 20.5 19.84 19.78L22.86 12.73C22.95 12.5 23 12.26 23 12V10Z" 
-          stroke="currentColor" strokeWidth={filled ? "0" : "1.5"} fill={filled ? "currentColor" : "none"}/>
+    <path d="M1 21H5V9H1V21ZM23 10C23 8.9 22.1 8 21 8H14.69L15.64 3.43L15.67 3.11C15.67 2.7 15.5 2.32 15.23 2.05L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9V19C7 20.1 7.9 21 9 21H18C18.83 21 19.54 20.5 19.84 19.78L22.86 12.73C22.95 12.5 23 12.26 23 12V10Z"
+      stroke="currentColor" strokeWidth={filled ? "0" : "1.5"} fill={filled ? "currentColor" : "none"} />
   </svg>
 );
 
 const DislikeIcon = ({ filled = false }) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} xmlns="http://www.w3.org/2000/svg">
-    <path d="M15 3H9V15H15V3ZM23 14C23 15.1 22.1 16 21 16H14.69L15.64 20.57L15.67 20.89C15.67 21.3 15.5 21.68 15.23 21.95L14.17 23L7.59 16.42C7.22 16.05 7 15.55 7 15V5C7 3.9 7.9 3 9 3H18C18.83 3 19.54 3.5 19.84 4.22L22.86 11.27C22.95 11.5 23 11.74 23 12V14Z" 
-          stroke="currentColor" strokeWidth={filled ? "0" : "1.5"} fill={filled ? "currentColor" : "none"}/>
+    <path d="M15 3H9V15H15V3ZM23 14C23 15.1 22.1 16 21 16H14.69L15.64 20.57L15.67 20.89C15.67 21.3 15.5 21.68 15.23 21.95L14.17 23L7.59 16.42C7.22 16.05 7 15.55 7 15V5C7 3.9 7.9 3 9 3H18C18.83 3 19.54 3.5 19.84 4.22L22.86 11.27C22.95 11.5 23 11.74 23 12V14Z"
+      stroke="currentColor" strokeWidth={filled ? "0" : "1.5"} fill={filled ? "currentColor" : "none"} />
   </svg>
 );
 
 const MinimizeIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 11H18V13H6V11Z" fill="currentColor"/>
+    <path d="M6 11H18V13H6V11Z" fill="currentColor" />
   </svg>
 );
 
 const ExpandIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M7 14H5V19H10V17H7V14ZM5 10H7V7H10V5H5V10ZM17 17H14V19H19V14H17V17ZM14 5V7H17V10H19V5H14Z" fill="currentColor"/>
+    <path d="M7 14H5V19H10V17H7V14ZM5 10H7V7H10V5H5V10ZM17 17H14V19H19V14H17V17ZM14 5V7H17V10H19V5H14Z" fill="currentColor" />
   </svg>
 );
 
-// Modern Welcome Screen
+const HistoryIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13 3C8.03 3 4 7.03 4 12H1L4.89 15.89L4.96 16.03L9 12H6C6 8.13 9.13 5 13 5C16.87 5 20 8.13 20 12C20 15.87 16.87 19 13 19C11.07 19 9.32 18.21 8.06 16.94L6.64 18.36C8.27 20 10.5 21 13 21C17.97 21 22 16.97 22 12C22 7.03 17.97 3 13 3ZM12 8V13L16.28 15.54L17 14.33L13.5 12.25V8H12Z" fill="currentColor" />
+  </svg>
+);
+
+const DeleteIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="currentColor" />
+  </svg>
+);
+
+// Welcome Screen (คงเดิม)
 const WelcomeScreen = ({ onStartChat, onClose }) => {
   return (
     <motion.div
@@ -138,12 +150,33 @@ const AIChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [, setIsGeneratingQuestions] = useState(false);
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [userQueryHistory, setUserQueryHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
-  // Show welcome screen on first open
+  // โหลดประวัติจาก localStorage
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('ai_chat_query_history');
+    if (savedHistory) {
+      try {
+        setUserQueryHistory(JSON.parse(savedHistory));
+      } catch (err) {
+        console.error('Error loading query history:', err);
+      }
+    }
+  }, []);
+
+  // บันทึกลง localStorage
+  useEffect(() => {
+    if (userQueryHistory.length > 0) {
+      localStorage.setItem('ai_chat_query_history', JSON.stringify(userQueryHistory));
+    }
+  }, [userQueryHistory]);
+
+  // Show welcome screen
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setShowWelcome(true);
@@ -153,16 +186,11 @@ const AIChatbot = () => {
   // Auto-scroll to bottom
   useEffect(() => {
     if (messagesContainerRef.current && isOpen) {
-      const scrollToBottom = () => {
-        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-      };
-      
-      // ใช้ setTimeout เพื่อให้แน่ใจว่า DOM อัพเดทแล้ว
-      setTimeout(scrollToBottom, 100);
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, isTyping, isOpen]);
 
-  // Prevent body scroll when open
+  // Prevent body scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -174,23 +202,29 @@ const AIChatbot = () => {
     };
   }, [isOpen]);
 
+  // ฟังก์ชันพิมพ์ข้อความทีละตัวอักษร
   const typeMessage = (fullText, onComplete) => {
     let index = 0;
-    const newMessageIndex = messages.length;
-    
+    const botMessageId = Date.now();
+
+    // เพิ่มข้อความบอทเปล่า
+    setMessages(prev => [...prev, {
+      text: '',
+      sender: 'bot',
+      id: botMessageId
+    }]);
+
     const interval = setInterval(() => {
-      setMessages(prev => {
-        const newMessages = [...prev];
-        if (newMessages[newMessageIndex]) {
-          newMessages[newMessageIndex] = {
-            ...newMessages[newMessageIndex],
-            text: fullText.slice(0, index + 1)
-          };
-        }
-        return newMessages;
-      });
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === botMessageId
+            ? { ...msg, text: fullText.slice(0, index + 1) }
+            : msg
+        )
+      );
+
       index++;
-      
+
       if (index >= fullText.length) {
         clearInterval(interval);
         onComplete();
@@ -200,6 +234,17 @@ const AIChatbot = () => {
     return () => clearInterval(interval);
   };
 
+  // เพิ่มคำถามลงประวัติ
+  const addToQueryHistory = (query) => {
+    if (query && query.trim()) {
+      setUserQueryHistory(prev => {
+        const filtered = prev.filter(q => q.toLowerCase() !== query.toLowerCase());
+        return [query.trim(), ...filtered].slice(0, 15);
+      });
+    }
+  };
+
+  // สร้างคำถามแนะนำ
   const generateSuggestedQuestions = async (userInput, botResponse) => {
     setIsGeneratingQuestions(true);
     try {
@@ -213,38 +258,47 @@ const AIChatbot = () => {
     }
   };
 
-  // แก้ไขฟังก์ชัน handleSubmit ให้รองรับทั้งการ submit form และ custom input
+  // ฟังก์ชันส่งข้อความ
   const handleSubmit = async (e, customInput = null) => {
-    // ถ้ามี event (มาจาก form) ให้ป้องกัน default behavior
     if (e && e.preventDefault) {
       e.preventDefault();
     }
 
-    // กำหนด userInput จาก customInput หรือจาก state input
     const userInput = customInput !== null ? customInput : input;
-    
-    // ตรวจสอบว่า userInput เป็น string และไม่ว่าง
+
     if (!userInput || typeof userInput !== 'string' || !userInput.trim() || isTyping) {
       return;
     }
 
-    const userMessage = { text: userInput, sender: 'user' };
+    // เพิ่มข้อความผู้ใช้
+    const userMessage = {
+      text: userInput,
+      sender: 'user',
+      id: Date.now()
+    };
     setMessages(prev => [...prev, userMessage]);
-    
-    // เคลียร์ input เฉพาะเมื่อไม่ได้ใช้ custom input
+
+    // บันทึกคำถามลงประวัติ
+    addToQueryHistory(userInput);
+
     if (customInput === null) {
       setInput('');
     }
-    
+
     setIsTyping(true);
     setShowWelcome(false);
     setSuggestedQuestions([]);
+    setShowHistory(false);
 
     try {
-      const context = `ผู้ใช้ถามเกี่ยวกับ: ${userInput}. โปรดตอบตามข้อมูล portfolio ของธนภัทรที่มีอยู่โดยอ้างอิงจากข้อมูลจริง`;
+      const context = `ผู้ใช้ถามเกี่ยวกับ: ${userInput}`;
       const response = await aiChatResponse(userInput, context);
-      
-      setMessages(prev => [...prev, { text: '', sender: 'bot' }]);
+
+      if (!response || response.trim() === '') {
+        throw new Error('Empty response from AI');
+      }
+
+      // ใช้ typeMessage เพื่อพิมพ์ทีละตัวอักษร
       typeMessage(response, () => {
         setIsTyping(false);
         generateSuggestedQuestions(userInput, response);
@@ -253,23 +307,22 @@ const AIChatbot = () => {
       console.error("AI Error:", err);
       setMessages(prev => [...prev, {
         text: "ขออภัยครับ เกิดข้อผิดพลาดในการประมวลผล กรุณาลองใหม่อีกครั้ง",
-        sender: 'bot'
+        sender: 'bot',
+        id: Date.now()
       }]);
       setIsTyping(false);
       setSuggestedQuestions([]);
     }
   };
 
-  // ฟังก์ชันแยกสำหรับจัดการคำถามแนะนำ
   const handleSuggestedQuestion = (question) => {
     handleSubmit(null, question);
   };
 
-  // ฟังก์ชันแยกสำหรับเริ่มการสนทนา
   const handleStartChat = (customQuestion = null) => {
     setShowWelcome(false);
+    setShowHistory(false);
     if (customQuestion) {
-      // ใช้ setTimeout เพื่อให้ state อัพเดทก่อน
       setTimeout(() => handleSubmit(null, customQuestion), 100);
     }
   };
@@ -301,8 +354,85 @@ const AIChatbot = () => {
     }));
   };
 
+  // ล้างประวัติ
+  const clearQueryHistory = () => {
+    setUserQueryHistory([]);
+    localStorage.removeItem('ai_chat_query_history');
+  };
+
+  // ลบคำถามเดียว
+  const removeQueryFromHistory = (queryToRemove) => {
+    setUserQueryHistory(prev => prev.filter(query => query !== queryToRemove));
+  };
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+  };
+
+  const toggleHistory = () => {
+    setShowHistory(!showHistory);
+  };
+
+  // คอมโพเนนต์แสดงประวัติ
+  const QueryHistoryPanel = () => {
+    if (!showHistory || userQueryHistory.length === 0) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 20 }}
+        className="absolute right-0 top-14 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-10 max-h-80 overflow-hidden"
+      >
+        <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <HistoryIcon />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              ประวัติคำถาม ({userQueryHistory.length})
+            </span>
+          </div>
+          <button
+            onClick={clearQueryHistory}
+            className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1"
+            title="ล้างประวัติทั้งหมด"
+          >
+            <DeleteIcon />
+          </button>
+        </div>
+
+        <div className="max-h-64 overflow-y-auto p-2">
+          {userQueryHistory.map((query, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="group flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 mb-1"
+            >
+              <button
+                onClick={() => {
+                  handleSuggestedQuestion(query);
+                  setShowHistory(false);
+                }}
+                className="flex-1 text-left text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 truncate pr-2"
+                title={query}
+              >
+                "{query}"
+              </button>
+              <button
+                onClick={() => removeQueryFromHistory(query)}
+                className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity p-1"
+                title="ลบคำถามนี้"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" />
+                </svg>
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    );
   };
 
   const quickQuestions = [
@@ -346,42 +476,25 @@ const AIChatbot = () => {
               onClick={() => setIsOpen(false)}
               className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             />
-            
-            {/* Chat Container */}
+
+            {/* Chat Container - ปรับปรุงตำแหน่งและขนาดให้รองรับทุกหน้าจอ */}
             <motion.div
-              initial={{ 
-                scale: 0.8, 
-                opacity: 0,
-                y: 20
-              }}
-              animate={{ 
-                scale: 1,
-                opacity: 1,
-                y: 0
-              }}
-              exit={{ 
-                scale: 0.8,
-                opacity: 0,
-                y: 20
-              }}
-              transition={{ 
-                type: "spring",
-                damping: 25,
-                stiffness: 300
-              }}
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className={`
-                fixed z-50 flex flex-col bg-white dark:bg-gray-900 shadow-2xl
-                border border-gray-200 dark:border-gray-700
-                /* Responsive sizing */
-                ${isFullscreen 
-                  ? 'inset-5 rounded-2xl' 
-                  : 'bottom-6 right-5 left-5 top-25 rounded-2xl md:bottom-auto md:right-0 md:left-auto md:transform md:-translate-y-1/2 md:w-96 md:h-[600px]'
+  fixed z-50 flex flex-col bg-white dark:bg-gray-900 shadow-2xl
+  border border-gray-200 dark:border-gray-700
+${isFullscreen
+                  ? 'inset-2 sm:inset-4 rounded-xl md:rounded-2xl'
+                  : 'bottom-2 top-2 left-2 right-2 sm:bottom-4 sm:top-4 sm:left-4 sm:right-4 md:bottom-auto md:right-6 md:left-auto md:top-[14%] md:w-96 md:h-[80vh] max-h-[700px]'
                 }
-                overflow-hidden
-              `}
+  overflow-hidden
+`}
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex justify-between items-center flex-shrink-0">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex justify-between items-center flex-shrink-0 relative">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                     <BotIcon />
@@ -391,8 +504,22 @@ const AIChatbot = () => {
                     <p className="text-xs text-blue-100">ถามเกี่ยวกับผลงานและทักษะ</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-1">
+                  {/* History Button */}
+                  {userQueryHistory.length > 0 && (
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={toggleHistory}
+                      className={`text-white p-2 rounded-lg transition-all duration-200 ${showHistory ? 'bg-white/20' : 'hover:bg-white/10'
+                        }`}
+                      aria-label="ประวัติคำถาม"
+                    >
+                      <HistoryIcon />
+                    </motion.button>
+                  )}
+
                   {/* Fullscreen Toggle */}
                   <motion.button
                     whileHover={{ scale: 1.1 }}
@@ -415,52 +542,55 @@ const AIChatbot = () => {
                     <CloseIcon />
                   </motion.button>
                 </div>
+
+                {/* History Panel */}
+                <QueryHistoryPanel />
               </div>
 
               {/* Welcome Screen */}
               <AnimatePresence>
                 {showWelcome && (
-                  <WelcomeScreen 
+                  <WelcomeScreen
                     onStartChat={handleStartChat}
                     onClose={() => setShowWelcome(false)}
                   />
                 )}
               </AnimatePresence>
 
-              {/* Messages Area */}
-              <div 
+              {/* Messages Area - เพิ่ม safe area สำหรับมือถือ */}
+              <div
                 ref={messagesContainerRef}
-                className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-800/50"
+                className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-800/50 pb-safe"
+                style={{
+                  paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+                }}
               >
                 <div className="p-4 space-y-4">
                   {messages.map((msg, i) => (
                     <motion.div
-                      key={i}
+                      key={msg.id || i}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div className={`
-                        relative max-w-[85%] md:max-w-[80%]
+                        relative max-w-[85%] p-3 rounded-2xl
                         ${msg.sender === 'user'
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl rounded-br-md'
-                          : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl rounded-bl-md shadow-sm border border-gray-100 dark:border-gray-700'
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-br-md'
+                          : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700'
                         }
                       `}>
-                        <div className="p-4">
-                          <p className="text-sm leading-relaxed break-words">{msg.text}</p>
-                        </div>
+                        <p className="text-sm leading-relaxed break-words">{msg.text}</p>
 
                         {msg.sender === 'bot' && msg.text && (
-                          <div className="flex items-center space-x-2 px-4 pb-3">
+                          <div className="flex items-center space-x-2 mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
                             <motion.button
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleReaction(i, 'like')}
-                              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs transition-all ${
-                                msg.reactions?.userLiked
-                                  ? 'bg-blue-500 text-white shadow-md'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                              }`}
+                              className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-all ${msg.reactions?.userLiked
+                                ? 'bg-blue-500 text-white shadow-md'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                }`}
                             >
                               <LikeIcon filled={msg.reactions?.userLiked} />
                               <span>{msg.reactions?.like || 0}</span>
@@ -469,11 +599,10 @@ const AIChatbot = () => {
                             <motion.button
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleReaction(i, 'dislike')}
-                              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs transition-all ${
-                                msg.reactions?.userDisliked
-                                  ? 'bg-red-500 text-white shadow-md'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                              }`}
+                              className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-all ${msg.reactions?.userDisliked
+                                ? 'bg-red-500 text-white shadow-md'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                }`}
                             >
                               <DislikeIcon filled={msg.reactions?.userDisliked} />
                               <span>{msg.reactions?.dislike || 0}</span>
@@ -490,17 +619,17 @@ const AIChatbot = () => {
                       animate={{ opacity: 1, y: 0 }}
                       className="flex justify-start"
                     >
-                      <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl rounded-bl-md shadow-sm border border-gray-100 dark:border-gray-700">
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700">
                         <div className="flex space-x-2">
                           {[0, 1, 2].map((i) => (
                             <motion.div
                               key={i}
-                              animate={{ 
+                              animate={{
                                 scale: [1, 1.2, 1],
                                 opacity: [0.5, 1, 0.5]
                               }}
-                              transition={{ 
-                                duration: 1.5, 
+                              transition={{
+                                duration: 1.5,
                                 repeat: Infinity,
                                 delay: i * 0.2
                               }}
@@ -564,15 +693,37 @@ const AIChatbot = () => {
                 </div>
               </div>
 
-              {/* Input Area */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0 safe-area-padding">
+              {/* ใส่ก่อน Input Area */}
+              {isGeneratingQuestions && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-t border-blue-100 dark:border-blue-800/50"
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500"></div>
+                    <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                      กำลังสร้างคำถามแนะนำ...
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Input Area - เพิ่ม safe area สำหรับมือถือ */}
+              <div
+                className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0 pb-safe"
+                style={{
+                  paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))'
+                }}
+              >
                 <form onSubmit={handleSubmit} className="flex space-x-3">
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="พิมพ์ข้อความที่นี่..."
-                    className="flex-1 px-1 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white text-sm transition-all duration-200"
+                    className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white text-sm transition-all duration-200"
                     disabled={isTyping}
                   />
                   <motion.button
@@ -590,38 +741,6 @@ const AIChatbot = () => {
           </>
         )}
       </AnimatePresence>
-
-      <style jsx global>{`
-        .safe-area-padding {
-          padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-        }
-        
-        /* Custom scrollbar */
-        .overflow-y-auto::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        .overflow-y-auto::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        
-        .overflow-y-auto::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 3px;
-        }
-        
-        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-        
-        .dark .overflow-y-auto::-webkit-scrollbar-thumb {
-          background: #475569;
-        }
-        
-        .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-          background: #64748b;
-        }
-      `}</style>
     </>
   );
 };

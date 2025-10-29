@@ -3,66 +3,90 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 
+// Animation Variants
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+    scale: 0.95
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15,
+      mass: 0.8
+    }
+  },
+  hover: {
+    y: -6,
+    scale: 1.02,
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 25
+    }
+  },
+  tap: {
+    scale: 0.98,
+    y: -2
+  }
+};
+
+const imageVariants = {
+  hover: {
+    scale: 1.05,
+    transition: {
+      duration: 0.3,
+      ease: "easeOut"
+    }
+  }
+};
+
 const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
+  const [imageLoaded, setImageLoaded] = React.useState(false);
+  const [imageError, setImageError] = React.useState(false);
+
   // ✅ ฟังก์ชัน Like — พร้อม console.log
   const handleLike = (e) => {
     e.stopPropagation();
-    // console.log('❤️ Like clicked:', { 
-    //   projectId: project.id, 
-    //   currentIsLiked: project.isLiked, 
-    //   currentIsDisliked: project.isDisliked 
-    // });
-
+    
     if (project.isDisliked) {
-      // console.log('🔄 Auto-unlike Dislike first');
       onDislike(project.id, false);
     }
     
     const newIsLiked = !project.isLiked;
-    // console.log('✅ Setting like:', { id: project.id, isLiked: newIsLiked });
     onLike(project.id, newIsLiked);
   };
 
   // ✅ ฟังก์ชัน Dislike — พร้อม console.log
   const handleDislike = (e) => {
     e.stopPropagation();
-    // console.log('👎 Dislike clicked:', { 
-    //   projectId: project.id, 
-    //   currentIsLiked: project.isLiked, 
-    //   currentIsDisliked: project.isDisliked 
-    // });
 
     if (project.isLiked) {
-      // console.log('🔄 Auto-unlike Like first');
       onLike(project.id, false);
     }
     
     const newIsDisliked = !project.isDisliked;
-    // console.log('✅ Setting dislike:', { id: project.id, isDisliked: newIsDisliked });
     onDislike(project.id, newIsDisliked);
   };
 
   return (
     <motion.div
       layoutId={`project-${project.id}`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ 
-        opacity: 0, 
-        y: 20,
-        transition: { duration: 0.2 }
-      }}
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover="hover"
+      whileTap="tap"
       transition={{ 
-        duration: 0.4, 
-        delay: index * 0.1,
+        delay: index * 0.08,
         type: "spring",
         stiffness: 80,
         damping: 15
-      }}
-      whileHover={{ 
-        y: -6, 
-        scale: 1.02,
-        transition: { duration: 0.2 }
       }}
       className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer group"
       onClick={() => onSelect(project)}
@@ -70,14 +94,28 @@ const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
       <motion.div 
         layoutId={`image-${project.id}`} 
         className="relative overflow-hidden"
-        whileHover={{ scale: 1.05 }}
-        transition={{ duration: 0.3 }}
+        variants={imageVariants}
+        whileHover="hover"
       >
-        <img
-          src={project.image || "https://via.placeholder.com/400x200?text=Project"}
-          alt={project.title}
-          className="w-full h-48 object-cover transition-transform duration-500"
-        />
+        <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700">
+          <img
+            src={project.image || "https://via.placeholder.com/400x200?text=Project"}
+            alt={project.title}
+            className={`w-full h-48 object-cover transition-opacity duration-500 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => {
+              setImageError(true);
+              setImageLoaded(true);
+            }}
+          />
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          )}
+        </div>
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
       </motion.div>
 
@@ -95,12 +133,14 @@ const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
 
         <div className="flex flex-wrap gap-2 mb-4">
           {project.tags?.slice(0, 3).map((tag, i) => (
-            <span 
+            <motion.span 
               key={i} 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-xs font-medium rounded-full"
             >
               {tag}
-            </span>
+            </motion.span>
           ))}
           {project.tags && project.tags.length > 3 && (
             <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-full">
