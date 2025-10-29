@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { aiChatResponse, aiGenerateQuestions } from '../utils/ai';
 
-// SVG Icons (คงเดิมเหมือนเดิม)
+// SVG Icons
 const BotIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M20 9V7C20 5.35 18.65 4 17 4H7C5.35 4 4 5.35 4 7V9C2.9 9 2 9.9 2 11V16C2 17.1 2.9 18 4 18H5V19C5 19.55 5.45 20 6 20H8C8.55 20 9 19.55 9 19V18H15V19C15 19.55 15.45 20 16 20H18C18.55 20 19 19.55 19 19V18H20C21.1 18 22 17.1 22 16V11C22 9.9 21.1 9 20 9ZM7 6H17C17.55 6 18 6.45 18 7V9H6V7C6 6.45 6.45 6 7 6ZM20 16H4V11H20V16Z" fill="currentColor" />
@@ -62,8 +62,22 @@ const DeleteIcon = () => (
   </svg>
 );
 
-// Welcome Screen (คงเดิม)
+// Welcome Screen
 const WelcomeScreen = ({ onStartChat, onClose }) => {
+  const quickLinks = [
+    { text: "แนะนำตัวหน่อย", link: "/about" },
+    { text: "มีทักษะอะไรบ้าง", link: "/skills" },
+    { text: "ดูผลงาน", link: "/portfolio" },
+    { text: "ประกาศนียบัตร", link: "/certificates" }
+  ];
+
+  const handleLinkClick = (link) => {
+    onClose();
+    setTimeout(() => {
+      window.location.href = link;
+    }, 300);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -123,18 +137,18 @@ const WelcomeScreen = ({ onStartChat, onClose }) => {
         </motion.button>
 
         <div className="grid grid-cols-2 gap-2">
-          {["แนะนำตัวหน่อย", "มีทักษะอะไรบ้าง"].map((question, index) => (
+          {quickLinks.map((item, index) => (
             <motion.button
-              key={question}
+              key={item.text}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onStartChat(question)}
+              onClick={() => handleLinkClick(item.link)}
               className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 py-2 px-3 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border border-blue-100 dark:border-blue-800/50"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 + index * 0.1 }}
             >
-              {question}
+              {item.text}
             </motion.button>
           ))}
         </div>
@@ -156,6 +170,60 @@ const AIChatbot = () => {
   const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+
+  // ฟังก์ชันแปลง path เป็นข้อความ
+  const getLinkText = (path) => {
+    const linkMap = {
+      '': 'หน้าแรก',
+      'about': 'เกี่ยวกับฉัน',
+      'portfolio': 'ผลงาน',
+      'skills': 'ทักษะ',
+      'certificates': 'ประกาศนียบัตร',
+      'blog': 'บทความ'
+    };
+    return linkMap[path] || path;
+  };
+
+  // ฟังก์ชันจัดการเมื่อคลิกลิงก์
+  const handleLinkClick = (path) => {
+    setIsOpen(false);
+    setTimeout(() => {
+      window.location.href = `/${path}`;
+    }, 300);
+  };
+
+  // ฟังก์ชันแปลงข้อความที่มีลิงก์
+  const formatMessageWithLinks = (text) => {
+    if (!text) return text;
+    
+    const linkRegex = /\[\[\/([a-zA-Z0-9-_]*)\]\]/g;
+    const parts = text.split(linkRegex);
+    
+    if (parts.length === 1) return text;
+
+    const result = [];
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 0) {
+        result.push(parts[i]);
+      } else {
+        const path = parts[i];
+        const linkText = getLinkText(path);
+        result.push(
+          <motion.span
+            key={i}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleLinkClick(path)}
+            className="inline-flex items-center px-2 py-1 mx-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition-all duration-200 border border-blue-200 dark:border-blue-700 text-sm font-medium"
+          >
+            {linkText}
+          </motion.span>
+        );
+      }
+    }
+    
+    return result;
+  };
 
   // โหลดประวัติจาก localStorage
   useEffect(() => {
@@ -207,7 +275,6 @@ const AIChatbot = () => {
     let index = 0;
     const botMessageId = Date.now();
 
-    // เพิ่มข้อความบอทเปล่า
     setMessages(prev => [...prev, {
       text: '',
       sender: 'bot',
@@ -270,7 +337,6 @@ const AIChatbot = () => {
       return;
     }
 
-    // เพิ่มข้อความผู้ใช้
     const userMessage = {
       text: userInput,
       sender: 'user',
@@ -278,7 +344,6 @@ const AIChatbot = () => {
     };
     setMessages(prev => [...prev, userMessage]);
 
-    // บันทึกคำถามลงประวัติ
     addToQueryHistory(userInput);
 
     if (customInput === null) {
@@ -298,7 +363,6 @@ const AIChatbot = () => {
         throw new Error('Empty response from AI');
       }
 
-      // ใช้ typeMessage เพื่อพิมพ์ทีละตัวอักษร
       typeMessage(response, () => {
         setIsTyping(false);
         generateSuggestedQuestions(userInput, response);
@@ -477,21 +541,21 @@ const AIChatbot = () => {
               className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             />
 
-            {/* Chat Container - ปรับปรุงตำแหน่งและขนาดให้รองรับทุกหน้าจอ */}
+            {/* Chat Container */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className={`
-  fixed z-50 flex flex-col bg-white dark:bg-gray-900 shadow-2xl
-  border border-gray-200 dark:border-gray-700
-${isFullscreen
+                fixed z-50 flex flex-col bg-white dark:bg-gray-900 shadow-2xl
+                border border-gray-200 dark:border-gray-700
+                ${isFullscreen
                   ? 'inset-2 sm:inset-4 rounded-xl md:rounded-2xl'
                   : 'bottom-2 top-2 left-2 right-2 sm:bottom-4 sm:top-4 sm:left-4 sm:right-4 md:bottom-auto md:right-6 md:left-auto md:top-[14%] md:w-96 md:h-[80vh] max-h-[700px]'
                 }
-  overflow-hidden
-`}
+                overflow-hidden
+              `}
             >
               {/* Header */}
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex justify-between items-center flex-shrink-0 relative">
@@ -557,7 +621,7 @@ ${isFullscreen
                 )}
               </AnimatePresence>
 
-              {/* Messages Area - เพิ่ม safe area สำหรับมือถือ */}
+              {/* Messages Area */}
               <div
                 ref={messagesContainerRef}
                 className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-800/50 pb-safe"
@@ -580,7 +644,9 @@ ${isFullscreen
                           : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700'
                         }
                       `}>
-                        <p className="text-sm leading-relaxed break-words">{msg.text}</p>
+                        <div className="text-sm leading-relaxed break-words">
+                          {msg.sender === 'bot' ? formatMessageWithLinks(msg.text) : msg.text}
+                        </div>
 
                         {msg.sender === 'bot' && msg.text && (
                           <div className="flex items-center space-x-2 mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
@@ -693,7 +759,7 @@ ${isFullscreen
                 </div>
               </div>
 
-              {/* ใส่ก่อน Input Area */}
+              {/* Generating Questions Indicator */}
               {isGeneratingQuestions && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -710,7 +776,7 @@ ${isFullscreen
                 </motion.div>
               )}
 
-              {/* Input Area - เพิ่ม safe area สำหรับมือถือ */}
+              {/* Input Area */}
               <div
                 className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0 pb-safe"
                 style={{
