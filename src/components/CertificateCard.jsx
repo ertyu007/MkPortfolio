@@ -55,7 +55,7 @@ const imageVariants = {
 
 const CertificateCard = ({ cert, onSelect, index }) => {
   const [imageLoaded, setImageLoaded] = React.useState(false);
-  const [imageError, setImageError] = React.useState(false);
+  const [, setImageError] = React.useState(false);
 
   return (
     <motion.div
