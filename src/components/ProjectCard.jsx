@@ -48,7 +48,7 @@ const imageVariants = {
 
 const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
   const [imageLoaded, setImageLoaded] = React.useState(false);
-  const [imageError, setImageError] = React.useState(false);
+  const [, setImageError] = React.useState(false);
 
   // ✅ ฟังก์ชัน Like — พร้อม console.log
   const handleLike = (e) => {
