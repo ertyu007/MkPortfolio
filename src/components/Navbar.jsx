@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaUser, FaCode, FaBriefcase, FaAward, FaNewspaper, 
-  FaEnvelope, FaBars, FaTimes, FaMoon, FaSun 
+  FaEnvelope, FaBars, FaTimes, FaMoon, FaSun, FaVideo 
 } from 'react-icons/fa';
 
 const Navbar = ({ scrollToSection }) => {
@@ -19,6 +19,7 @@ const Navbar = ({ scrollToSection }) => {
     { label: "เกี่ยวกับ", icon: <FaUser />, section: "about" },
     { label: "ทักษะ", icon: <FaCode />, section: "skills" },
     { label: "ผลงาน", icon: <FaBriefcase />, section: "portfolio" },
+        { label: "TikTok", icon: <FaVideo />, section: "tiktok" },
     { label: "ประกาศนียบัตร", icon: <FaAward />, section: "certificates" },
     { label: "บทความ", icon: <FaNewspaper />, section: "blog" },
     { label: "ติดต่อ", icon: <FaEnvelope />, section: "contact" },

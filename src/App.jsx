@@ -7,6 +7,7 @@ import About from './pages/About';
 import Skills from './pages/Skills';
 import Portfolio from './pages/Portfolio';
 import Certificates from './pages/Certificates';
+import TikTokVideos from './pages/TiktokVideos';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import { ThemeProvider } from './context/ThemeContext';
@@ -22,6 +23,7 @@ const App = () => {
   const certificatesRef = useRef(null); // เปลี่ยนจาก CertificatesRef เป็น certificatesRef
   const blogRef = useRef(null);
   const contactRef = useRef(null);
+  const tiktokRef = useRef(null);
 
   const [showWelcome, setShowWelcome] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -42,7 +44,7 @@ const App = () => {
           setShowWelcome(true);
           setHasInitialized(true);
         }, 1000);
-        
+
         return () => clearTimeout(timer);
       }
       setHasInitialized(true);
@@ -62,7 +64,8 @@ const App = () => {
     portfolio: portfolioRef,
     certificates: certificatesRef, // เปลี่ยนจาก CertificatesRef เป็น certificatesRef
     blog: blogRef,
-    contact: contactRef
+    contact: contactRef,
+    tiktok: tiktokRef
   };
 
   return (
@@ -74,11 +77,12 @@ const App = () => {
             about: aboutRef,
             skills: skillsRef,
             portfolio: portfolioRef,
+            tiktok: tiktokRef,
             blog: blogRef,
             contact: contactRef
           }}
         />
-        
+
         {/* ส่ง sectionRefs ไปให้ AIChatbot */}
         <AIChatbot sectionRefs={sectionRefs} />
 
@@ -87,7 +91,8 @@ const App = () => {
           <div ref={aboutRef} id="about"><About /></div>
           <div ref={skillsRef} id="skills"><Skills /></div>
           <div ref={portfolioRef} id="portfolio"><Portfolio /></div>
-          <div ref={certificatesRef} id="certificates"><Certificates /></div> {/* เปลี่ยนจาก CertificatesRef เป็น certificatesRef */}
+          <div ref={tiktokRef} id="tiktok"><TikTokVideos /></div>
+          <div ref={certificatesRef} id="certificates"><Certificates /></div>
           <div ref={blogRef} id="blog"><Blog /></div>
           <div ref={contactRef} id="contact"><Contact /></div>
         </main>
