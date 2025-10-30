@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { aiChatResponseWithRetry, aiGenerateQuestions, getFallbackResponse } from '../utils/ai';
 
-// SVG Icons Components
+// SVG Icons Components (คงเดิม)
 const BotIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M20 9V7C20 5.35 18.65 4 17 4H7C5.35 4 4 5.35 4 7V9C2.9 9 2 9.9 2 11V16C2 17.1 2.9 18 4 18H5V19C5 19.55 5.45 20 6 20H8C8.55 20 9 19.55 9 19V18H15V19C15 19.55 15.45 20 16 20H18C18.55 20 19 19.55 19 19V18H20C21.1 18 22 17.1 22 16V11C22 9.9 21.1 9 20 9ZM7 6H17C17.55 6 18 6.45 18 7V9H6V7C6 6.45 6.45 6 7 6ZM20 16H4V11H20V16Z" fill="currentColor" />
@@ -60,16 +60,6 @@ const DeleteIcon = () => (
   </svg>
 );
 
-const ClearChatIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 12C17.31 12 20 14.69 20 18C20 21.31 17.31 24 14 24C10.69 24 8 21.31 8 18C8 14.69 10.69 12 14 12ZM14 10C9.58 10 6 13.58 6 18C6 22.42 9.58 26 14 26C18.42 26 22 22.42 22 18C22 13.58 18.42 10 14 10Z" fill="currentColor"/>
-    <path d="M16 16L12 20M12 16L16 20" stroke="currentColor" strokeWidth="2"/>
-    <path d="M2 4H6V2H2V4ZM22 4H10V2H22V4Z" fill="currentColor"/>
-    <path d="M8 8H6V22H8V8Z" fill="currentColor"/>
-    <path d="M4 8H2V22H4V8Z" fill="currentColor"/>
-  </svg>
-);
-
 const ClearAllIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="currentColor"/>
@@ -78,13 +68,7 @@ const ClearAllIcon = () => (
   </svg>
 );
 
-const RestartIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 5V2L8 6L12 10V7C15.31 7 18 9.69 18 13C18 16.31 15.31 19 12 19C8.69 19 6 16.31 6 13H4C4 17.42 7.58 21 12 21C16.42 21 20 17.42 20 13C20 8.58 16.42 5 12 5Z" fill="currentColor"/>
-  </svg>
-);
-
-// Welcome Screen Component
+// Welcome Screen Component (คงเดิม)
 const WelcomeScreen = ({ onStartChat, onClose, sectionRefs }) => {
   const quickLinks = [
     { text: "หน้าแรก", link: "home" },
@@ -198,13 +182,13 @@ const WelcomeScreen = ({ onStartChat, onClose, sectionRefs }) => {
   );
 };
 
-// Query History Panel Component
+// Query History Panel Component (ลดความซับซ้อน)
 const QueryHistoryPanel = ({ 
   showHistory, 
   userQueryHistory, 
   onQuestionClick, 
   onRemoveQuery, 
-  onClearWithConfirm 
+  onClearAll 
 }) => {
   if (!showHistory || userQueryHistory.length === 0) return null;
 
@@ -222,37 +206,15 @@ const QueryHistoryPanel = ({
             ประวัติคำถาม ({userQueryHistory.length})
           </span>
         </div>
-        <div className="flex space-x-1">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onClearWithConfirm('restart')}
-            className="text-xs text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-2 transition-colors bg-green-50 dark:bg-green-900/20 rounded-lg"
-            title="เริ่มแชทใหม่ทั้งหมด"
-          >
-            <RestartIcon />
-          </motion.button>
-          
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onClearWithConfirm('chat')}
-            className="text-xs text-orange-500 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 p-2 transition-colors bg-orange-50 dark:bg-orange-900/20 rounded-lg"
-            title="ล้างประวัติการสนทนา"
-          >
-            <ClearChatIcon />
-          </motion.button>
-          
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onClearWithConfirm('queries')}
-            className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 transition-colors bg-red-50 dark:bg-red-900/20 rounded-lg"
-            title="ล้างประวัติคำถาม"
-          >
-            <ClearAllIcon />
-          </motion.button>
-        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onClearAll}
+          className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 transition-colors bg-red-50 dark:bg-red-900/20 rounded-lg"
+          title="ล้างประวัติคำถามทั้งหมด"
+        >
+          <ClearAllIcon />
+        </motion.button>
       </div>
 
       <div className="max-h-64 overflow-y-auto p-2">
@@ -287,35 +249,9 @@ const QueryHistoryPanel = ({
   );
 };
 
-// Clear Confirmation Dialog Component
-const ClearConfirmationDialog = ({ showClearConfirm, clearType, onConfirm, onCancel }) => {
+// Clear Confirmation Dialog Component (ลดความซับซ้อน)
+const ClearConfirmationDialog = ({ showClearConfirm, onConfirm, onCancel }) => {
   if (!showClearConfirm) return null;
-
-  const messages = {
-    chat: {
-      title: "ล้างประวัติการสนทนา",
-      message: "คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติการสนทนาทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้",
-      confirmText: "ล้างประวัติ",
-      icon: <ClearChatIcon />,
-      confirmColor: "bg-orange-500 hover:bg-orange-600"
-    },
-    queries: {
-      title: "ล้างประวัติคำถาม",
-      message: "คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติคำถามทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้",
-      confirmText: "ล้างคำถาม",
-      icon: <ClearAllIcon />,
-      confirmColor: "bg-red-500 hover:bg-red-600"
-    },
-    restart: {
-      title: "เริ่มแชทใหม่",
-      message: "คุณแน่ใจหรือไม่ว่าต้องการเริ่มแชทใหม่ทั้งหมด? ทั้งประวัติการสนทนาและคำถามจะถูกล้าง",
-      confirmText: "เริ่มใหม่",
-      icon: <RestartIcon />,
-      confirmColor: "bg-green-500 hover:bg-green-600"
-    }
-  };
-
-  const { title, message, confirmText, icon, confirmColor } = messages[clearType] || messages.chat;
 
   return (
     <motion.div
@@ -330,10 +266,12 @@ const ClearConfirmationDialog = ({ showClearConfirm, clearType, onConfirm, onCan
         className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-200 dark:border-gray-700"
       >
         <div className="flex items-center space-x-3 mb-4">
-          <div className="text-2xl">{icon}</div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
+          <div className="text-2xl"><ClearAllIcon /></div>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">ล้างประวัติคำถาม</h3>
         </div>
-        <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">{message}</p>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">
+          คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติคำถามทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้
+        </p>
         <div className="flex space-x-3">
           <button
             onClick={onCancel}
@@ -343,9 +281,9 @@ const ClearConfirmationDialog = ({ showClearConfirm, clearType, onConfirm, onCan
           </button>
           <button
             onClick={onConfirm}
-            className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors font-medium ${confirmColor}`}
+            className="flex-1 px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors font-medium"
           >
-            {confirmText}
+            ล้างทั้งหมด
           </button>
         </div>
       </motion.div>
@@ -353,7 +291,7 @@ const ClearConfirmationDialog = ({ showClearConfirm, clearType, onConfirm, onCan
   );
 };
 
-// Message Component
+// Message Component (คงเดิม)
 const Message = ({ msg, onReaction, formatMessageWithLinks }) => (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
@@ -404,7 +342,7 @@ const Message = ({ msg, onReaction, formatMessageWithLinks }) => (
   </motion.div>
 );
 
-// Typing Indicator Component
+// Typing Indicator Component (คงเดิม)
 const TypingIndicator = () => (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
@@ -433,7 +371,7 @@ const TypingIndicator = () => (
   </motion.div>
 );
 
-// Suggested Questions Component
+// Suggested Questions Component (คงเดิม)
 const SuggestedQuestions = ({ questions, onQuestionClick, isGenerating }) => (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
@@ -459,7 +397,7 @@ const SuggestedQuestions = ({ questions, onQuestionClick, isGenerating }) => (
   </motion.div>
 );
 
-// Main Component
+// Main Component (ลดความซับซ้อน)
 const AIChatbot = ({ sectionRefs }) => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
@@ -472,11 +410,10 @@ const AIChatbot = ({ sectionRefs }) => {
   const [userQueryHistory, setUserQueryHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [clearType, setClearType] = useState('');
   
   const messagesContainerRef = useRef(null);
 
-  // Constants
+  // Constants (คงเดิม)
   const QUICK_QUESTIONS = [
     "แนะนำตัวหน่อย",
     "มีทักษะอะไรบ้าง",
@@ -494,45 +431,31 @@ const AIChatbot = ({ sectionRefs }) => {
     'contact': 'ติดต่อ'
   };
 
-  // Helper Functions
+  // Helper Functions (คงเดิม)
   const getLinkText = (path) => LINK_MAP[path] || path;
 
   const handleLinkClick = (path) => {
     console.log('Attempting to navigate to:', path);
     
-    // ปิดแชทก่อน
     setIsOpen(false);
     
-    // รอให้แชทปิดก่อนแล้วค่อยเลื่อน
     setTimeout(() => {
       const sectionKey = path || 'home';
-      console.log('Looking for section:', sectionKey);
-      console.log('Available sections:', Object.keys(sectionRefs));
-      
-      // พยายามใช้ sectionRefs ก่อน
       const sectionRef = sectionRefs[sectionKey];
       
       if (sectionRef?.current) {
-        console.log('Found section via ref, scrolling...');
         sectionRef.current.scrollIntoView({ 
           behavior: 'smooth',
           block: 'start'
         });
       } else {
-        console.log('Section ref not found, trying document.getElementById...');
-        
-        // Fallback: พยายามใช้ ID selector
         const element = document.getElementById(sectionKey);
         if (element) {
-          console.log('Found element by ID, scrolling...');
           element.scrollIntoView({ 
             behavior: 'smooth',
             block: 'start'
           });
         } else {
-          console.error(`Cannot find section: ${sectionKey}`);
-          
-          // Fallback สุดท้าย: ใช้ hash URL
           window.location.hash = sectionKey;
         }
       }
@@ -571,50 +494,7 @@ const AIChatbot = ({ sectionRefs }) => {
     return result;
   };
 
-  // Effects
-  useEffect(() => {
-    const savedMessages = localStorage.getItem('ai_chat_messages');
-    const savedHistory = localStorage.getItem('ai_chat_query_history');
-    
-    if (savedMessages) {
-      try {
-        const parsedMessages = JSON.parse(savedMessages);
-        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
-          setMessages(parsedMessages);
-        }
-      } catch (err) {
-        console.error('Error loading chat messages:', err);
-      }
-    }
-    
-    if (savedHistory) {
-      try {
-        const parsedHistory = JSON.parse(savedHistory);
-        if (Array.isArray(parsedHistory)) {
-          setUserQueryHistory(parsedHistory);
-        }
-      } catch (err) {
-        console.error('Error loading query history:', err);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('ai_chat_messages', JSON.stringify(messages));
-    } else {
-      localStorage.removeItem('ai_chat_messages');
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    if (userQueryHistory.length > 0) {
-      localStorage.setItem('ai_chat_query_history', JSON.stringify(userQueryHistory));
-    } else {
-      localStorage.removeItem('ai_chat_query_history');
-    }
-  }, [userQueryHistory]);
-
+  // Effects (ลดความซับซ้อน - เอาการบันทึก localStorage ออก)
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setShowWelcome(true);
@@ -640,7 +520,7 @@ const AIChatbot = ({ sectionRefs }) => {
     };
   }, [isOpen]);
 
-  // Core Functions
+  // Core Functions (คงเดิม)
   const typeMessage = (fullText, onComplete) => {
     let index = 0;
     const botMessageId = Date.now();
@@ -728,7 +608,6 @@ const AIChatbot = ({ sectionRefs }) => {
         ? `บทสนทนาก่อนหน้า: ${messages.slice(-3).map(m => `${m.sender}: ${m.text}`).join(' | ')}`
         : '';
 
-      // ✅ ใช้ฟังก์ชันใหม่ที่มี retry mechanism
       const response = await aiChatResponseWithRetry(userInput.trim(), context);
       
       if (!response?.trim()) throw new Error('Empty response from AI');
@@ -741,7 +620,6 @@ const AIChatbot = ({ sectionRefs }) => {
     } catch (err) {
       console.error("AI Error:", err);
       
-      // ✅ ใช้ fallback response เมื่อเกิด error
       const fallbackResponse = getFallbackResponse(userInput.trim());
       
       setMessages(prev => [...prev, {
@@ -800,13 +678,7 @@ const AIChatbot = ({ sectionRefs }) => {
     }));
   };
 
-  // History Management
-  const clearChatHistory = () => {
-    setMessages([]);
-    setSuggestedQuestions([]);
-    setShowWelcome(true);
-  };
-
+  // History Management (ลดความซับซ้อน)
   const clearQueryHistory = () => {
     setUserQueryHistory([]);
   };
@@ -815,15 +687,7 @@ const AIChatbot = ({ sectionRefs }) => {
     setUserQueryHistory(prev => prev.filter(query => query !== queryToRemove));
   };
 
-  const restartChat = () => {
-    setMessages([]);
-    setUserQueryHistory([]);
-    setSuggestedQuestions([]);
-    setShowWelcome(true);
-    setShowHistory(false);
-  };
-
-  // UI Handlers
+  // UI Handlers (ลดความซับซ้อน)
   const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
   const toggleHistory = () => setShowHistory(!showHistory);
   const handleCloseChat = () => {
@@ -831,28 +695,22 @@ const AIChatbot = ({ sectionRefs }) => {
     setShowHistory(false);
   };
 
-  const handleClearWithConfirm = (type) => {
-    setClearType(type);
+  const handleClearAll = () => {
     setShowClearConfirm(true);
   };
 
   const confirmClear = () => {
-    if (clearType === 'chat') clearChatHistory();
-    else if (clearType === 'queries') clearQueryHistory();
-    else if (clearType === 'restart') restartChat();
-    
+    clearQueryHistory();
     setShowClearConfirm(false);
-    setClearType('');
   };
 
   const cancelClear = () => {
     setShowClearConfirm(false);
-    setClearType('');
   };
 
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Floating Action Button (คงเดิม) */}
       {!isOpen && (
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
@@ -909,183 +767,172 @@ const AIChatbot = ({ sectionRefs }) => {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">AI Assistant</h3>
-                    <p className="text-xs text-blue-100">ถามเกี่ยวกับผลงานและทักษะ</p>
+                    <p className="text-xs opacity-90">ถามอะไรก็ได้เกี่ยวกับผลงานของฉัน</p>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-1">
-                  {(userQueryHistory.length > 0 || messages.length > 0) && (
+                <div className="flex items-center space-x-2">
+                  {/* History Button */}
+                  {userQueryHistory.length > 0 && (
                     <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={toggleHistory}
-                      className={`text-white p-2 rounded-lg transition-all duration-200 ${showHistory ? 'bg-white/20' : 'hover:bg-white/10'}`}
-                      aria-label="ประวัติคำถาม"
+                      className="p-2 hover:bg-white/20 rounded-lg transition-colors relative"
+                      title="ประวัติคำถาม"
                     >
                       <HistoryIcon />
+                      {userQueryHistory.length > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 text-white text-xs rounded-full flex items-center justify-center">
+                          {userQueryHistory.length > 9 ? '9+' : userQueryHistory.length}
+                        </span>
+                      )}
                     </motion.button>
                   )}
 
-                  {messages.length > 0 && (
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleClearWithConfirm('restart')}
-                      className="text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-200"
-                      aria-label="เริ่มแชทใหม่"
-                      title="เริ่มแชทใหม่ทั้งหมด"
-                    >
-                      <RestartIcon />
-                    </motion.button>
-                  )}
-
+                  {/* Fullscreen Toggle */}
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={toggleFullscreen}
-                    className="text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-200"
-                    aria-label={isFullscreen ? "ย่อ" : "ขยาย"}
+                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    title={isFullscreen ? "ย่อขนาด" : "ขยายเต็มหน้าจอ"}
                   >
                     {isFullscreen ? <MinimizeIcon /> : <ExpandIcon />}
                   </motion.button>
 
+                  {/* Close Button */}
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={handleCloseChat}
-                    className="text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-200"
-                    aria-label="ปิด"
+                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    title="ปิดแชท"
                   >
                     <CloseIcon />
                   </motion.button>
                 </div>
-
-                {/* History Panel */}
-                <QueryHistoryPanel
-                  showHistory={showHistory}
-                  userQueryHistory={userQueryHistory}
-                  onQuestionClick={handleSuggestedQuestion}
-                  onRemoveQuery={removeQueryFromHistory}
-                  onClearWithConfirm={handleClearWithConfirm}
-                />
               </div>
-
-              {/* Welcome Screen */}
-              <AnimatePresence>
-                {showWelcome && (
-                  <WelcomeScreen
-                    onStartChat={handleStartChat}
-                    onClose={() => setShowWelcome(false)}
-                    sectionRefs={sectionRefs}
-                  />
-                )}
-              </AnimatePresence>
 
               {/* Messages Area */}
               <div
                 ref={messagesContainerRef}
-                className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-800/50"
+                className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 relative"
               >
-                <div className="p-4 space-y-4">
-                  {messages.map((msg) => (
-                    <Message
-                      key={msg.id}
-                      msg={msg}
-                      onReaction={handleReaction}
-                      formatMessageWithLinks={formatMessageWithLinks}
-                    />
-                  ))}
-
-                  {isTyping && <TypingIndicator />}
-
-                  {suggestedQuestions.length > 0 && !isTyping && (
-                    <SuggestedQuestions
-                      questions={suggestedQuestions}
-                      onQuestionClick={handleSuggestedQuestion}
-                      isGenerating={isGeneratingQuestions}
+                <AnimatePresence>
+                  {showWelcome && (
+                    <WelcomeScreen
+                      onStartChat={handleStartChat}
+                      onClose={() => setShowWelcome(false)}
+                      sectionRefs={sectionRefs}
                     />
                   )}
+                </AnimatePresence>
 
-                  {!showWelcome && messages.length <= 1 && !isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="grid grid-cols-2 gap-2 mt-4"
-                    >
-                      {QUICK_QUESTIONS.map((question, i) => (
-                        <motion.button
-                          key={question}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => handleSuggestedQuestion(question)}
-                          className="p-3 text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-200 dark:border-gray-600"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.1 }}
-                        >
-                          {question}
-                        </motion.button>
+                {!showWelcome && (
+                  <>
+                    {messages.length === 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-center py-8"
+                      >
+                        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white">
+                          <BotIcon />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                          สวัสดีครับ!
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
+                          ผมคือ AI Assistant ที่จะช่วยตอบคำถามเกี่ยวกับผลงานและทักษะของ ธนภัทร การะจักษ์
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
+                          {QUICK_QUESTIONS.map((q, i) => (
+                            <motion.button
+                              key={i}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => handleSuggestedQuestion(q)}
+                              className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 py-2 px-3 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border border-blue-100 dark:border-blue-800/50"
+                            >
+                              {q}
+                            </motion.button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+
+                    <AnimatePresence>
+                      {messages.map((msg) => (
+                        <Message
+                          key={msg.id}
+                          msg={msg}
+                          onReaction={handleReaction}
+                          formatMessageWithLinks={formatMessageWithLinks}
+                        />
                       ))}
-                    </motion.div>
-                  )}
-                </div>
-              </div>
+                    </AnimatePresence>
 
-              {/* Generating Questions Indicator */}
-              {isGeneratingQuestions && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-t border-blue-100 dark:border-blue-800/50"
-                >
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500"></div>
-                    <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                      กำลังสร้างคำถามแนะนำ...
-                    </span>
-                  </div>
-                </motion.div>
-              )}
+                    {isTyping && <TypingIndicator />}
+
+                    {suggestedQuestions.length > 0 && !isTyping && (
+                      <SuggestedQuestions
+                        questions={suggestedQuestions}
+                        onQuestionClick={handleSuggestedQuestion}
+                        isGenerating={isGeneratingQuestions}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
 
               {/* Input Area */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
-                <form onSubmit={handleSubmit} className="flex space-x-3">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="พิมพ์ข้อความที่นี่..."
-                    className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white text-sm transition-all duration-200"
-                    disabled={isTyping}
-                  />
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    type="submit"
-                    disabled={!input.trim() || isTyping}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center w-12 h-12"
-                  >
-                    <SendIcon />
-                  </motion.button>
+              {!showWelcome && (
+                <form
+                  onSubmit={handleSubmit}
+                  className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0"
+                >
+                  <div className="flex space-x-3">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="พิมพ์คำถามของคุณที่นี่..."
+                      className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      disabled={isTyping}
+                    />
+                    <motion.button
+                      type="submit"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      disabled={isTyping || !input.trim()}
+                      className="px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center space-x-2"
+                    >
+                      <SendIcon />
+                    </motion.button>
+                  </div>
                 </form>
-              </div>
+              )}
+
+              {/* Query History Panel */}
+              <QueryHistoryPanel
+                showHistory={showHistory}
+                userQueryHistory={userQueryHistory}
+                onQuestionClick={handleStartChat}
+                onRemoveQuery={removeQueryFromHistory}
+                onClearAll={handleClearAll}
+              />
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
       {/* Clear Confirmation Dialog */}
-      <AnimatePresence>
-        {showClearConfirm && (
-          <ClearConfirmationDialog
-            showClearConfirm={showClearConfirm}
-            clearType={clearType}
-            onConfirm={confirmClear}
-            onCancel={cancelClear}
-          />
-        )}
-      </AnimatePresence>
+      <ClearConfirmationDialog
+        showClearConfirm={showClearConfirm}
+        onConfirm={confirmClear}
+        onCancel={cancelClear}
+      />
     </>
   );
 };
