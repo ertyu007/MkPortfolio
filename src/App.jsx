@@ -19,7 +19,7 @@ const App = () => {
   const aboutRef = useRef(null);
   const skillsRef = useRef(null);
   const portfolioRef = useRef(null);
-  const CertificatesRef = useRef(null);
+  const certificatesRef = useRef(null); // เปลี่ยนจาก CertificatesRef เป็น certificatesRef
   const blogRef = useRef(null);
   const contactRef = useRef(null);
 
@@ -47,11 +47,22 @@ const App = () => {
       }
       setHasInitialized(true);
     }
-  }, [hasInitialized]); // ใส่ dependency ที่ถูกต้อง
+  }, [hasInitialized]);
 
   const handleWelcomeClose = () => {
     setShowWelcome(false);
     localStorage.setItem('hasSeenWelcome', 'true');
+  };
+
+  // ส่ง sectionRefs ไปให้ AIChatbot - แก้ไข key ให้ตรงกัน
+  const sectionRefs = {
+    home: homeRef,
+    about: aboutRef,
+    skills: skillsRef,
+    portfolio: portfolioRef,
+    certificates: certificatesRef, // เปลี่ยนจาก CertificatesRef เป็น certificatesRef
+    blog: blogRef,
+    contact: contactRef
   };
 
   return (
@@ -67,14 +78,16 @@ const App = () => {
             contact: contactRef
           }}
         />
-        <AIChatbot />
+        
+        {/* ส่ง sectionRefs ไปให้ AIChatbot */}
+        <AIChatbot sectionRefs={sectionRefs} />
 
         <main>
           <div ref={homeRef} id="home"><Home /></div>
           <div ref={aboutRef} id="about"><About /></div>
           <div ref={skillsRef} id="skills"><Skills /></div>
           <div ref={portfolioRef} id="portfolio"><Portfolio /></div>
-          <div ref={CertificatesRef} id="certificates"><Certificates /></div>
+          <div ref={certificatesRef} id="certificates"><Certificates /></div> {/* เปลี่ยนจาก CertificatesRef เป็น certificatesRef */}
           <div ref={blogRef} id="blog"><Blog /></div>
           <div ref={contactRef} id="contact"><Contact /></div>
         </main>

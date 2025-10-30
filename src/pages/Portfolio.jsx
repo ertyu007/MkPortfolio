@@ -18,6 +18,33 @@ const CloseIcon = () => (
   </svg>
 );
 
+// Like/Dislike Icons
+const LikeIcon = ({ isLiked }) => (
+  <svg 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill={isLiked ? "currentColor" : "none"} 
+    stroke="currentColor" 
+    strokeWidth="2"
+  >
+    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+  </svg>
+);
+
+const DislikeIcon = ({ isDisliked }) => (
+  <svg 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill={isDisliked ? "currentColor" : "none"} 
+    stroke="currentColor" 
+    strokeWidth="2"
+  >
+    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+  </svg>
+);
+
 // Animation Variants
 const modalVariants = {
   hidden: {
@@ -74,6 +101,7 @@ const Portfolio = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false); // ✅ เพิ่ม state ป้องกันการคลิกซ้ำ
 
   // Debounce search
   useEffect(() => {
@@ -146,6 +174,89 @@ const Portfolio = () => {
     setTimeout(() => {
       setIsAnimating(false);
     }, 300);
+  };
+
+  // ✅ ฟังก์ชันจัดการ Like/Dislike ใน Modal - แก้ไขแล้ว
+  const handleLikeInModal = async (projectId, isLiked) => {
+    if (isProcessing) return; // ✅ ป้องกันการคลิกซ้ำ
+    
+    setIsProcessing(true);
+    
+    try {
+      // ✅ อัพเดทเฉพาะค่าที่จำเป็น ไม่ต้องคำนวณใหม่
+      const newLikeCount = isLiked 
+        ? (selectedProject.like_count || 0) + 1 
+        : Math.max(0, (selectedProject.like_count || 0) - 1);
+      
+      const newDislikeCount = selectedProject.isDisliked && isLiked 
+        ? Math.max(0, (selectedProject.dislike_count || 0) - 1)
+        : (selectedProject.dislike_count || 0);
+
+      // ✅ อัพเดท state modal
+      setSelectedProject(prev => ({
+        ...prev,
+        isLiked,
+        isDisliked: isLiked ? false : prev.isDisliked,
+        like_count: newLikeCount,
+        dislike_count: newDislikeCount
+      }));
+      
+      // ✅ เรียกฟังก์ชันจาก hook
+      await likeProject(projectId, isLiked);
+    } catch (error) {
+      console.error('Error handling like:', error);
+      // ✅ Rollback ถ้ามี error
+      setSelectedProject(prev => ({
+        ...prev,
+        isLiked: !isLiked,
+        like_count: isLiked 
+          ? Math.max(0, (prev.like_count || 0) - 1)
+          : (prev.like_count || 0) + 1
+      }));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDislikeInModal = async (projectId, isDisliked) => {
+    if (isProcessing) return; // ✅ ป้องกันการคลิกซ้ำ
+    
+    setIsProcessing(true);
+    
+    try {
+      // ✅ อัพเดทเฉพาะค่าที่จำเป็น ไม่ต้องคำนวณใหม่
+      const newDislikeCount = isDisliked 
+        ? (selectedProject.dislike_count || 0) + 1 
+        : Math.max(0, (selectedProject.dislike_count || 0) - 1);
+      
+      const newLikeCount = selectedProject.isLiked && isDisliked 
+        ? Math.max(0, (selectedProject.like_count || 0) - 1)
+        : (selectedProject.like_count || 0);
+
+      // ✅ อัพเดท state modal
+      setSelectedProject(prev => ({
+        ...prev,
+        isDisliked,
+        isLiked: isDisliked ? false : prev.isLiked,
+        dislike_count: newDislikeCount,
+        like_count: newLikeCount
+      }));
+      
+      // ✅ เรียกฟังก์ชันจาก hook
+      await dislikeProject(projectId, isDisliked);
+    } catch (error) {
+      console.error('Error handling dislike:', error);
+      // ✅ Rollback ถ้ามี error
+      setSelectedProject(prev => ({
+        ...prev,
+        isDisliked: !isDisliked,
+        dislike_count: isDisliked 
+          ? Math.max(0, (prev.dislike_count || 0) - 1)
+          : (prev.dislike_count || 0) + 1
+      }));
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -247,7 +358,7 @@ const Portfolio = () => {
           </>
         )}
 
-        {/* ✅ แก้ไข Modal Overlay - ทำให้ลื่นไหลมากขึ้น */}
+        {/* Modal Overlay */}
         <AnimatePresence mode="sync">
           {selectedProject && (
             <motion.div
@@ -328,7 +439,7 @@ const Portfolio = () => {
                     </motion.div>
                   )}
 
-                  {/* Like/Dislike Buttons */}
+                  {/* Like/Dislike Buttons - แก้ไขแล้ว */}
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -337,42 +448,40 @@ const Portfolio = () => {
                   >
                     {/* Like Button */}
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        if (selectedProject.isDisliked) {
-                          dislikeProject(selectedProject.id, false);
-                        }
-                        likeProject(selectedProject.id, !selectedProject.isLiked);
-                      }}
+                      whileHover={{ scale: isProcessing ? 1 : 1.05 }}
+                      whileTap={{ scale: isProcessing ? 1 : 0.95 }}
+                      onClick={() => handleLikeInModal(selectedProject.id, !selectedProject.isLiked)}
+                      disabled={isProcessing}
                       className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ${
                         selectedProject.isLiked
                           ? 'bg-blue-600 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                      }`}
+                      } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <span className="text-lg">👍</span>
+                      <LikeIcon isLiked={selectedProject.isLiked} />
                       <span className="font-semibold">{selectedProject.like_count || 0}</span>
+                      {isProcessing && (
+                        <div className="ml-2 animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current"></div>
+                      )}
                     </motion.button>
 
                     {/* Dislike Button */}
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        if (selectedProject.isLiked) {
-                          likeProject(selectedProject.id, false);
-                        }
-                        dislikeProject(selectedProject.id, !selectedProject.isDisliked);
-                      }}
+                      whileHover={{ scale: isProcessing ? 1 : 1.05 }}
+                      whileTap={{ scale: isProcessing ? 1 : 0.95 }}
+                      onClick={() => handleDislikeInModal(selectedProject.id, !selectedProject.isDisliked)}
+                      disabled={isProcessing}
                       className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ${
                         selectedProject.isDisliked
                           ? 'bg-red-600 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                      }`}
+                      } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <span className="text-lg">👎</span>
+                      <DislikeIcon isDisliked={selectedProject.isDisliked} />
                       <span className="font-semibold">{selectedProject.dislike_count || 0}</span>
+                      {isProcessing && (
+                        <div className="ml-2 animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current"></div>
+                      )}
                     </motion.button>
                   </motion.div>
                 </div>

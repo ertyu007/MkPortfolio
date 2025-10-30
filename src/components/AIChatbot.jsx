@@ -1,9 +1,9 @@
 // AIChatbot.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { aiChatResponse, aiGenerateQuestions } from '../utils/ai';
+import { aiChatResponseWithRetry, aiGenerateQuestions, getFallbackResponse } from '../utils/ai';
 
-// SVG Icons
+// SVG Icons Components
 const BotIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M20 9V7C20 5.35 18.65 4 17 4H7C5.35 4 4 5.35 4 7V9C2.9 9 2 9.9 2 11V16C2 17.1 2.9 18 4 18H5V19C5 19.55 5.45 20 6 20H8C8.55 20 9 19.55 9 19V18H15V19C15 19.55 15.45 20 16 20H18C18.55 20 19 19.55 19 19V18H20C21.1 18 22 17.1 22 16V11C22 9.9 21.1 9 20 9ZM7 6H17C17.55 6 18 6.45 18 7V9H6V7C6 6.45 6.45 6 7 6ZM20 16H4V11H20V16Z" fill="currentColor" />
@@ -25,16 +25,14 @@ const CloseIcon = () => (
 );
 
 const LikeIcon = ({ filled = false }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} xmlns="http://www.w3.org/2000/svg">
-    <path d="M1 21H5V9H1V21ZM23 10C23 8.9 22.1 8 21 8H14.69L15.64 3.43L15.67 3.11C15.67 2.7 15.5 2.32 15.23 2.05L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9V19C7 20.1 7.9 21 9 21H18C18.83 21 19.54 20.5 19.84 19.78L22.86 12.73C22.95 12.5 23 12.26 23 12V10Z"
-      stroke="currentColor" strokeWidth={filled ? "0" : "1.5"} fill={filled ? "currentColor" : "none"} />
+  <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
+    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
   </svg>
 );
 
 const DislikeIcon = ({ filled = false }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} xmlns="http://www.w3.org/2000/svg">
-    <path d="M15 3H9V15H15V3ZM23 14C23 15.1 22.1 16 21 16H14.69L15.64 20.57L15.67 20.89C15.67 21.3 15.5 21.68 15.23 21.95L14.17 23L7.59 16.42C7.22 16.05 7 15.55 7 15V5C7 3.9 7.9 3 9 3H18C18.83 3 19.54 3.5 19.84 4.22L22.86 11.27C22.95 11.5 23 11.74 23 12V14Z"
-      stroke="currentColor" strokeWidth={filled ? "0" : "1.5"} fill={filled ? "currentColor" : "none"} />
+  <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
+    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
   </svg>
 );
 
@@ -62,19 +60,62 @@ const DeleteIcon = () => (
   </svg>
 );
 
-// Welcome Screen
-const WelcomeScreen = ({ onStartChat, onClose }) => {
+const ClearChatIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 12C17.31 12 20 14.69 20 18C20 21.31 17.31 24 14 24C10.69 24 8 21.31 8 18C8 14.69 10.69 12 14 12ZM14 10C9.58 10 6 13.58 6 18C6 22.42 9.58 26 14 26C18.42 26 22 22.42 22 18C22 13.58 18.42 10 14 10Z" fill="currentColor"/>
+    <path d="M16 16L12 20M12 16L16 20" stroke="currentColor" strokeWidth="2"/>
+    <path d="M2 4H6V2H2V4ZM22 4H10V2H22V4Z" fill="currentColor"/>
+    <path d="M8 8H6V22H8V8Z" fill="currentColor"/>
+    <path d="M4 8H2V22H4V8Z" fill="currentColor"/>
+  </svg>
+);
+
+const ClearAllIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="currentColor"/>
+    <path d="M10 10H12V17H10V10ZM14 10H16V17H14V10Z" fill="currentColor"/>
+    <path d="M2 10H6V8H2V10ZM22 10H10V8H22V10Z" fill="currentColor"/>
+  </svg>
+);
+
+const RestartIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 5V2L8 6L12 10V7C15.31 7 18 9.69 18 13C18 16.31 15.31 19 12 19C8.69 19 6 16.31 6 13H4C4 17.42 7.58 21 12 21C16.42 21 20 17.42 20 13C20 8.58 16.42 5 12 5Z" fill="currentColor"/>
+  </svg>
+);
+
+// Welcome Screen Component
+const WelcomeScreen = ({ onStartChat, onClose, sectionRefs }) => {
   const quickLinks = [
-    { text: "แนะนำตัวหน่อย", link: "/about" },
-    { text: "มีทักษะอะไรบ้าง", link: "/skills" },
-    { text: "ดูผลงาน", link: "/portfolio" },
-    { text: "ประกาศนียบัตร", link: "/certificates" }
+    { text: "หน้าแรก", link: "home" },
+    { text: "แนะนำตัวหน่อย", link: "about" },
+    { text: "มีทักษะอะไรบ้าง", link: "skills" },
+    { text: "ดูผลงาน", link: "portfolio" },
+    { text: "ประกาศนียบัตร", link: "certificates" }
   ];
 
   const handleLinkClick = (link) => {
+    console.log('Welcome screen link clicked:', link);
     onClose();
     setTimeout(() => {
-      window.location.href = link;
+      const sectionKey = link || 'home';
+      const sectionRef = sectionRefs[sectionKey];
+      
+      if (sectionRef?.current) {
+        sectionRef.current.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      } else {
+        // Fallback
+        const element = document.getElementById(sectionKey);
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }
     }, 300);
   };
 
@@ -157,7 +198,269 @@ const WelcomeScreen = ({ onStartChat, onClose }) => {
   );
 };
 
-const AIChatbot = () => {
+// Query History Panel Component
+const QueryHistoryPanel = ({ 
+  showHistory, 
+  userQueryHistory, 
+  onQuestionClick, 
+  onRemoveQuery, 
+  onClearWithConfirm 
+}) => {
+  if (!showHistory || userQueryHistory.length === 0) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      className="absolute right-0 top-14 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-10 max-h-80 overflow-hidden"
+    >
+      <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <HistoryIcon />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            ประวัติคำถาม ({userQueryHistory.length})
+          </span>
+        </div>
+        <div className="flex space-x-1">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onClearWithConfirm('restart')}
+            className="text-xs text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-2 transition-colors bg-green-50 dark:bg-green-900/20 rounded-lg"
+            title="เริ่มแชทใหม่ทั้งหมด"
+          >
+            <RestartIcon />
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onClearWithConfirm('chat')}
+            className="text-xs text-orange-500 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 p-2 transition-colors bg-orange-50 dark:bg-orange-900/20 rounded-lg"
+            title="ล้างประวัติการสนทนา"
+          >
+            <ClearChatIcon />
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onClearWithConfirm('queries')}
+            className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 transition-colors bg-red-50 dark:bg-red-900/20 rounded-lg"
+            title="ล้างประวัติคำถาม"
+          >
+            <ClearAllIcon />
+          </motion.button>
+        </div>
+      </div>
+
+      <div className="max-h-64 overflow-y-auto p-2">
+        {userQueryHistory.map((query, index) => (
+          <motion.div
+            key={`${query}-${index}`}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className="group flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 mb-1"
+          >
+            <button
+              onClick={() => {
+                onQuestionClick(query);
+              }}
+              className="flex-1 text-left text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 truncate pr-2 transition-colors"
+              title={query}
+            >
+              "{query}"
+            </button>
+            <button
+              onClick={() => onRemoveQuery(query)}
+              className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all p-1"
+              title="ลบคำถามนี้"
+            >
+              <DeleteIcon />
+            </button>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+};
+
+// Clear Confirmation Dialog Component
+const ClearConfirmationDialog = ({ showClearConfirm, clearType, onConfirm, onCancel }) => {
+  if (!showClearConfirm) return null;
+
+  const messages = {
+    chat: {
+      title: "ล้างประวัติการสนทนา",
+      message: "คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติการสนทนาทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้",
+      confirmText: "ล้างประวัติ",
+      icon: <ClearChatIcon />,
+      confirmColor: "bg-orange-500 hover:bg-orange-600"
+    },
+    queries: {
+      title: "ล้างประวัติคำถาม",
+      message: "คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติคำถามทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้",
+      confirmText: "ล้างคำถาม",
+      icon: <ClearAllIcon />,
+      confirmColor: "bg-red-500 hover:bg-red-600"
+    },
+    restart: {
+      title: "เริ่มแชทใหม่",
+      message: "คุณแน่ใจหรือไม่ว่าต้องการเริ่มแชทใหม่ทั้งหมด? ทั้งประวัติการสนทนาและคำถามจะถูกล้าง",
+      confirmText: "เริ่มใหม่",
+      icon: <RestartIcon />,
+      confirmColor: "bg-green-500 hover:bg-green-600"
+    }
+  };
+
+  const { title, message, confirmText, icon, confirmColor } = messages[clearType] || messages.chat;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    >
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-200 dark:border-gray-700"
+      >
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="text-2xl">{icon}</div>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
+        </div>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">{message}</p>
+        <div className="flex space-x-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+          >
+            ยกเลิก
+          </button>
+          <button
+            onClick={onConfirm}
+            className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors font-medium ${confirmColor}`}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// Message Component
+const Message = ({ msg, onReaction, formatMessageWithLinks }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+  >
+    <div className={`
+      relative max-w-[85%] p-3 rounded-2xl
+      ${msg.sender === 'user'
+        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-br-md'
+        : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700'
+      }
+    `}>
+      <div className="text-sm leading-relaxed break-words">
+        {msg.sender === 'bot' ? formatMessageWithLinks(msg.text) : msg.text}
+      </div>
+
+      {msg.sender === 'bot' && msg.text && (
+        <div className="flex items-center space-x-2 mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onReaction(msg.id, 'like')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-all ${
+              msg.reactions?.userLiked
+                ? 'bg-blue-500 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            <LikeIcon filled={msg.reactions?.userLiked} />
+            <span>{msg.reactions?.like || 0}</span>
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onReaction(msg.id, 'dislike')}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-all ${
+              msg.reactions?.userDisliked
+                ? 'bg-red-500 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            <DislikeIcon filled={msg.reactions?.userDisliked} />
+            <span>{msg.reactions?.dislike || 0}</span>
+          </motion.button>
+        </div>
+      )}
+    </div>
+  </motion.div>
+);
+
+// Typing Indicator Component
+const TypingIndicator = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="flex justify-start"
+  >
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="flex space-x-2">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 1, 0.5]
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              delay: i * 0.2
+            }}
+            className="w-2 h-2 bg-blue-500 rounded-full"
+          />
+        ))}
+      </div>
+    </div>
+  </motion.div>
+);
+
+// Suggested Questions Component
+const SuggestedQuestions = ({ questions, onQuestionClick, isGenerating }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-4"
+  >
+    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-3">
+      คำถามแนะนำ:
+    </p>
+    <div className="space-y-2">
+      {questions.map((q, i) => (
+        <motion.button
+          key={i}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onQuestionClick(q)}
+          className="w-full text-left p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-sm rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all border border-blue-100 dark:border-blue-800/50"
+        >
+          {q}
+        </motion.button>
+      ))}
+    </div>
+  </motion.div>
+);
+
+// Main Component
+const AIChatbot = ({ sectionRefs }) => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -168,31 +471,74 @@ const AIChatbot = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [userQueryHistory, setUserQueryHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [clearType, setClearType] = useState('');
+  
   const messagesContainerRef = useRef(null);
 
-  // ฟังก์ชันแปลง path เป็นข้อความ
-  const getLinkText = (path) => {
-    const linkMap = {
-      '': 'หน้าแรก',
-      'about': 'เกี่ยวกับฉัน',
-      'portfolio': 'ผลงาน',
-      'skills': 'ทักษะ',
-      'certificates': 'ประกาศนียบัตร',
-      'blog': 'บทความ'
-    };
-    return linkMap[path] || path;
+  // Constants
+  const QUICK_QUESTIONS = [
+    "แนะนำตัวหน่อย",
+    "มีทักษะอะไรบ้าง",
+    "ผลงานที่น่าสนใจ",
+    "ประสบการณ์การทำงาน"
+  ];
+
+  const LINK_MAP = {
+    'home': 'หน้าแรก',
+    'about': 'เกี่ยวกับฉัน',
+    'portfolio': 'ผลงาน',
+    'skills': 'ทักษะ',
+    'certificates': 'ประกาศนียบัตร',
+    'blog': 'บทความ',
+    'contact': 'ติดต่อ'
   };
 
-  // ฟังก์ชันจัดการเมื่อคลิกลิงก์
+  // Helper Functions
+  const getLinkText = (path) => LINK_MAP[path] || path;
+
   const handleLinkClick = (path) => {
+    console.log('Attempting to navigate to:', path);
+    
+    // ปิดแชทก่อน
     setIsOpen(false);
+    
+    // รอให้แชทปิดก่อนแล้วค่อยเลื่อน
     setTimeout(() => {
-      window.location.href = `/${path}`;
+      const sectionKey = path || 'home';
+      console.log('Looking for section:', sectionKey);
+      console.log('Available sections:', Object.keys(sectionRefs));
+      
+      // พยายามใช้ sectionRefs ก่อน
+      const sectionRef = sectionRefs[sectionKey];
+      
+      if (sectionRef?.current) {
+        console.log('Found section via ref, scrolling...');
+        sectionRef.current.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      } else {
+        console.log('Section ref not found, trying document.getElementById...');
+        
+        // Fallback: พยายามใช้ ID selector
+        const element = document.getElementById(sectionKey);
+        if (element) {
+          console.log('Found element by ID, scrolling...');
+          element.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        } else {
+          console.error(`Cannot find section: ${sectionKey}`);
+          
+          // Fallback สุดท้าย: ใช้ hash URL
+          window.location.hash = sectionKey;
+        }
+      }
     }, 300);
   };
 
-  // ฟังก์ชันแปลงข้อความที่มีลิงก์
   const formatMessageWithLinks = (text) => {
     if (!text) return text;
     
@@ -225,40 +571,64 @@ const AIChatbot = () => {
     return result;
   };
 
-  // โหลดประวัติจาก localStorage
+  // Effects
   useEffect(() => {
+    const savedMessages = localStorage.getItem('ai_chat_messages');
     const savedHistory = localStorage.getItem('ai_chat_query_history');
+    
+    if (savedMessages) {
+      try {
+        const parsedMessages = JSON.parse(savedMessages);
+        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+          setMessages(parsedMessages);
+        }
+      } catch (err) {
+        console.error('Error loading chat messages:', err);
+      }
+    }
+    
     if (savedHistory) {
       try {
-        setUserQueryHistory(JSON.parse(savedHistory));
+        const parsedHistory = JSON.parse(savedHistory);
+        if (Array.isArray(parsedHistory)) {
+          setUserQueryHistory(parsedHistory);
+        }
       } catch (err) {
         console.error('Error loading query history:', err);
       }
     }
   }, []);
 
-  // บันทึกลง localStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('ai_chat_messages', JSON.stringify(messages));
+    } else {
+      localStorage.removeItem('ai_chat_messages');
+    }
+  }, [messages]);
+
   useEffect(() => {
     if (userQueryHistory.length > 0) {
       localStorage.setItem('ai_chat_query_history', JSON.stringify(userQueryHistory));
+    } else {
+      localStorage.removeItem('ai_chat_query_history');
     }
   }, [userQueryHistory]);
 
-  // Show welcome screen
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setShowWelcome(true);
+    } else {
+      setShowWelcome(false);
     }
   }, [isOpen, messages.length]);
 
-  // Auto-scroll to bottom
   useEffect(() => {
-    if (messagesContainerRef.current && isOpen) {
+    if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
-  }, [messages, isTyping, isOpen]);
+  }, [messages, isTyping]);
 
-  // Prevent body scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -270,7 +640,7 @@ const AIChatbot = () => {
     };
   }, [isOpen]);
 
-  // ฟังก์ชันพิมพ์ข้อความทีละตัวอักษร
+  // Core Functions
   const typeMessage = (fullText, onComplete) => {
     let index = 0;
     const botMessageId = Date.now();
@@ -294,29 +664,35 @@ const AIChatbot = () => {
 
       if (index >= fullText.length) {
         clearInterval(interval);
-        onComplete();
+        setTimeout(onComplete, 100);
       }
     }, 20);
 
     return () => clearInterval(interval);
   };
 
-  // เพิ่มคำถามลงประวัติ
   const addToQueryHistory = (query) => {
-    if (query && query.trim()) {
+    if (query?.trim()) {
       setUserQueryHistory(prev => {
-        const filtered = prev.filter(q => q.toLowerCase() !== query.toLowerCase());
+        const filtered = prev.filter(q => 
+          q.toLowerCase() !== query.toLowerCase().trim()
+        );
         return [query.trim(), ...filtered].slice(0, 15);
       });
     }
   };
 
-  // สร้างคำถามแนะนำ
   const generateSuggestedQuestions = async (userInput, botResponse) => {
+    if (!userInput || !botResponse) return;
+    
     setIsGeneratingQuestions(true);
     try {
       const questions = await aiGenerateQuestions(userInput, botResponse, 'general');
-      setSuggestedQuestions(questions);
+      if (Array.isArray(questions) && questions.length > 0) {
+        setSuggestedQuestions(questions);
+      } else {
+        setSuggestedQuestions([]);
+      }
     } catch (err) {
       console.error("Failed to generate questions:", err);
       setSuggestedQuestions([]);
@@ -325,92 +701,98 @@ const AIChatbot = () => {
     }
   };
 
-  // ฟังก์ชันส่งข้อความ
   const handleSubmit = async (e, customInput = null) => {
-    if (e && e.preventDefault) {
-      e.preventDefault();
-    }
+    if (e?.preventDefault) e.preventDefault();
 
-    const userInput = customInput !== null ? customInput : input;
-
-    if (!userInput || typeof userInput !== 'string' || !userInput.trim() || isTyping) {
-      return;
-    }
+    const userInput = customInput ?? input;
+    if (!userInput?.trim() || isTyping) return;
 
     const userMessage = {
-      text: userInput,
+      text: userInput.trim(),
       sender: 'user',
-      id: Date.now()
+      id: Date.now(),
+      timestamp: new Date().toISOString()
     };
+    
     setMessages(prev => [...prev, userMessage]);
+    addToQueryHistory(userInput.trim());
 
-    addToQueryHistory(userInput);
-
-    if (customInput === null) {
-      setInput('');
-    }
-
+    if (customInput === null) setInput('');
     setIsTyping(true);
     setShowWelcome(false);
     setSuggestedQuestions([]);
     setShowHistory(false);
 
     try {
-      const context = `ผู้ใช้ถามเกี่ยวกับ: ${userInput}`;
-      const response = await aiChatResponse(userInput, context);
+      const context = messages.length > 0 
+        ? `บทสนทนาก่อนหน้า: ${messages.slice(-3).map(m => `${m.sender}: ${m.text}`).join(' | ')}`
+        : '';
 
-      if (!response || response.trim() === '') {
-        throw new Error('Empty response from AI');
-      }
+      // ✅ ใช้ฟังก์ชันใหม่ที่มี retry mechanism
+      const response = await aiChatResponseWithRetry(userInput.trim(), context);
+      
+      if (!response?.trim()) throw new Error('Empty response from AI');
 
-      typeMessage(response, () => {
+      typeMessage(response.trim(), () => {
         setIsTyping(false);
-        generateSuggestedQuestions(userInput, response);
+        generateSuggestedQuestions(userInput.trim(), response.trim());
       });
+      
     } catch (err) {
       console.error("AI Error:", err);
+      
+      // ✅ ใช้ fallback response เมื่อเกิด error
+      const fallbackResponse = getFallbackResponse(userInput.trim());
+      
       setMessages(prev => [...prev, {
-        text: "ขออภัยครับ เกิดข้อผิดพลาดในการประมวลผล กรุณาลองใหม่อีกครั้ง",
+        text: fallbackResponse,
         sender: 'bot',
-        id: Date.now()
+        id: Date.now(),
+        timestamp: new Date().toISOString()
       }]);
+      
       setIsTyping(false);
       setSuggestedQuestions([]);
     }
   };
 
   const handleSuggestedQuestion = (question) => {
-    handleSubmit(null, question);
+    if (question?.trim()) {
+      handleSubmit(null, question.trim());
+    }
   };
 
   const handleStartChat = (customQuestion = null) => {
     setShowWelcome(false);
     setShowHistory(false);
-    if (customQuestion) {
-      setTimeout(() => handleSubmit(null, customQuestion), 100);
+    if (customQuestion?.trim()) {
+      setTimeout(() => handleSubmit(null, customQuestion.trim()), 100);
     }
   };
 
-  const handleReaction = (index, reactionType) => {
-    setMessages(prev => prev.map((msg, i) => {
-      if (i !== index || msg.sender !== 'bot') return msg;
+  const handleReaction = (messageId, reactionType) => {
+    setMessages(prev => prev.map(msg => {
+      if (msg.id !== messageId || msg.sender !== 'bot') return msg;
 
-      const current = msg.reactions || { like: 0, dislike: 0, userLiked: false, userDisliked: false };
+      const current = msg.reactions || { 
+        like: 0, dislike: 0, userLiked: false, userDisliked: false 
+      };
+
       let newReactions = { ...current };
 
       if (reactionType === 'like') {
         newReactions = {
-          ...newReactions,
           like: current.userLiked ? current.like - 1 : current.like + 1,
+          dislike: current.userDisliked ? current.dislike - 1 : current.dislike,
           userLiked: !current.userLiked,
-          userDisliked: current.userDisliked ? false : current.userDisliked
+          userDisliked: false
         };
       } else if (reactionType === 'dislike') {
         newReactions = {
-          ...newReactions,
+          like: current.userLiked ? current.like - 1 : current.like,
           dislike: current.userDisliked ? current.dislike - 1 : current.dislike + 1,
-          userDisliked: !current.userDisliked,
-          userLiked: current.userLiked ? false : current.userLiked
+          userLiked: false,
+          userDisliked: !current.userDisliked
         };
       }
 
@@ -418,93 +800,55 @@ const AIChatbot = () => {
     }));
   };
 
-  // ล้างประวัติ
-  const clearQueryHistory = () => {
-    setUserQueryHistory([]);
-    localStorage.removeItem('ai_chat_query_history');
+  // History Management
+  const clearChatHistory = () => {
+    setMessages([]);
+    setSuggestedQuestions([]);
+    setShowWelcome(true);
   };
 
-  // ลบคำถามเดียว
+  const clearQueryHistory = () => {
+    setUserQueryHistory([]);
+  };
+
   const removeQueryFromHistory = (queryToRemove) => {
     setUserQueryHistory(prev => prev.filter(query => query !== queryToRemove));
   };
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
+  const restartChat = () => {
+    setMessages([]);
+    setUserQueryHistory([]);
+    setSuggestedQuestions([]);
+    setShowWelcome(true);
+    setShowHistory(false);
   };
 
-  const toggleHistory = () => {
-    setShowHistory(!showHistory);
+  // UI Handlers
+  const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
+  const toggleHistory = () => setShowHistory(!showHistory);
+  const handleCloseChat = () => {
+    setIsOpen(false);
+    setShowHistory(false);
   };
 
-  // คอมโพเนนต์แสดงประวัติ
-  const QueryHistoryPanel = () => {
-    if (!showHistory || userQueryHistory.length === 0) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: 20 }}
-        className="absolute right-0 top-14 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-10 max-h-80 overflow-hidden"
-      >
-        <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <HistoryIcon />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              ประวัติคำถาม ({userQueryHistory.length})
-            </span>
-          </div>
-          <button
-            onClick={clearQueryHistory}
-            className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1"
-            title="ล้างประวัติทั้งหมด"
-          >
-            <DeleteIcon />
-          </button>
-        </div>
-
-        <div className="max-h-64 overflow-y-auto p-2">
-          {userQueryHistory.map((query, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="group flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 mb-1"
-            >
-              <button
-                onClick={() => {
-                  handleSuggestedQuestion(query);
-                  setShowHistory(false);
-                }}
-                className="flex-1 text-left text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 truncate pr-2"
-                title={query}
-              >
-                "{query}"
-              </button>
-              <button
-                onClick={() => removeQueryFromHistory(query)}
-                className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity p-1"
-                title="ลบคำถามนี้"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" />
-                </svg>
-              </button>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-    );
+  const handleClearWithConfirm = (type) => {
+    setClearType(type);
+    setShowClearConfirm(true);
   };
 
-  const quickQuestions = [
-    "แนะนำตัวหน่อย",
-    "มีทักษะอะไรบ้าง",
-    "ผลงานที่น่าสนใจ",
-    "ประสบการณ์การทำงาน"
-  ];
+  const confirmClear = () => {
+    if (clearType === 'chat') clearChatHistory();
+    else if (clearType === 'queries') clearQueryHistory();
+    else if (clearType === 'restart') restartChat();
+    
+    setShowClearConfirm(false);
+    setClearType('');
+  };
+
+  const cancelClear = () => {
+    setShowClearConfirm(false);
+    setClearType('');
+  };
 
   return (
     <>
@@ -537,7 +881,7 @@ const AIChatbot = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
+              onClick={handleCloseChat}
               className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             />
 
@@ -570,21 +914,31 @@ const AIChatbot = () => {
                 </div>
 
                 <div className="flex items-center space-x-1">
-                  {/* History Button */}
-                  {userQueryHistory.length > 0 && (
+                  {(userQueryHistory.length > 0 || messages.length > 0) && (
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={toggleHistory}
-                      className={`text-white p-2 rounded-lg transition-all duration-200 ${showHistory ? 'bg-white/20' : 'hover:bg-white/10'
-                        }`}
+                      className={`text-white p-2 rounded-lg transition-all duration-200 ${showHistory ? 'bg-white/20' : 'hover:bg-white/10'}`}
                       aria-label="ประวัติคำถาม"
                     >
                       <HistoryIcon />
                     </motion.button>
                   )}
 
-                  {/* Fullscreen Toggle */}
+                  {messages.length > 0 && (
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleClearWithConfirm('restart')}
+                      className="text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-200"
+                      aria-label="เริ่มแชทใหม่"
+                      title="เริ่มแชทใหม่ทั้งหมด"
+                    >
+                      <RestartIcon />
+                    </motion.button>
+                  )}
+
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
@@ -595,11 +949,10 @@ const AIChatbot = () => {
                     {isFullscreen ? <MinimizeIcon /> : <ExpandIcon />}
                   </motion.button>
 
-                  {/* Close Button */}
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsOpen(false)}
+                    onClick={handleCloseChat}
                     className="text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-200"
                     aria-label="ปิด"
                   >
@@ -608,7 +961,13 @@ const AIChatbot = () => {
                 </div>
 
                 {/* History Panel */}
-                <QueryHistoryPanel />
+                <QueryHistoryPanel
+                  showHistory={showHistory}
+                  userQueryHistory={userQueryHistory}
+                  onQuestionClick={handleSuggestedQuestion}
+                  onRemoveQuery={removeQueryFromHistory}
+                  onClearWithConfirm={handleClearWithConfirm}
+                />
               </div>
 
               {/* Welcome Screen */}
@@ -617,6 +976,7 @@ const AIChatbot = () => {
                   <WelcomeScreen
                     onStartChat={handleStartChat}
                     onClose={() => setShowWelcome(false)}
+                    sectionRefs={sectionRefs}
                   />
                 )}
               </AnimatePresence>
@@ -624,121 +984,35 @@ const AIChatbot = () => {
               {/* Messages Area */}
               <div
                 ref={messagesContainerRef}
-                className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-800/50 pb-safe"
-                style={{
-                  paddingBottom: 'env(safe-area-inset-bottom, 0px)'
-                }}
+                className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-800/50"
               >
                 <div className="p-4 space-y-4">
-                  {messages.map((msg, i) => (
-                    <motion.div
-                      key={msg.id || i}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`
-                        relative max-w-[85%] p-3 rounded-2xl
-                        ${msg.sender === 'user'
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-br-md'
-                          : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700'
-                        }
-                      `}>
-                        <div className="text-sm leading-relaxed break-words">
-                          {msg.sender === 'bot' ? formatMessageWithLinks(msg.text) : msg.text}
-                        </div>
-
-                        {msg.sender === 'bot' && msg.text && (
-                          <div className="flex items-center space-x-2 mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-                            <motion.button
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleReaction(i, 'like')}
-                              className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-all ${msg.reactions?.userLiked
-                                ? 'bg-blue-500 text-white shadow-md'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                                }`}
-                            >
-                              <LikeIcon filled={msg.reactions?.userLiked} />
-                              <span>{msg.reactions?.like || 0}</span>
-                            </motion.button>
-
-                            <motion.button
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleReaction(i, 'dislike')}
-                              className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-all ${msg.reactions?.userDisliked
-                                ? 'bg-red-500 text-white shadow-md'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                                }`}
-                            >
-                              <DislikeIcon filled={msg.reactions?.userDisliked} />
-                              <span>{msg.reactions?.dislike || 0}</span>
-                            </motion.button>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
+                  {messages.map((msg) => (
+                    <Message
+                      key={msg.id}
+                      msg={msg}
+                      onReaction={handleReaction}
+                      formatMessageWithLinks={formatMessageWithLinks}
+                    />
                   ))}
 
-                  {isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex justify-start"
-                    >
-                      <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700">
-                        <div className="flex space-x-2">
-                          {[0, 1, 2].map((i) => (
-                            <motion.div
-                              key={i}
-                              animate={{
-                                scale: [1, 1.2, 1],
-                                opacity: [0.5, 1, 0.5]
-                              }}
-                              transition={{
-                                duration: 1.5,
-                                repeat: Infinity,
-                                delay: i * 0.2
-                              }}
-                              className="w-2 h-2 bg-blue-500 rounded-full"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
+                  {isTyping && <TypingIndicator />}
 
                   {suggestedQuestions.length > 0 && !isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-4"
-                    >
-                      <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-3">
-                        คำถามแนะนำ:
-                      </p>
-                      <div className="space-y-2">
-                        {suggestedQuestions.map((q, i) => (
-                          <motion.button
-                            key={i}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => handleSuggestedQuestion(q)}
-                            className="w-full text-left p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-sm rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all border border-blue-100 dark:border-blue-800/50"
-                          >
-                            {q}
-                          </motion.button>
-                        ))}
-                      </div>
-                    </motion.div>
+                    <SuggestedQuestions
+                      questions={suggestedQuestions}
+                      onQuestionClick={handleSuggestedQuestion}
+                      isGenerating={isGeneratingQuestions}
+                    />
                   )}
 
-                  {!showWelcome && messages.length <= 1 && (
+                  {!showWelcome && messages.length <= 1 && !isTyping && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="grid grid-cols-2 gap-2 mt-4"
                     >
-                      {quickQuestions.map((question, i) => (
+                      {QUICK_QUESTIONS.map((question, i) => (
                         <motion.button
                           key={question}
                           whileHover={{ scale: 1.02 }}
@@ -754,8 +1028,6 @@ const AIChatbot = () => {
                       ))}
                     </motion.div>
                   )}
-
-                  <div ref={messagesEndRef} />
                 </div>
               </div>
 
@@ -777,12 +1049,7 @@ const AIChatbot = () => {
               )}
 
               {/* Input Area */}
-              <div
-                className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0 pb-safe"
-                style={{
-                  paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))'
-                }}
-              >
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
                 <form onSubmit={handleSubmit} className="flex space-x-3">
                   <input
                     type="text"
@@ -805,6 +1072,18 @@ const AIChatbot = () => {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Clear Confirmation Dialog */}
+      <AnimatePresence>
+        {showClearConfirm && (
+          <ClearConfirmationDialog
+            showClearConfirm={showClearConfirm}
+            clearType={clearType}
+            onConfirm={confirmClear}
+            onCancel={cancelClear}
+          />
         )}
       </AnimatePresence>
     </>

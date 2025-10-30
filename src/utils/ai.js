@@ -86,6 +86,34 @@ export const updatePortfolioContext = (newData) => {
   return false;
 };
 
+// ✅ Fallback responses สำหรับเมื่อ API ไม่ทำงาน
+const FALLBACK_RESPONSES = {
+  "แนะนำตัวหน่อย": "สวัสดีครับ! ผมชื่อธนภัทร การะจักษ์ เป็นนักเรียนชั้นม.5 ที่โรงเรียนน้ำปลีกศึกษา ผมสนใจด้านวิศวกรรมเครือข่ายและพัฒนาเว็บไซต์ครับ [[/about]]",
+  "มีทักษะอะไรบ้าง": "ผมมีทักษะด้าน HTML/CSS, JavaScript, PHP และการจัดการเครือข่าย LAN ครับ สามารถดูรายละเอียดทั้งหมดได้ที่หน้าทักษะนะครับ [[/skills]]",
+  "ผลงานที่น่าสนใจ": "ผมเคยพัฒนาระบบจัดการงานด้วย AI, แอปจองห้องประชุม และเว็บพอร์ตโฟลิโอส่วนตัวครับ ดูผลงานทั้งหมดได้ที่นี่ [[/portfolio]]",
+  "ประสบการณ์การทำงาน": "ตอนนี้ผมยังเป็นนักเรียนแต่มีประสบการณ์จากการทำโปรเจกต์ส่วนตัวและการแข่งขันหุ่นยนต์ครับ [[/about]]",
+  "default": "ขออภัยครับ ระบบกำลังประมวลผลหนักในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่ หรือดูข้อมูลเพิ่มเติมได้ที่หน้าเกี่ยวกับฉันครับ [[/about]]"
+};
+
+export const getFallbackResponse = (userInput) => {
+  const input = userInput.toLowerCase().trim();
+  
+  if (input.includes("แนะนำตัว") || input.includes("ชื่ออะไร")) {
+    return FALLBACK_RESPONSES["แนะนำตัวหน่อย"];
+  }
+  if (input.includes("ทักษะ") || input.includes("ความสามารถ")) {
+    return FALLBACK_RESPONSES["มีทักษะอะไรบ้าง"];
+  }
+  if (input.includes("ผลงาน") || input.includes("โปรเจกต์")) {
+    return FALLBACK_RESPONSES["ผลงานที่น่าสนใจ"];
+  }
+  if (input.includes("ประสบการณ์") || input.includes("ทำงาน")) {
+    return FALLBACK_RESPONSES["ประสบการณ์การทำงาน"];
+  }
+  
+  return FALLBACK_RESPONSES.default;
+};
+
 // ✅ ฟังก์ชันหลัก — ส่ง prompt ไปยัง Groq
 export const aiChatResponse = async (prompt, context = "") => {
   if (!GROQ_API_KEY) {
@@ -93,7 +121,7 @@ export const aiChatResponse = async (prompt, context = "") => {
   }
 
   try {
-const fullPrompt = `
+    const fullPrompt = `
 คุณคือ "AI Assistant" ผู้ช่วยส่วนตัวของธนภัทร การะจักษ์ 
 
 ข้อมูลเกี่ยวกับธนภัทร (ใช้เป็นข้อมูลอ้างอิง):
@@ -151,6 +179,12 @@ ${context}
     if (!response.ok) {
       const error = await response.json();
       console.error("❌ Groq Error:", error);
+      
+      // ✅ ตรวจสอบว่าเป็น rate limit error
+      if (response.status === 429) {
+        throw new Error("rate_limit");
+      }
+      
       throw new Error(`Groq Error: ${error.error?.message || response.statusText}`);
     }
 
@@ -159,120 +193,72 @@ ${context}
 
   } catch (err) {
     console.error("❌ AI Error:", err);
+    
+    // ✅ แยกประเภท error
+    if (err.message === "rate_limit") {
+      throw new Error("ระบบกำลังใช้งานหนักในขณะนี้ กรุณารอสักครู่แล้วลองอีกครั้ง");
+    }
+    
     throw new Error("ไม่สามารถประมวลผลคำถามได้ในขณะนี้");
   }
 };
 
-// ✅ ฟังก์ชันสร้างคำถามแนะนำอัตโนมัติ
-export const aiGenerateQuestions = async (userInput, botResponse, contextType) => {
-  if (!GROQ_API_KEY) {
-    throw new Error("API key is not available");
-  }
-
-  try {
-    const prompt = `
-จากบทสนทนาล่าสุด:
-- ผู้ใช้ถาม: "${userInput}"
-- คุณตอบ: "${botResponse}"
-- ประเภท: ${contextType}
-
-ข้อมูลเกี่ยวกับธนภัทร:
-${PORTFOLIO_CONTEXT}
-
-สร้างคำถามแนะนำ 3 คำถามที่เกี่ยวข้องกับบทสนทนานี้
-คำถามต้องสั้น น่าสนใจ และทำให้การสนทนาต่อเนื่องได้
-ตอบเป็น array JSON เท่านั้น
-
-ตัวอย่าง:
-["คำถามที่1?", "คำถามที่2?", "คำถามที่3?"]
-`;
-
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
-        messages: [
-          {
-            role: "system",
-            content: "คุณสร้างคำถามแนะนำสั้นๆ 3 คำถามที่น่าสนใจ ตอบเป็น JSON array เท่านั้น"
-          },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 80, // ลด tokens เพื่อให้คำถามสั้น
-        temperature: 0.8,
-        top_p: 1,
-        stream: false,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("API request failed");
-    }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content.trim();
-
+// ✅ ฟังก์ชันใหม่ที่มี retry mechanism
+export const aiChatResponseWithRetry = async (prompt, context = "", retries = 2) => {
+  for (let i = 0; i < retries; i++) {
     try {
-      const questions = JSON.parse(content);
-      if (Array.isArray(questions) && questions.length > 0) {
-        return questions.slice(0, 3).filter(q => q && q.length > 0);
+      return await aiChatResponse(prompt, context);
+    } catch (err) {
+      if (err.message.includes("rate_limit") && i < retries - 1) {
+        // รอ 3 วินาทีก่อนลองใหม่
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        continue;
       }
-    } catch (e) {
-      console.warn("Failed to parse AI response as JSON:", content);
-      const extractedQuestions = extractQuestionsFromText(content);
-      if (extractedQuestions.length > 0) {
-        return extractedQuestions.slice(0, 3);
-      }
+      throw err;
     }
-
-    // คำถามแนะนำพื้นฐานที่สั้นกว่า
-    return [
-      "มีผลงานอะไรน่าสนใจบ้าง?",
-      "ทักษะไหนสำคัญที่สุด?",
-      "แผนในอนาคตคือ?"
-    ];
-
-  } catch (err) {
-    console.error("AI Question Generation Error:", err);
-    return [
-      "ชอบทำงานแบบไหน?",
-      "มีโปรเจกต์ใหม่ไหม?",
-      "ความท้าทายที่เคยเจอ?"
-    ];
   }
 };
 
-// ✅ ฟังก์ชันแยกคำถามจากข้อความ
-const extractQuestionsFromText = (text) => {
-  const patterns = [
-    /["']([^"']*[?？])["']/g,
-    /(\d+\.\s*([^.]*[?？]))/g,
-    /[-•]\s*([^\n]*[?？])/g,
-    /([^\n?]{5,}[?？])/g
+// ✅ ฟังก์ชันสร้างคำถามแนะนำอัตโนมัติ (แบบง่าย ไม่ใช้ API)
+export const aiGenerateQuestions = async (userInput, botResponse, contextType) => {
+  // ✅ ใช้คำถามแนะนำแบบคงที่เพื่อลดการใช้งาน API
+  const defaultQuestions = [
+    "มีผลงานอะไรน่าสนใจบ้าง?",
+    "ทักษะไหนสำคัญที่สุด?", 
+    "แผนในอนาคตคือ?"
   ];
 
-  const questions = new Set();
-
-  patterns.forEach(pattern => {
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      let question = (match[1] || match[2] || match[0]).trim();
-      question = question.replace(/^[0-9.\-•\s]+/, '');
-
-      if (question && question.includes('?') && question.length > 5) {
-        question.split(/(?<=\?)/).forEach(q => {
-          q = q.trim();
-          if (q.length > 5) questions.add(q);
-        });
-      }
+  // ✅ พยายามสร้างคำถามที่เกี่ยวข้องจาก context แบบง่ายๆ
+  if (userInput && botResponse) {
+    const input = userInput.toLowerCase();
+    const response = botResponse.toLowerCase();
+    
+    if (input.includes("ทักษะ") || response.includes("ทักษะ")) {
+      return [
+        "มีประสบการณ์กับโปรเจกต์อะไรบ้าง?",
+        "เรียนภาษาอะไรเพิ่มเติมดี?",
+        "เครื่องมือที่ชอบใช้คือ?"
+      ];
     }
-  });
-
-  return Array.from(questions);
+    
+    if (input.includes("ผลงาน") || response.includes("ผลงาน")) {
+      return [
+        "ใช้เทคโนโลยีอะไรในโปรเจกต์?",
+        "ความท้าทายที่เจอคืออะไร?",
+        "มีโปรเจกต์ใหม่ไหม?"
+      ];
+    }
+    
+    if (input.includes("การศึกษา") || response.includes("เรียน")) {
+      return [
+        "เตรียมตัวสอบอย่างไร?",
+        "目標มหาวิทยาลัยไหนอีก?",
+        "แผนการเรียนต่อคือ?"
+      ];
+    }
+  }
+  
+  return defaultQuestions;
 };
 
 // ✅ สรุปบทความ
