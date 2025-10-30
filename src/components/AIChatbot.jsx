@@ -3,29 +3,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { aiChatResponseWithRetry, aiGenerateQuestions, getFallbackResponse } from '../utils/ai';
 
-// สีใหม่ - โทนสีม่วง-น้ำเงินที่ทันสมัย
+// โทนสีใหม่ - Liquid Glass Theme
 const COLOR_SCHEME = {
   primary: {
-    from: '#8B5CF6', // violet-500
+    from: '#06B6D4', // cyan-500
     to: '#3B82F6',   // blue-500
   },
   secondary: {
-    from: '#6366F1', // indigo-500
-    to: '#EC4899',   // pink-500
+    from: '#0EA5E9', // sky-500
+    to: '#8B5CF6',   // violet-500
   },
   background: {
     light: {
-      from: '#F8FAFC',
-      to: '#F1F5F9',
+      from: '#F0FDFA',
+      to: '#ECFEFF',
     },
     dark: {
-      from: '#0F172A',
-      to: '#1E293B',
+      from: '#0C4A6E',
+      to: '#1E3A8A',
     }
   }
 };
 
-// SVG Icons Components (คงเดิม)
+// SVG Icons Components (คงเดิมแต่ปรับสี)
 const BotIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M20 9V7C20 5.35 18.65 4 17 4H7C5.35 4 4 5.35 4 7V9C2.9 9 2 9.9 2 11V16C2 17.1 2.9 18 4 18H5V19C5 19.55 5.45 20 6 20H8C8.55 20 9 19.55 9 19V18H15V19C15 19.55 15.45 20 16 20H18C18.55 20 19 19.55 19 19V18H20C21.1 18 22 17.1 22 16V11C22 9.9 21.1 9 20 9ZM7 6H17C17.55 6 18 6.45 18 7V9H6V7C6 6.45 6.45 6 7 6ZM20 16H4V11H20V16Z" fill="currentColor" />
@@ -98,13 +98,13 @@ const CustomScrollbar = ({ children, className = "" }) => {
       <style jsx>{`
         .custom-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: #8B5CF6 #F1F5F9;
+          scrollbar-color: #06B6D4 #F0FDFA;
         }
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #F1F5F9;
+          background: #F0FDFA;
           border-radius: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -115,10 +115,10 @@ const CustomScrollbar = ({ children, className = "" }) => {
           background: linear-gradient(135deg, ${COLOR_SCHEME.secondary.from}, ${COLOR_SCHEME.secondary.to});
         }
         .dark .custom-scrollbar::-webkit-scrollbar-track {
-          background: #1E293B;
+          background: #0C4A6E;
         }
         .dark .custom-scrollbar {
-          scrollbar-color: #8B5CF6 #1E293B;
+          scrollbar-color: #06B6D4 #0C4A6E;
         }
       `}</style>
     </div>
@@ -164,7 +164,7 @@ const WelcomeScreen = ({ onStartChat, onClose, sectionRefs }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-violet-100 dark:from-slate-900 dark:via-slate-800 dark:to-violet-900 flex flex-col items-center justify-center p-6 z-10"
+      className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-blue-50 to-sky-100 dark:from-slate-900 dark:via-blue-950 dark:to-cyan-900 flex flex-col items-center justify-center p-6 z-10 backdrop-blur-sm"
     >
       <motion.button
         onClick={onClose}
@@ -179,7 +179,7 @@ const WelcomeScreen = ({ onStartChat, onClose, sectionRefs }) => {
         initial={{ scale: 0.8, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-        className="w-20 h-20 bg-gradient-to-r from-violet-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 text-white shadow-lg"
+        className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 text-white shadow-lg backdrop-blur-sm"
       >
         <BotIcon />
       </motion.div>
@@ -212,7 +212,7 @@ const WelcomeScreen = ({ onStartChat, onClose, sectionRefs }) => {
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onStartChat()}
-          className="w-full bg-gradient-to-r from-violet-600 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200"
+          className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-sm"
         >
           เริ่มการสนทนา
         </motion.button>
@@ -224,7 +224,7 @@ const WelcomeScreen = ({ onStartChat, onClose, sectionRefs }) => {
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleLinkClick(item.link)}
-              className="text-xs text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 py-2 px-3 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors border border-violet-100 dark:border-violet-800/50"
+              className="text-xs text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/20 py-2 px-3 rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors border border-cyan-100 dark:border-cyan-800/50 backdrop-blur-sm"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 + index * 0.1 }}
@@ -253,9 +253,9 @@ const QueryHistoryPanel = ({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
-      className="absolute right-0 top-14 w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-10 max-h-80 overflow-hidden backdrop-blur-sm bg-white/95 dark:bg-slate-800/95"
+      className="absolute right-0 top-14 w-72 bg-white/95 dark:bg-slate-800/95 border border-slate-200/50 dark:border-slate-700/50 rounded-xl shadow-2xl z-10 max-h-80 overflow-hidden backdrop-blur-xl"
     >
-      <div className="p-3 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+      <div className="p-3 border-b border-slate-200/50 dark:border-slate-700/50 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <HistoryIcon />
           <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -266,7 +266,7 @@ const QueryHistoryPanel = ({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onClearAll}
-          className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 transition-colors bg-red-50 dark:bg-red-900/20 rounded-lg"
+          className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 transition-colors bg-red-50 dark:bg-red-900/20 rounded-lg backdrop-blur-sm"
           title="ล้างประวัติคำถามทั้งหมด"
         >
           <ClearAllIcon />
@@ -280,13 +280,13 @@ const QueryHistoryPanel = ({
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="group flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 mb-1"
+            className="group flex items-center justify-between p-2 rounded-lg hover:bg-slate-50/50 dark:hover:bg-slate-700/50 mb-1 backdrop-blur-sm"
           >
             <button
               onClick={() => {
                 onQuestionClick(query);
               }}
-              className="flex-1 text-left text-xs text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 truncate pr-2 transition-colors"
+              className="flex-1 text-left text-xs text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 truncate pr-2 transition-colors"
               title={query}
             >
               "{query}"
@@ -320,7 +320,7 @@ const ClearConfirmationDialog = ({ showClearConfirm, onConfirm, onCancel }) => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 dark:border-slate-700"
+        className="bg-white/95 dark:bg-slate-800/95 rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-xl"
       >
         <div className="flex items-center space-x-3 mb-4">
           <div className="text-2xl"><ClearAllIcon /></div>
@@ -332,7 +332,7 @@ const ClearConfirmationDialog = ({ showClearConfirm, onConfirm, onCancel }) => {
         <div className="flex space-x-3">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-2 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors font-medium"
+            className="flex-1 px-4 py-2 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors font-medium backdrop-blur-sm"
           >
             ยกเลิก
           </button>
@@ -357,10 +357,10 @@ const Message = ({ msg, onReaction, formatMessageWithLinks }) => (
     className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
   >
     <div className={`
-      relative max-w-[85%] p-3 rounded-2xl
+      relative max-w-[85%] p-3 rounded-2xl backdrop-blur-sm
       ${msg.sender === 'user'
-        ? 'bg-gradient-to-r from-violet-500 to-blue-500 text-white rounded-br-md shadow-lg'
-        : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-md shadow-sm border border-slate-200 dark:border-slate-700'
+        ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-br-md shadow-lg'
+        : 'bg-white/80 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 rounded-bl-md shadow-sm border border-slate-200/50 dark:border-slate-700/50'
       }
     `}>
       <div className="text-sm leading-relaxed break-words">
@@ -368,13 +368,13 @@ const Message = ({ msg, onReaction, formatMessageWithLinks }) => (
       </div>
 
       {msg.sender === 'bot' && msg.text && (
-        <div className="flex items-center space-x-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+        <div className="flex items-center space-x-2 mt-2 pt-2 border-t border-slate-100/50 dark:border-slate-700/50">
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => onReaction(msg.id, 'like')}
             className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-all ${
               msg.reactions?.userLiked
-                ? 'bg-violet-500 text-white shadow-md'
+                ? 'bg-cyan-500 text-white shadow-md'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
             }`}
           >
@@ -407,7 +407,7 @@ const TypingIndicator = () => (
     animate={{ opacity: 1, y: 0 }}
     className="flex justify-start"
   >
-    <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-bl-md shadow-sm border border-slate-200 dark:border-slate-700">
+    <div className="bg-white/80 dark:bg-slate-800/80 p-4 rounded-2xl rounded-bl-md shadow-sm border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm">
       <div className="flex space-x-2">
         {[0, 1, 2].map((i) => (
           <motion.div
@@ -421,7 +421,7 @@ const TypingIndicator = () => (
               repeat: Infinity,
               delay: i * 0.2
             }}
-            className="w-2 h-2 bg-violet-500 rounded-full"
+            className="w-2 h-2 bg-cyan-500 rounded-full"
           />
         ))}
       </div>
@@ -434,7 +434,7 @@ const SuggestedQuestions = ({ questions, onQuestionClick, isGenerating }) => (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-4"
+    className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-4"
   >
     <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-3">
       คำถามแนะนำ:
@@ -446,7 +446,7 @@ const SuggestedQuestions = ({ questions, onQuestionClick, isGenerating }) => (
           whileHover={{ scale: 1.02, y: -1 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onQuestionClick(q)}
-          className="w-full text-left p-3 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 text-sm rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-all border border-violet-100 dark:border-violet-800/50"
+          className="w-full text-left p-3 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 text-sm rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-all border border-cyan-100 dark:border-cyan-800/50 backdrop-blur-sm"
         >
           {q}
         </motion.button>
@@ -472,12 +472,23 @@ const AIChatbot = ({ sectionRefs }) => {
   
   const messagesContainerRef = useRef(null);
 
+  // Floating background animation
+  const floatingVariants = {
+    float: {
+      y: [0, -10, 0],
+      transition: {
+        duration: 4,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    }
+  };
+
   // Track window width for responsive design
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       
-      // Auto-exit fullscreen on mobile when window gets too small
       if (window.innerWidth < 768 && isFullscreen) {
         setIsFullscreen(false);
       }
@@ -557,7 +568,7 @@ const AIChatbot = ({ sectionRefs }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleLinkClick(path)}
-            className="inline-flex items-center px-2 py-1 mx-1 bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 rounded-lg cursor-pointer hover:bg-violet-200 dark:hover:bg-violet-800 transition-all duration-200 border border-violet-200 dark:border-violet-700 text-sm font-medium"
+            className="inline-flex items-center px-2 py-1 mx-1 bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300 rounded-lg cursor-pointer hover:bg-cyan-200 dark:hover:bg-cyan-800 transition-all duration-200 border border-cyan-200 dark:border-cyan-700 text-sm font-medium"
           >
             {linkText}
           </motion.span>
@@ -763,7 +774,7 @@ const AIChatbot = ({ sectionRefs }) => {
 
   // UI Handlers
   const toggleFullscreen = () => {
-    if (windowWidth >= 768) { // Only allow fullscreen on tablet and desktop
+    if (windowWidth >= 768) {
       setIsFullscreen(!isFullscreen);
     }
   };
@@ -795,19 +806,19 @@ const AIChatbot = ({ sectionRefs }) => {
   const isMobile = windowWidth < 768;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
   
-  // Layout สำหรับ Fullscreen Mode (แสดงเฉพาะบนแท็บเล็ตและเดสก์ท็อป)
+  // Layout สำหรับ Fullscreen Mode
   const renderFullscreenLayout = () => (
     <div className="flex h-full">
       {/* Sidebar - สำหรับประวัติและคำถามแนะนำ */}
       <motion.div 
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        className="w-80 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col"
+        className="w-80 bg-slate-50/95 dark:bg-slate-800/95 border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col backdrop-blur-xl"
       >
         {/* Header */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+        <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl flex items-center justify-center text-white">
+            <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center text-white backdrop-blur-sm">
               <BotIcon />
             </div>
             <div>
@@ -818,7 +829,7 @@ const AIChatbot = ({ sectionRefs }) => {
         </div>
 
         {/* Quick Actions */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+        <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50">
           <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">คำถามด่วน</h4>
           <div className="space-y-2">
             {QUICK_QUESTIONS.map((question, index) => (
@@ -827,7 +838,7 @@ const AIChatbot = ({ sectionRefs }) => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleStartChat(question)}
-                className="w-full text-left p-3 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm rounded-lg hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all border border-slate-200 dark:border-slate-600"
+                className="w-full text-left p-3 bg-white/80 dark:bg-slate-700/80 text-slate-700 dark:text-slate-300 text-sm rounded-lg hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all border border-slate-200/50 dark:border-slate-600/50 backdrop-blur-sm"
               >
                 {question}
               </motion.button>
@@ -837,7 +848,7 @@ const AIChatbot = ({ sectionRefs }) => {
 
         {/* Query History */}
         <div className="flex-1 overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+          <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50 flex justify-between items-center">
             <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">ประวัติคำถาม</h4>
             {userQueryHistory.length > 0 && (
               <motion.button
@@ -863,11 +874,11 @@ const AIChatbot = ({ sectionRefs }) => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="group flex items-center justify-between p-3 rounded-lg hover:bg-white dark:hover:bg-slate-700 mb-2 border border-transparent hover:border-slate-200 dark:hover:border-slate-600"
+                  className="group flex items-center justify-between p-3 rounded-lg hover:bg-white/50 dark:hover:bg-slate-700/50 mb-2 border border-transparent hover:border-slate-200/50 dark:hover:border-slate-600/50 backdrop-blur-sm"
                 >
                   <button
                     onClick={() => handleStartChat(query)}
-                    className="flex-1 text-left text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 truncate pr-2"
+                    className="flex-1 text-left text-sm text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 truncate pr-2"
                     title={query}
                   >
                     "{query}"
@@ -888,9 +899,9 @@ const AIChatbot = ({ sectionRefs }) => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Chat Header */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-white dark:bg-slate-800">
+        <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50 flex justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-violet-500 to-blue-500 rounded-lg flex items-center justify-center text-white">
+            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center text-white backdrop-blur-sm">
               <BotIcon />
             </div>
             <div>
@@ -902,7 +913,6 @@ const AIChatbot = ({ sectionRefs }) => {
           </div>
           
           <div className="flex items-center space-x-2">
-            {/* Fullscreen Toggle - แสดงเฉพาะบนแท็บเล็ตและเดสก์ท็อป */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -927,8 +937,21 @@ const AIChatbot = ({ sectionRefs }) => {
         {/* Messages Area */}
         <CustomScrollbar 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800"
+          className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 relative"
         >
+          {/* Floating Background Elements */}
+          <motion.div
+            variants={floatingVariants}
+            animate="float"
+            className="absolute top-10 left-10 w-32 h-32 bg-cyan-200/30 dark:bg-cyan-700/20 rounded-full blur-2xl"
+          />
+          <motion.div
+            variants={floatingVariants}
+            animate="float"
+            transition={{ delay: 2 }}
+            className="absolute bottom-10 right-10 w-40 h-40 bg-blue-200/20 dark:bg-blue-700/20 rounded-full blur-2xl"
+          />
+          
           {showWelcome ? (
             <WelcomeScreen 
               onStartChat={handleStartChat}
@@ -960,7 +983,7 @@ const AIChatbot = ({ sectionRefs }) => {
         </CustomScrollbar>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+        <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl">
           <form onSubmit={handleSubmit} className="flex space-x-3">
             <div className="flex-1 relative">
               <input
@@ -968,7 +991,7 @@ const AIChatbot = ({ sectionRefs }) => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="พิมพ์คำถามของคุณที่นี่..."
-                className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-slate-100/80 dark:bg-slate-700/80 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 rounded-xl border border-slate-200/50 dark:border-slate-600/50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all backdrop-blur-sm"
                 disabled={isTyping}
               />
             </div>
@@ -977,7 +1000,7 @@ const AIChatbot = ({ sectionRefs }) => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               disabled={!input.trim() || isTyping}
-              className="px-6 bg-gradient-to-r from-violet-600 to-blue-600 text-white rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center space-x-2"
+              className="px-6 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center space-x-2 backdrop-blur-sm"
             >
               <SendIcon />
             </motion.button>
@@ -987,27 +1010,26 @@ const AIChatbot = ({ sectionRefs }) => {
     </div>
   );
 
-  // Layout สำหรับ Compact Mode (มือถือและหน้าจอเล็ก)
+  // Layout สำหรับ Compact Mode
   const renderCompactLayout = () => (
     <motion.div
       initial={{ scale: 0.9, opacity: 0, y: 20 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       exit={{ scale: 0.9, opacity: 0, y: 20 }}
       className={`
-        fixed z-50 flex flex-col bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden
+        fixed z-50 flex flex-col bg-white/95 dark:bg-slate-800/95 shadow-2xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden backdrop-blur-xl
         ${isMobile 
           ? 'inset-4 rounded-2xl' 
           : isTablet 
             ? 'inset-8 rounded-2xl'
             : 'bottom-6 top-6 right-6 left-auto w-96 rounded-2xl'
         }
-        backdrop-blur-sm bg-white/95 dark:bg-slate-800/95
       `}
     >
       {/* Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-white dark:bg-slate-800">
+      <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50 flex justify-between items-center bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-violet-500 to-blue-500 rounded-lg flex items-center justify-center text-white">
+          <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center text-white backdrop-blur-sm">
             <BotIcon />
           </div>
           <div>
@@ -1019,7 +1041,6 @@ const AIChatbot = ({ sectionRefs }) => {
         </div>
         
         <div className="flex items-center space-x-1">
-          {/* History Button */}
           {userQueryHistory.length > 0 && (
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -1027,7 +1048,7 @@ const AIChatbot = ({ sectionRefs }) => {
               onClick={toggleHistory}
               className={`p-2 transition-colors rounded-lg ${
                 showHistory 
-                  ? 'bg-violet-100 text-violet-600 dark:bg-violet-900/50 dark:text-violet-400' 
+                  ? 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/50 dark:text-cyan-400' 
                   : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
               title="ประวัติคำถาม"
@@ -1036,7 +1057,6 @@ const AIChatbot = ({ sectionRefs }) => {
             </motion.button>
           )}
           
-          {/* Fullscreen Toggle - ซ่อนในมือถือ, แสดงในแท็บเล็ตและเดสก์ท็อป */}
           {!isMobile && (
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -1049,7 +1069,6 @@ const AIChatbot = ({ sectionRefs }) => {
             </motion.button>
           )}
           
-          {/* Close Button */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -1074,8 +1093,15 @@ const AIChatbot = ({ sectionRefs }) => {
       {/* Messages Area */}
       <CustomScrollbar 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800"
+        className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 relative"
       >
+        {/* Floating Background Elements */}
+        <motion.div
+          variants={floatingVariants}
+          animate="float"
+          className="absolute top-5 left-5 w-20 h-20 bg-cyan-200/20 dark:bg-cyan-700/10 rounded-full blur-xl"
+        />
+        
         {showWelcome ? (
           <WelcomeScreen 
             onStartChat={handleStartChat}
@@ -1107,7 +1133,7 @@ const AIChatbot = ({ sectionRefs }) => {
       </CustomScrollbar>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+      <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl">
         <form onSubmit={handleSubmit} className="flex space-x-2">
           <div className="flex-1 relative">
             <input
@@ -1115,7 +1141,7 @@ const AIChatbot = ({ sectionRefs }) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="พิมพ์คำถามของคุณ..."
-              className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 rounded-lg border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all text-sm"
+              className="w-full px-3 py-2 bg-slate-100/80 dark:bg-slate-700/80 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 rounded-lg border border-slate-200/50 dark:border-slate-600/50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-sm backdrop-blur-sm"
               disabled={isTyping}
             />
           </div>
@@ -1124,7 +1150,7 @@ const AIChatbot = ({ sectionRefs }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             disabled={!input.trim() || isTyping}
-            className="px-4 bg-gradient-to-r from-violet-600 to-blue-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center space-x-1"
+            className="px-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center space-x-1 backdrop-blur-sm"
           >
             <SendIcon />
           </motion.button>
@@ -1148,7 +1174,7 @@ const AIChatbot = ({ sectionRefs }) => {
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsOpen(true)}
           className={`
-            fixed z-40 bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow-2xl flex items-center justify-center hover:shadow-3xl transition-all duration-300
+            fixed z-40 bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-2xl flex items-center justify-center hover:shadow-3xl transition-all duration-300 backdrop-blur-sm
             ${isMobile 
               ? 'bottom-4 right-4 w-12 h-12 rounded-xl' 
               : 'bottom-6 right-6 w-14 h-14 rounded-2xl'

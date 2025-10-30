@@ -3,91 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CertificateCard from '../components/CertificateCard';
 
-// SVG Icons
-const CertificateIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const AwardIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 15C15.866 15 19 11.866 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 11.866 8.13401 15 12 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M8.21 13.89L7 23L12 20L17 23L15.79 13.88" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const CloseIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-// Animation Variants
-const modalVariants = {
-  hidden: {
-    opacity: 0,
-    scale: 0.85,
-    y: 20,
-    transition: {
-      duration: 0.2,
-      ease: "easeIn"
-    }
-  },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      damping: 25,
-      stiffness: 300,
-      mass: 0.8
-    }
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.9,
-    y: -10,
-    transition: {
-      duration: 0.15,
-      ease: "easeOut"
-    }
-  }
-};
-
-const overlayVariants = {
-  hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1,
-    transition: { duration: 0.2 }
-  },
-  exit: { 
-    opacity: 0,
-    transition: { 
-      duration: 0.15,
-      delay: 0.05 
-    }
-  }
-};
-
 const Certificates = () => {
   const [selectedCert, setSelectedCert] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Lock scroll when modal is open
   useEffect(() => {
     if (selectedCert) {
       document.body.style.overflow = 'hidden';
-      document.documentElement.style.paddingRight = '0px';
     } else {
       document.body.style.overflow = 'unset';
-      document.documentElement.style.paddingRight = '0px';
     }
-    
+
     return () => {
       document.body.style.overflow = 'unset';
-      document.documentElement.style.paddingRight = '0px';
     };
   }, [selectedCert]);
 
@@ -98,10 +26,10 @@ const Certificates = () => {
 
   const handleCloseModal = () => {
     if (isAnimating || !selectedCert) return;
-    
+
     setIsAnimating(true);
     setSelectedCert(null);
-    
+
     setTimeout(() => {
       setIsAnimating(false);
     }, 300);
@@ -188,121 +116,203 @@ const Certificates = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50/50 via-orange-50/50 to-yellow-50/50 dark:from-gray-900 dark:via-amber-950/50 dark:to-orange-950/50 py-12 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <motion.div
+        className="absolute top-20 left-10 w-72 h-72 bg-amber-300/20 rounded-full blur-3xl"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+          x: [0, 30, 0],
+          y: [0, -20, 0]
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute bottom-20 right-10 w-96 h-96 bg-orange-300/20 rounded-full blur-3xl"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.2, 0.4, 0.2],
+          x: [0, -40, 0],
+          y: [0, 30, 0]
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Header Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <div className="flex items-center justify-center mb-4">
-            <CertificateIcon className="text-blue-600 dark:text-blue-400 mr-3" />
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <motion.div
+            className="flex items-center justify-center mb-6"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.div
+              animate={{
+                rotate: [0, 10, -10, 0],
+                scale: [1, 1.1, 1]
+              }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl mr-4"
+            >
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+            </motion.div>
+            <motion.h1
+              className="text-5xl font-bold bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
               ประกาศนียบัตร
-            </h1>
-          </div>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            </motion.h1>
+          </motion.div>
+          <motion.p
+            className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
             ความสำเร็จและความภาคภูมิใจจากการเข้าร่วมกิจกรรมและโครงการต่าง ๆ
-          </p>
+          </motion.p>
         </motion.div>
 
         {/* Certificates Grid */}
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          layout
         >
-          {certificates.map((cert, index) => (
-            <CertificateCard
-              key={cert.id}
-              cert={cert}
-              onSelect={handleOpenModal}
-              index={index}
-            />
-          ))}
+          <AnimatePresence>
+            {certificates.map((cert, index) => (
+              <CertificateCard
+                key={cert.id}
+                cert={cert}
+                onSelect={handleOpenModal}
+                index={index}
+              />
+            ))}
+          </AnimatePresence>
         </motion.div>
 
-        {/* ✅ แก้ไข Certificate Modal - ทำให้ลื่นไหลมากขึ้น */}
-        <AnimatePresence mode="sync">
+        {/* Certificate Modal */}
+        <AnimatePresence>
           {selectedCert && (
-            <motion.div
-              key="cert-modal-overlay"
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
-              onClick={handleCloseModal}
-            >
+            <>
               <motion.div
-                key="cert-modal-content"
-                layoutId={`cert-${selectedCert.id}`}
-                variants={modalVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl max-h-[90vh] overflow-y-auto cursor-auto"
-                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl"
+                onClick={handleCloseModal}
               >
-                {/* Modal Image */}
-                <motion.div layoutId={`cert-image-${selectedCert.id}`} className="relative">
-                  <img
-                    src={selectedCert.image}
-                    alt={selectedCert.title}
-                    className="w-full h-64 md:h-80 object-contain bg-gray-100 dark:bg-gray-900"
-                  />
+                <motion.div
+                  layoutId={`cert-${selectedCert.id}`}
+                  className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl max-h-[90vh] overflow-y-auto cursor-auto border border-white/30 dark:border-gray-700/30"
+                  onClick={(e) => e.stopPropagation()}
+                  initial={{ scale: 0.9, opacity: 0, y: 50 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.9, opacity: 0, y: -50 }}
+                  transition={{
+                    type: "spring",
+                    damping: 30,
+                    stiffness: 300,
+                    duration: 0.4
+                  }}
+                >
+                  {/* Close Button */}
                   <motion.button
-                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.7)' }}
+                    whileHover={{ scale: 1.1, rotate: 90 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={handleCloseModal}
-                    className="absolute top-4 right-4 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm transition-all duration-200"
+                    className="absolute top-6 right-6 z-20 w-12 h-12 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-white/30 dark:border-gray-600/30 transition-all duration-300 shadow-2xl"
                   >
-                    <CloseIcon />
-                  </motion.button>
-                </motion.div>
-
-                {/* Modal Content */}
-                <div className="p-6 md:p-8">
-                  <motion.div 
-                    className="flex items-center space-x-3 mb-4"
-                    layoutId={`cert-header-${selectedCert.id}`}
-                  >
-                    <AwardIcon className="text-yellow-500 flex-shrink-0" />
-                    <motion.h2 
-                      className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
-                      layoutId={`cert-title-${selectedCert.id}`}
-                    >
-                      {selectedCert.title}
-                    </motion.h2>
-                  </motion.div>
-                  
-                  <motion.p 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6"
-                  >
-                    {selectedCert.description}
-                  </motion.p>
-
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="flex items-center space-x-2 text-gray-500 dark:text-gray-400"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="font-medium">วันที่ได้รับ:</span>
-                    <span>{selectedCert.date}</span>
-                  </motion.div>
-                </div>
+                  </motion.button>
+
+                  {/* Modal Content */}
+                  <div className="max-h-[90vh] overflow-y-auto">
+                    {/* Image */}
+                    <motion.div
+                      layoutId={`cert-image-${selectedCert.id}`}
+                      className="relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600"
+                    >
+                      <img
+                        src={selectedCert.image}
+                        alt={selectedCert.title}
+                        className="w-full h-64 md:h-80 object-contain"
+                      />
+                    </motion.div>
+
+                    {/* Content */}
+                    <div className="p-8">
+                      <motion.div
+                        className="flex items-center space-x-4 mb-6"
+                        layoutId={`cert-header-${selectedCert.id}`}
+                      >
+                        <motion.div
+                          animate={{
+                            rotate: [0, -5, 5, 0],
+                            scale: [1, 1.1, 1]
+                          }}
+                          transition={{ duration: 2, repeat: Infinity, repeatDelay: 5 }}
+                          className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg"
+                        >
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                          </svg>
+                        </motion.div>
+                        <motion.h2
+                          className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight"
+                          layoutId={`cert-title-${selectedCert.id}`}
+                        >
+                          {selectedCert.title}
+                        </motion.h2>
+                      </motion.div>
+
+                      <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-6"
+                      >
+                        {selectedCert.description}
+                      </motion.p>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="flex items-center space-x-3 text-gray-600 dark:text-gray-400 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl p-4 border border-white/30 dark:border-gray-600/30"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span className="font-medium">วันที่ได้รับ:</span>
+                        <span>{selectedCert.date}</span>
+                      </motion.div>
+                    </div>
+                  </div>
+                </motion.div>
               </motion.div>
-            </motion.div>
+            </>
           )}
         </AnimatePresence>
 
@@ -310,21 +320,25 @@ const Certificates = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           className="mt-16 text-center"
         >
-          <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg inline-flex items-center space-x-4">
-            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+          <motion.div
+            className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-6 shadow-lg inline-flex items-center space-x-4 border border-white/30 dark:border-gray-700/30"
+            whileHover={{ scale: 1.05, y: -2 }}
+            transition={{ type: "spring", stiffness: 400 }}
+          >
+            <motion.div
+              className="w-3 h-3 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
             <span className="text-gray-700 dark:text-gray-300 font-medium">
               พบประกาศนียบัตรทั้งหมด {certificates.length} รายการ
             </span>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
-
-      {/* Background Decoration */}
-      <div className="fixed top-20 left-10 w-72 h-72 bg-blue-300/20 rounded-full filter blur-3xl -z-10"></div>
-      <div className="fixed bottom-20 right-10 w-72 h-72 bg-purple-300/20 rounded-full filter blur-3xl -z-10"></div>
     </div>
   );
 };
