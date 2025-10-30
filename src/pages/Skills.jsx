@@ -1,9 +1,10 @@
 // Skills.jsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const Skills = () => {
-  const categories = [
+  // ใช้ useMemo เพื่อป้องกันการ recreate data
+  const categories = useMemo(() => [
     {
       title: "ทักษะทางเทคนิค",
       color: "from-cyan-500 to-blue-500",
@@ -43,19 +44,47 @@ const Skills = () => {
         { name: "การทำงานร่วมกับผู้ใหญ่", level: "สูง", description: "สามารถทำงานร่วมกับผู้ใหญ่และบุคคลต่างวัยได้อย่างราบรื่น" }
       ]
     }
-  ];
+  ], []);
 
-  // Floating animation
-  const floatingVariants = {
-    float: {
-      y: [0, -10, 0],
-      transition: {
-        duration: 4,
-        repeat: Infinity,
-        ease: "easeInOut"
+  // ใช้ useMemo สำหรับ animations
+  const animations = useMemo(() => ({
+    // Floating animation - ปรับให้เบาลง
+    floatingVariants: {
+      float: {
+        y: [0, -8, 0],
+        transition: {
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }
+      }
+    },
+
+    // Container variants
+    containerVariants: {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.08 // ลดจาก 0.1
+        }
+      }
+    },
+
+    itemVariants: {
+      hidden: { y: 15, opacity: 0 }, // ลดจาก y: 20
+      visible: {
+        y: 0,
+        opacity: 1,
+        transition: {
+          type: "spring",
+          stiffness: 120, // เพิ่ม stiffness
+          damping: 16, // เพิ่ม damping
+          mass: 0.8
+        }
       }
     }
-  };
+  }), []);
 
   // กำหนดสีและไอคอนตามระดับ
   const getLevelStyle = (level) => {
@@ -87,59 +116,42 @@ const Skills = () => {
     }
   };
 
-  // Container variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12
-      }
-    }
-  };
-
-  return (
-    <div className="bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-cyan-950 dark:to-blue-950 py-20 relative overflow-hidden">
-      {/* Floating Background Elements */}
+  // Optimized background elements
+  const BackgroundElements = () => (
+    <>
       <motion.div
-        variants={floatingVariants}
+        variants={animations.floatingVariants}
         animate="float"
         className="absolute top-20 left-10 w-32 h-32 bg-cyan-200/30 dark:bg-cyan-700/20 rounded-full blur-3xl"
+        style={{ willChange: 'transform' }}
       />
       <motion.div
-        variants={floatingVariants}
+        variants={animations.floatingVariants}
         animate="float"
-        transition={{ delay: 2 }}
+        transition={{ delay: 1.5 }} // ลด delay
         className="absolute bottom-20 right-10 w-40 h-40 bg-blue-200/20 dark:bg-blue-700/20 rounded-full blur-3xl"
+        style={{ willChange: 'transform' }}
       />
-      <motion.div
-        variants={floatingVariants}
-        animate="float"
-        transition={{ delay: 1 }}
-        className="absolute top-1/2 left-1/3 w-28 h-28 bg-indigo-200/20 dark:bg-indigo-700/20 rounded-full blur-3xl"
-      />
+    </>
+  );
+
+  return (
+    <div className="bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-cyan-950 dark:to-blue-950 py-16 relative overflow-hidden">
+      <BackgroundElements />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Header */}
         <motion.div 
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
+          className="text-center mb-12" // ลดจาก mb-16
+          initial={{ opacity: 0, y: 20 }} // ลดจาก y: 30
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
+          transition={{ 
+            duration: 0.6,
+            type: "spring",
+            stiffness: 100,
+            damping: 15
+          }}
+          viewport={{ once: true, margin: "-50px" }} // เพิ่ม margin
         >
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">ทักษะของฉัน</h2>
           <p className="text-xl text-gray-600 dark:text-gray-400">ทักษะและความสามารถที่ผมมี — แบ่งตามระดับ ต่ำ / กลาง / สูง</p>
@@ -147,44 +159,48 @@ const Skills = () => {
 
         {/* Skills Grid */}
         <motion.div 
-          className="space-y-16"
-          variants={containerVariants}
+          className="space-y-12" // ลดจาก space-y-16
+          variants={animations.containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-50px" }} // เพิ่ม margin
         >
           {categories.map((category, categoryIndex) => (
             <motion.div
               key={categoryIndex}
-              variants={itemVariants}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50 dark:border-gray-700/50"
-              whileHover={{ y: -5 }}
-              transition={{ type: "spring", stiffness: 300 }}
+              variants={animations.itemVariants}
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/50 dark:border-gray-700/50" // ลด padding
+              whileHover={{ y: -3 }} // ลดจาก y: -5
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              style={{ willChange: 'transform' }}
             >
-              <h3 className={`text-3xl font-bold mb-8 bg-gradient-to-r ${category.color} bg-clip-text text-transparent`}>
+              <h3 className={`text-3xl font-bold mb-6 bg-gradient-to-r ${category.color} bg-clip-text text-transparent`}> 
                 {category.title}
               </h3>
               
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4"> 
                 {category.skills.map((skill, skillIndex) => {
                   const levelStyle = getLevelStyle(skill.level);
                   return (
                     <motion.div
                       key={skillIndex}
-                      className="bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100/50 dark:border-gray-700/50"
+                      className="bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100/50 dark:border-gray-700/50" // ลด padding
                       whileHover={{ scale: 1.02 }}
-                      transition={{ type: "spring", stiffness: 300 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 15 }} // เพิ่ม damping
+                      style={{ willChange: 'transform' }}
                     >
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="font-semibold text-gray-900 dark:text-white text-lg">{skill.name}</h4>
-                        <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${levelStyle.bg} ${levelStyle.text} font-medium backdrop-blur-sm`}>
+                      <div className="flex items-center justify-between mb-3"> 
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-base"> 
+                          {skill.name}
+                        </h4>
+                        <div className={`flex items-center space-x-2 px-2 py-1 rounded-full ${levelStyle.bg} ${levelStyle.text} font-medium backdrop-blur-sm text-sm`}> 
                           <span>{levelStyle.icon}</span>
                           <span>{skill.level}</span>
                         </div>
                       </div>
                       
                       {/* Description */}
-                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed"> 
                         {skill.description}
                       </p>
                     </motion.div>
@@ -197,15 +213,21 @@ const Skills = () => {
 
         {/* Recommendation */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }} // ลดจาก y: 30
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-20 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-3xl p-8 text-center border border-cyan-200/50 dark:border-cyan-800/50 backdrop-blur-xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 300, duration: 0.7, delay: 0.3 }}
+          transition={{ 
+            duration: 0.6,
+            type: "spring",
+            stiffness: 100,
+            damping: 15
+          }}
+          viewport={{ once: true, margin: "-50px" }}
+          className="mt-16 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-3xl p-6 text-center border border-cyan-200/50 dark:border-cyan-800/50 backdrop-blur-xl" // ลด padding และ margin
+          whileHover={{ scale: 1.01 }} // ลดจาก scale: 1.02
+          style={{ willChange: 'transform' }}
         >
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">💡 คำแนะนำสำหรับคุณ:</h3>
-          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">💡 คำแนะนำสำหรับคุณ:</h3>
+          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto"> 
             แนะนำให้เรียนรู้ Python, Linux, และ CCNA เพื่อเตรียมความพร้อมสำหรับการสอบเข้าคณะวิศวกรรมศาสตร์ สาขาเครือข่าย
           </p>
         </motion.div>
