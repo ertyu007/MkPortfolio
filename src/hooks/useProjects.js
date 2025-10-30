@@ -97,7 +97,7 @@ export const useProjects = () => {
       }
     };
     fetchProjects();
-  }, []);
+  }, [apiOnline]);
 
   // ✅ ฟังก์ชันบันทึกสถานะลง localStorage
   const saveToLocalStorage = (projectId, updates) => {
