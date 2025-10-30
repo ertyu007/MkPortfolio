@@ -50,26 +50,18 @@ const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const [, setImageError] = React.useState(false);
 
-  // ✅ ฟังก์ชัน Like — พร้อม console.log
+  // ✅ ฟังก์ชัน Like
   const handleLike = (e) => {
     e.stopPropagation();
-    
-    if (project.isDisliked) {
-      onDislike(project.id, false);
-    }
     
     const newIsLiked = !project.isLiked;
     onLike(project.id, newIsLiked);
   };
 
-  // ✅ ฟังก์ชัน Dislike — พร้อม console.log
+  // ✅ ฟังก์ชัน Dislike
   const handleDislike = (e) => {
     e.stopPropagation();
 
-    if (project.isLiked) {
-      onLike(project.id, false);
-    }
-    
     const newIsDisliked = !project.isDisliked;
     onDislike(project.id, newIsDisliked);
   };

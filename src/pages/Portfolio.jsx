@@ -18,7 +18,6 @@ const CloseIcon = () => (
   </svg>
 );
 
-// Like/Dislike Icons
 const LikeIcon = ({ isLiked }) => (
   <svg 
     width="20" 
@@ -94,14 +93,14 @@ const overlayVariants = {
 };
 
 const Portfolio = () => {
-  const { projects, likeProject, dislikeProject, loading } = useProjects();
+  const { projects, likeProject, dislikeProject, updateProject, loading } = useProjects();
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false); // ✅ เพิ่ม state ป้องกันการคลิกซ้ำ
+  const [modalProcessing, setModalProcessing] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -176,33 +175,34 @@ const Portfolio = () => {
     }, 300);
   };
 
-  // ✅ ฟังก์ชันจัดการ Like/Dislike ใน Modal - แก้ไขแล้ว
+  // ✅ ฟังก์ชันจัดการ Like/Dislike ใน Modal
   const handleLikeInModal = async (projectId, isLiked) => {
-    if (isProcessing) return; // ✅ ป้องกันการคลิกซ้ำ
+    if (modalProcessing) return;
     
-    setIsProcessing(true);
+    setModalProcessing(true);
     
     try {
-      // ✅ อัพเดทเฉพาะค่าที่จำเป็น ไม่ต้องคำนวณใหม่
-      const newLikeCount = isLiked 
-        ? (selectedProject.like_count || 0) + 1 
-        : Math.max(0, (selectedProject.like_count || 0) - 1);
-      
-      const newDislikeCount = selectedProject.isDisliked && isLiked 
-        ? Math.max(0, (selectedProject.dislike_count || 0) - 1)
-        : (selectedProject.dislike_count || 0);
-
-      // ✅ อัพเดท state modal
-      setSelectedProject(prev => ({
-        ...prev,
+      // ✅ อัพเดท state ใน modal ทันที (optimistic update)
+      const updatedProject = {
+        ...selectedProject,
         isLiked,
-        isDisliked: isLiked ? false : prev.isDisliked,
-        like_count: newLikeCount,
-        dislike_count: newDislikeCount
-      }));
+        isDisliked: isLiked ? false : selectedProject.isDisliked,
+        like_count: isLiked 
+          ? (selectedProject.like_count || 0) + 1 
+          : Math.max(0, (selectedProject.like_count || 0) - 1),
+        dislike_count: selectedProject.isDisliked && isLiked 
+          ? Math.max(0, (selectedProject.dislike_count || 0) - 1)
+          : selectedProject.dislike_count
+      };
+      
+      setSelectedProject(updatedProject);
       
       // ✅ เรียกฟังก์ชันจาก hook
       await likeProject(projectId, isLiked);
+      
+      // ✅ อัพเดท projects list ด้วย
+      updateProject(updatedProject);
+      
     } catch (error) {
       console.error('Error handling like:', error);
       // ✅ Rollback ถ้ามี error
@@ -214,36 +214,37 @@ const Portfolio = () => {
           : (prev.like_count || 0) + 1
       }));
     } finally {
-      setIsProcessing(false);
+      setModalProcessing(false);
     }
   };
 
   const handleDislikeInModal = async (projectId, isDisliked) => {
-    if (isProcessing) return; // ✅ ป้องกันการคลิกซ้ำ
+    if (modalProcessing) return;
     
-    setIsProcessing(true);
+    setModalProcessing(true);
     
     try {
-      // ✅ อัพเดทเฉพาะค่าที่จำเป็น ไม่ต้องคำนวณใหม่
-      const newDislikeCount = isDisliked 
-        ? (selectedProject.dislike_count || 0) + 1 
-        : Math.max(0, (selectedProject.dislike_count || 0) - 1);
-      
-      const newLikeCount = selectedProject.isLiked && isDisliked 
-        ? Math.max(0, (selectedProject.like_count || 0) - 1)
-        : (selectedProject.like_count || 0);
-
-      // ✅ อัพเดท state modal
-      setSelectedProject(prev => ({
-        ...prev,
+      // ✅ อัพเดท state ใน modal ทันที (optimistic update)
+      const updatedProject = {
+        ...selectedProject,
         isDisliked,
-        isLiked: isDisliked ? false : prev.isLiked,
-        dislike_count: newDislikeCount,
-        like_count: newLikeCount
-      }));
+        isLiked: isDisliked ? false : selectedProject.isLiked,
+        dislike_count: isDisliked 
+          ? (selectedProject.dislike_count || 0) + 1 
+          : Math.max(0, (selectedProject.dislike_count || 0) - 1),
+        like_count: selectedProject.isLiked && isDisliked 
+          ? Math.max(0, (selectedProject.like_count || 0) - 1)
+          : selectedProject.like_count
+      };
+      
+      setSelectedProject(updatedProject);
       
       // ✅ เรียกฟังก์ชันจาก hook
       await dislikeProject(projectId, isDisliked);
+      
+      // ✅ อัพเดท projects list ด้วย
+      updateProject(updatedProject);
+      
     } catch (error) {
       console.error('Error handling dislike:', error);
       // ✅ Rollback ถ้ามี error
@@ -255,7 +256,7 @@ const Portfolio = () => {
           : (prev.dislike_count || 0) + 1
       }));
     } finally {
-      setIsProcessing(false);
+      setModalProcessing(false);
     }
   };
 
@@ -439,7 +440,7 @@ const Portfolio = () => {
                     </motion.div>
                   )}
 
-                  {/* Like/Dislike Buttons - แก้ไขแล้ว */}
+                  {/* Like/Dislike Buttons */}
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -448,38 +449,38 @@ const Portfolio = () => {
                   >
                     {/* Like Button */}
                     <motion.button
-                      whileHover={{ scale: isProcessing ? 1 : 1.05 }}
-                      whileTap={{ scale: isProcessing ? 1 : 0.95 }}
+                      whileHover={{ scale: modalProcessing ? 1 : 1.05 }}
+                      whileTap={{ scale: modalProcessing ? 1 : 0.95 }}
                       onClick={() => handleLikeInModal(selectedProject.id, !selectedProject.isLiked)}
-                      disabled={isProcessing}
+                      disabled={modalProcessing}
                       className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ${
                         selectedProject.isLiked
                           ? 'bg-blue-600 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                      } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      } ${modalProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       <LikeIcon isLiked={selectedProject.isLiked} />
                       <span className="font-semibold">{selectedProject.like_count || 0}</span>
-                      {isProcessing && (
+                      {modalProcessing && (
                         <div className="ml-2 animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current"></div>
                       )}
                     </motion.button>
 
                     {/* Dislike Button */}
                     <motion.button
-                      whileHover={{ scale: isProcessing ? 1 : 1.05 }}
-                      whileTap={{ scale: isProcessing ? 1 : 0.95 }}
+                      whileHover={{ scale: modalProcessing ? 1 : 1.05 }}
+                      whileTap={{ scale: modalProcessing ? 1 : 0.95 }}
                       onClick={() => handleDislikeInModal(selectedProject.id, !selectedProject.isDisliked)}
-                      disabled={isProcessing}
+                      disabled={modalProcessing}
                       className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ${
                         selectedProject.isDisliked
                           ? 'bg-red-600 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                      } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      } ${modalProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       <DislikeIcon isDisliked={selectedProject.isDisliked} />
                       <span className="font-semibold">{selectedProject.dislike_count || 0}</span>
-                      {isProcessing && (
+                      {modalProcessing && (
                         <div className="ml-2 animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current"></div>
                       )}
                     </motion.button>

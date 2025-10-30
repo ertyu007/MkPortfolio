@@ -1,61 +1,55 @@
 import { useState, useEffect } from 'react';
-import { getProjects, likeProject, dislikeProject } from '../utils/api';
+import { getProjects, likeProject, dislikeProject, checkAPIHealth } from '../utils/api';
 
 export const useProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState({});
+  const [apiOnline, setApiOnline] = useState(true);
 
-  // ✅ โหลด projects จาก API + โหลดสถานะจาก localStorage
+  // ✅ ตรวจสอบสถานะ API
+  useEffect(() => {
+    const checkAPI = async () => {
+      const online = await checkAPIHealth();
+      setApiOnline(online);
+      if (!online) {
+        console.warn("⚠️ API is offline, using fallback mode");
+      }
+    };
+    checkAPI();
+  }, []);
+
+  // ✅ โหลด projects
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        // console.log('📥 Fetching projects from API...');
         const data = await getProjects();
         
-        // ✅ Map ข้อมูลจากฐานข้อมูลให้ตรงกับ frontend
         const enhancedProjects = data.map(p => {
-          // ✅ แก้ไขตรงนี้: map image_url เป็น image
           const mappedProject = {
             ...p,
-            image: p.image_url || p.image, // ใช้ image_url จาก DB เป็น image ใน frontend
+            image: p.image_url || p.image,
             isLiked: false,
             isDisliked: false
           };
 
-          // ✅ ดึงสถานะ Like/Dislike จาก localStorage
           const saved = localStorage.getItem(`project_${p.id}`);
           if (saved) {
             const { isLiked, isDisliked } = JSON.parse(saved);
-            // console.log(`💾 Loaded state for project ${p.id}:`, { isLiked, isDisliked });
             return { 
               ...mappedProject, 
               isLiked: isLiked || false, 
               isDisliked: isDisliked || false 
             };
           }
-          // console.log(`🆕 New project ${p.id}: default state`);
           return mappedProject;
         });
         
         setProjects(enhancedProjects);
-        // console.log('✅ Projects loaded:', enhancedProjects);
       } catch (err) {
         console.error("❌ Failed to fetch projects:", err);
-        // Fallback - ใช้ mock data ที่มี image property ถูกต้อง
-        setProjects([
-          { 
-            id: 1, 
-            title: "ผมได้เป็นหนึ่งใน สภานักเรียน",
-            description: "ผมได้เป็นหนึ่งใน สภานักเรียน มีหน้าทีช่วยดูแลและรับหน้าที่ จัดการควมคุ้มเครื่องเสียงเนื่องในกิจกรรมต่างๆ และเป็นตากล้องของโรงเรียน และช่วยเหลือครูในงานต่างๆที่เกี่ยวกับ อิเล็กทรอนิกส์ หรือ IT ",
-            tags: ["Student Council", "Sound System", "Photography", "IT Support"],
-            like_count: 0, 
-            dislike_count: 0, 
-            isLiked: false, 
-            isDisliked: false,
-            image: "/assets/images/works/1740286124834.jpg"
-          }
-        ]);
+        // Fallback data จะถูกจัดการใน getProjects() แล้ว
       } finally {
         setLoading(false);
       }
@@ -63,77 +57,145 @@ export const useProjects = () => {
     fetchProjects();
   }, []);
 
-  // ✅ Like Project — พร้อม console.log
+  // ✅ Like Project
   const likeProjectById = async (id, isLike) => {
+    if (isProcessing[id]) return;
+    
+    setIsProcessing(prev => ({ ...prev, [id]: true }));
+    
     try {
-      // console.log('🚀 Like project:', { id, isLike });
       const action = isLike ? 'like' : 'unlike';
-      const { like_count } = await likeProject(id, action);
-      // console.log('✅ Like API response:', { like_count });
-
+      
+      // ✅ Optimistic update
       setProjects(prev => {
-        const updatedProjects = prev.map(p => {
+        return prev.map(p => {
           if (p.id === id) {
-            let updated = { ...p, like_count, isLiked: isLike };
-            // ✅ ถ้า Like — ต้องยกเลิก Dislike
-            if (isLike) {
-              // console.log('🔄 Auto-unlike Dislike');
-              updated = { ...updated, isDisliked: false };
-            }
-            // ✅ บันทึกสถานะลง localStorage
+            const updated = { 
+              ...p, 
+              isLiked: isLike,
+              isDisliked: isLike ? false : p.isDisliked,
+              like_count: isLike 
+                ? (p.like_count || 0) + 1 
+                : Math.max(0, (p.like_count || 0) - 1),
+              dislike_count: isLike && p.isDisliked 
+                ? Math.max(0, (p.dislike_count || 0) - 1)
+                : p.dislike_count
+            };
+            
             localStorage.setItem(`project_${id}`, JSON.stringify({ 
               isLiked: updated.isLiked, 
               isDisliked: updated.isDisliked 
             }));
-            // console.log('💾 Saved state:', { id, isLiked: updated.isLiked, isDisliked: updated.isDisliked });
+            
             return updated;
           }
           return p;
         });
-        // console.log('✅ Projects updated after like:', updatedProjects);
-        return updatedProjects;
       });
+
+      // ✅ Call API
+      if (apiOnline) {
+        const { like_count } = await likeProject(id, action);
+        
+        // ✅ Sync กับ response จาก API
+        setProjects(prev => prev.map(p => 
+          p.id === id ? { ...p, like_count } : p
+        ));
+      }
+      
     } catch (err) {
-      // console.error("❌ Like toggle failed:", err);
-      // alert("ไม่สามารถกด Like ได้ในขณะนี้");
+      console.error("❌ Like toggle failed:", err);
+      // ✅ Rollback on error
+      setProjects(prev => prev.map(p => 
+        p.id === id ? { 
+          ...p, 
+          isLiked: !isLike,
+          like_count: isLike 
+            ? Math.max(0, (p.like_count || 0) - 1)
+            : (p.like_count || 0) + 1
+        } : p
+      ));
+    } finally {
+      setIsProcessing(prev => ({ ...prev, [id]: false }));
     }
   };
 
-  // ✅ Dislike Project — พร้อม console.log
+  // ✅ Dislike Project
   const dislikeProjectById = async (id, isDislike) => {
-    try {
-      // console.log('🚀 Dislike project:', { id, isDislike });
-      const action = isDislike ? 'dislike' : 'undislike';
-      const { dislike_count } = await dislikeProject(id, action);
-      // console.log('✅ Dislike API response:', { dislike_count });
+    if (isProcessing[id]) return;
+    
+    setIsProcessing(prev => ({ ...prev, [id]: true }));
 
+    try {
+      const action = isDislike ? 'dislike' : 'undislike';
+      
+      // ✅ Optimistic update
       setProjects(prev => {
-        const updatedProjects = prev.map(p => {
+        return prev.map(p => {
           if (p.id === id) {
-            let updated = { ...p, dislike_count, isDisliked: isDislike };
-            // ✅ ถ้า Dislike — ต้องยกเลิก Like
-            if (isDislike) {
-              // console.log('🔄 Auto-unlike Like');
-              updated = { ...updated, isLiked: false };
-            }
-            // ✅ บันทึกสถานะลง localStorage
+            const updated = { 
+              ...p, 
+              isDisliked: isDislike,
+              isLiked: isDislike ? false : p.isLiked,
+              dislike_count: isDislike 
+                ? (p.dislike_count || 0) + 1 
+                : Math.max(0, (p.dislike_count || 0) - 1),
+              like_count: isDislike && p.isLiked 
+                ? Math.max(0, (p.like_count || 0) - 1)
+                : p.like_count
+            };
+            
             localStorage.setItem(`project_${id}`, JSON.stringify({ 
               isLiked: updated.isLiked, 
               isDisliked: updated.isDisliked 
             }));
-            // console.log('💾 Saved state:', { id, isLiked: updated.isLiked, isDisliked: updated.isDisliked });
+            
             return updated;
           }
           return p;
         });
-        // console.log('✅ Projects updated after dislike:', updatedProjects);
-        return updatedProjects;
       });
+
+      // ✅ Call API
+      if (apiOnline) {
+        const { dislike_count } = await dislikeProject(id, action);
+        
+        // ✅ Sync กับ response จาก API
+        setProjects(prev => prev.map(p => 
+          p.id === id ? { ...p, dislike_count } : p
+        ));
+      }
+      
     } catch (err) {
       console.error("❌ Dislike toggle failed:", err);
-      alert("ไม่สามารถกด Dislike ได้ในขณะนี้");
+      // ✅ Rollback on error
+      setProjects(prev => prev.map(p => 
+        p.id === id ? { 
+          ...p, 
+          isDisliked: !isDislike,
+          dislike_count: isDislike 
+            ? Math.max(0, (p.dislike_count || 0) - 1)
+            : (p.dislike_count || 0) + 1
+        } : p
+      ));
+    } finally {
+      setIsProcessing(prev => ({ ...prev, [id]: false }));
     }
   };
 
-  return { projects, likeProject: likeProjectById, dislikeProject: dislikeProjectById, loading };
+  // ✅ ฟังก์ชันสำหรับอัพเดท project โดยตรง
+  const updateProject = (updatedProject) => {
+    setProjects(prev => prev.map(p => 
+      p.id === updatedProject.id ? updatedProject : p
+    ));
+  };
+
+  return { 
+    projects, 
+    likeProject: likeProjectById, 
+    dislikeProject: dislikeProjectById, 
+    updateProject,
+    loading,
+    apiOnline // ✅ เพิ่มสถานะ API
+  };
 };
