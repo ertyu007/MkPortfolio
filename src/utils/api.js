@@ -12,70 +12,64 @@ export const getProjects = async (retries = 3) => {
       console.warn(`⚠️ Attempt ${i + 1} failed to fetch projects:`, err.message);
       if (i === retries - 1) {
         console.error("❌ All attempts failed, using fallback data");
-        // ✅ Fallback data ถ้า API ล้มเหลว
         return getFallbackProjects();
       }
-      // รอ 1 วินาทีก่อนลองใหม่
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 };
 
-// ✅ Like Project - เพิ่ม error handling ที่ดีขึ้น
-export const likeProject = async (id, action, retries = 2) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const res = await fetch(`${API_BASE}/api/projects/${id}/like`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ action }),
-      });
-      
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errorText}`);
-      }
-      
-      return await res.json();
-    } catch (err) {
-      console.warn(`⚠️ Attempt ${i + 1} failed to ${action} project ${id}:`, err.message);
-      if (i === retries - 1) {
-        throw new Error(`Failed to ${action} project: ${err.message}`);
-      }
-      await new Promise(resolve => setTimeout(resolve, 500));
+// ✅ ฟังก์ชัน Like Project แบบใหม่
+export const likeProject = async (id, currentStatus) => {
+  try {
+    const res = await fetch(`${API_BASE}/api/projects/${id}/like`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ 
+        current_liked: currentStatus.isLiked,
+        current_disliked: currentStatus.isDisliked 
+      }),
+    });
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`HTTP ${res.status}: ${errorText}`);
     }
+    
+    return await res.json();
+  } catch (err) {
+    console.error(`❌ Failed to toggle like for project ${id}:`, err.message);
+    throw err;
   }
 };
 
-// ✅ Dislike Project - เพิ่ม error handling ที่ดีขึ้น
-export const dislikeProject = async (id, action, retries = 2) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const res = await fetch(`${API_BASE}/api/projects/${id}/dislike`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ action }),
-      });
-      
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errorText}`);
-      }
-      
-      return await res.json();
-    } catch (err) {
-      console.warn(`⚠️ Attempt ${i + 1} failed to ${action} project ${id}:`, err.message);
-      if (i === retries - 1) {
-        throw new Error(`Failed to ${action} project: ${err.message}`);
-      }
-      await new Promise(resolve => setTimeout(resolve, 500));
+// ✅ ฟังก์ชัน Dislike Project แบบใหม่
+export const dislikeProject = async (id, currentStatus) => {
+  try {
+    const res = await fetch(`${API_BASE}/api/projects/${id}/dislike`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ 
+        current_liked: currentStatus.isLiked,
+        current_disliked: currentStatus.isDisliked 
+      }),
+    });
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`HTTP ${res.status}: ${errorText}`);
     }
+    
+    return await res.json();
+  } catch (err) {
+    console.error(`❌ Failed to toggle dislike for project ${id}:`, err.message);
+    throw err;
   }
 };
 

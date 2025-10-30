@@ -18,6 +18,7 @@ const CloseIcon = () => (
   </svg>
 );
 
+// Like/Dislike Icons (สำหรับแสดงสถานะอย่างเดียว)
 const LikeIcon = ({ isLiked }) => (
   <svg 
     width="20" 
@@ -93,14 +94,13 @@ const overlayVariants = {
 };
 
 const Portfolio = () => {
-  const { projects, likeProject, dislikeProject, updateProject, loading } = useProjects();
+  const { projects, likeProject, dislikeProject, loading, apiOnline } = useProjects();
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [modalProcessing, setModalProcessing] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -132,21 +132,26 @@ const Portfolio = () => {
     const performSearch = async () => {
       if (!debouncedSearch.trim()) {
         setFiltered(projects);
+        setIsSearching(false);
         return;
       }
 
       setIsSearching(true);
       try {
-        const aiResults = await aiSearch(debouncedSearch, projects);
-        if (aiResults.length > 0) {
-          setFiltered(aiResults);
-          return;
+        // ลองใช้ AI Search ก่อน
+        if (typeof aiSearch === 'function') {
+          const aiResults = await aiSearch(debouncedSearch, projects);
+          if (aiResults.length > 0) {
+            setFiltered(aiResults);
+            setIsSearching(false);
+            return;
+          }
         }
       } catch (err) {
         console.warn("AI Search failed, using keyword search:", err);
       }
 
-      // ✅ Keyword search
+      // ✅ Keyword search fallback
       const keywordResults = projects.filter(p =>
         p.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         p.description?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
@@ -175,91 +180,6 @@ const Portfolio = () => {
     }, 300);
   };
 
-  // ✅ ฟังก์ชันจัดการ Like/Dislike ใน Modal
-  const handleLikeInModal = async (projectId, isLiked) => {
-    if (modalProcessing) return;
-    
-    setModalProcessing(true);
-    
-    try {
-      // ✅ อัพเดท state ใน modal ทันที (optimistic update)
-      const updatedProject = {
-        ...selectedProject,
-        isLiked,
-        isDisliked: isLiked ? false : selectedProject.isDisliked,
-        like_count: isLiked 
-          ? (selectedProject.like_count || 0) + 1 
-          : Math.max(0, (selectedProject.like_count || 0) - 1),
-        dislike_count: selectedProject.isDisliked && isLiked 
-          ? Math.max(0, (selectedProject.dislike_count || 0) - 1)
-          : selectedProject.dislike_count
-      };
-      
-      setSelectedProject(updatedProject);
-      
-      // ✅ เรียกฟังก์ชันจาก hook
-      await likeProject(projectId, isLiked);
-      
-      // ✅ อัพเดท projects list ด้วย
-      updateProject(updatedProject);
-      
-    } catch (error) {
-      console.error('Error handling like:', error);
-      // ✅ Rollback ถ้ามี error
-      setSelectedProject(prev => ({
-        ...prev,
-        isLiked: !isLiked,
-        like_count: isLiked 
-          ? Math.max(0, (prev.like_count || 0) - 1)
-          : (prev.like_count || 0) + 1
-      }));
-    } finally {
-      setModalProcessing(false);
-    }
-  };
-
-  const handleDislikeInModal = async (projectId, isDisliked) => {
-    if (modalProcessing) return;
-    
-    setModalProcessing(true);
-    
-    try {
-      // ✅ อัพเดท state ใน modal ทันที (optimistic update)
-      const updatedProject = {
-        ...selectedProject,
-        isDisliked,
-        isLiked: isDisliked ? false : selectedProject.isLiked,
-        dislike_count: isDisliked 
-          ? (selectedProject.dislike_count || 0) + 1 
-          : Math.max(0, (selectedProject.dislike_count || 0) - 1),
-        like_count: selectedProject.isLiked && isDisliked 
-          ? Math.max(0, (selectedProject.like_count || 0) - 1)
-          : selectedProject.like_count
-      };
-      
-      setSelectedProject(updatedProject);
-      
-      // ✅ เรียกฟังก์ชันจาก hook
-      await dislikeProject(projectId, isDisliked);
-      
-      // ✅ อัพเดท projects list ด้วย
-      updateProject(updatedProject);
-      
-    } catch (error) {
-      console.error('Error handling dislike:', error);
-      // ✅ Rollback ถ้ามี error
-      setSelectedProject(prev => ({
-        ...prev,
-        isDisliked: !isDisliked,
-        dislike_count: isDisliked 
-          ? Math.max(0, (prev.dislike_count || 0) - 1)
-          : (prev.dislike_count || 0) + 1
-      }));
-    } finally {
-      setModalProcessing(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -276,6 +196,12 @@ const Portfolio = () => {
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             ผลงานที่ผ่านการพัฒนาด้วยความตั้งใจ — พร้อมให้คุณสำรวจและประเมิน
           </p>
+          {!apiOnline && (
+            <div className="mt-4 inline-flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-lg text-sm">
+              <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
+              โหมดออฟไลน์ - กำลังใช้ข้อมูลสำรอง
+            </div>
+          )}
         </motion.div>
 
         {/* Search Section */}
@@ -384,7 +310,7 @@ const Portfolio = () => {
                 {/* Modal Image */}
                 <motion.div layoutId={`image-${selectedProject.id}`} className="relative">
                   <img
-                    src={selectedProject.image || "https://via.placeholder.com/800x400?text=Project"}
+                    src={selectedProject.image || selectedProject.image_url || "https://via.placeholder.com/800x400?text=Project"}
                     alt={selectedProject.title}
                     className="w-full h-64 md:h-80 object-cover"
                   />
@@ -440,50 +366,50 @@ const Portfolio = () => {
                     </motion.div>
                   )}
 
-                  {/* Like/Dislike Buttons */}
+                  {/* ✅ Like/Dislike Stats - Display Only */}
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="flex items-center space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700"
+                    className="flex items-center space-x-8 pt-6 border-t border-gray-200 dark:border-gray-700"
                   >
-                    {/* Like Button */}
-                    <motion.button
-                      whileHover={{ scale: modalProcessing ? 1 : 1.05 }}
-                      whileTap={{ scale: modalProcessing ? 1 : 0.95 }}
-                      onClick={() => handleLikeInModal(selectedProject.id, !selectedProject.isLiked)}
-                      disabled={modalProcessing}
-                      className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ${
-                        selectedProject.isLiked
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                      } ${modalProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
+                    {/* Like Count - Display Only */}
+                    <div className={`flex items-center space-x-3 ${
+                      selectedProject.isLiked 
+                        ? 'text-blue-600 dark:text-blue-400' 
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}>
                       <LikeIcon isLiked={selectedProject.isLiked} />
-                      <span className="font-semibold">{selectedProject.like_count || 0}</span>
-                      {modalProcessing && (
-                        <div className="ml-2 animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current"></div>
-                      )}
-                    </motion.button>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-lg">{selectedProject.like_count || 0}</span>
+                        <span className="text-xs opacity-75">Likes</span>
+                      </div>
+                    </div>
 
-                    {/* Dislike Button */}
-                    <motion.button
-                      whileHover={{ scale: modalProcessing ? 1 : 1.05 }}
-                      whileTap={{ scale: modalProcessing ? 1 : 0.95 }}
-                      onClick={() => handleDislikeInModal(selectedProject.id, !selectedProject.isDisliked)}
-                      disabled={modalProcessing}
-                      className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-300 ${
-                        selectedProject.isDisliked
-                          ? 'bg-red-600 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                      } ${modalProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
+                    {/* Dislike Count - Display Only */}
+                    <div className={`flex items-center space-x-3 ${
+                      selectedProject.isDisliked 
+                        ? 'text-red-600 dark:text-red-400' 
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}>
                       <DislikeIcon isDisliked={selectedProject.isDisliked} />
-                      <span className="font-semibold">{selectedProject.dislike_count || 0}</span>
-                      {modalProcessing && (
-                        <div className="ml-2 animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current"></div>
-                      )}
-                    </motion.button>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-lg">{selectedProject.dislike_count || 0}</span>
+                        <span className="text-xs opacity-75">Dislikes</span>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* ✅ Note สำหรับผู้ใช้ */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+                  >
+                    <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
+                      💡 คุณสามารถกด Like/Dislike ได้ที่การ์ดผลงานด้านนอก
+                    </p>
                   </motion.div>
                 </div>
               </motion.div>
@@ -502,7 +428,7 @@ const Portfolio = () => {
             <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg inline-flex items-center space-x-4">
               <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
               <span className="text-gray-700 dark:text-gray-300 font-medium">
-                พบผลงาน {filtered.length} รายการ จากทั้งหมด {projects.length} รายการ
+                พบผลงาน {filtered.length} รายการ {search && `สำหรับ "${search}"`}
               </span>
             </div>
           </motion.div>

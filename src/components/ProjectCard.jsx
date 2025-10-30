@@ -48,22 +48,18 @@ const imageVariants = {
 
 const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
   const [imageLoaded, setImageLoaded] = React.useState(false);
-  const [, setImageError] = React.useState(false);
+  const [imageError, setImageError] = React.useState(false);
 
-  // ✅ ฟังก์ชัน Like
+  // ✅ ฟังก์ชัน Like แบบใหม่
   const handleLike = (e) => {
     e.stopPropagation();
-    
-    const newIsLiked = !project.isLiked;
-    onLike(project.id, newIsLiked);
+    onLike(project.id);
   };
 
-  // ✅ ฟังก์ชัน Dislike
+  // ✅ ฟังก์ชัน Dislike แบบใหม่
   const handleDislike = (e) => {
     e.stopPropagation();
-
-    const newIsDisliked = !project.isDisliked;
-    onDislike(project.id, newIsDisliked);
+    onDislike(project.id);
   };
 
   return (
@@ -90,19 +86,25 @@ const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
         whileHover="hover"
       >
         <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700">
-          <img
-            src={project.image || "https://via.placeholder.com/400x200?text=Project"}
-            alt={project.title}
-            className={`w-full h-48 object-cover transition-opacity duration-500 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            onLoad={() => setImageLoaded(true)}
-            onError={() => {
-              setImageError(true);
-              setImageLoaded(true);
-            }}
-          />
-          {!imageLoaded && (
+          {!imageError ? (
+            <img
+              src={project.image || project.image_url || "https://via.placeholder.com/400x200?text=Project"}
+              alt={project.title}
+              className={`w-full h-48 object-cover transition-opacity duration-500 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => {
+                setImageError(true);
+                setImageLoaded(true);
+              }}
+            />
+          ) : (
+            <div className="w-full h-48 bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700 flex items-center justify-center">
+              <span className="text-gray-500 dark:text-gray-400 text-sm">ไม่พบภาพ</span>
+            </div>
+          )}
+          {!imageLoaded && !imageError && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
@@ -154,6 +156,7 @@ const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
             }`}
             aria-label={project.isLiked ? "Unlike" : "Like"}
+            disabled={!onLike}
           >
             <FaThumbsUp className={`text-sm ${project.isLiked ? 'text-blue-600 dark:text-blue-400' : ''}`} />
             <span className="text-sm font-semibold">{project.like_count || 0}</span>
@@ -170,6 +173,7 @@ const ProjectCard = ({ project, onLike, onDislike, onSelect, index }) => {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
             }`}
             aria-label={project.isDisliked ? "Remove Dislike" : "Dislike"}
+            disabled={!onDislike}
           >
             <FaThumbsDown className={`text-sm ${project.isDisliked ? 'text-red-600 dark:text-red-400' : ''}`} />
             <span className="text-sm font-semibold">{project.dislike_count || 0}</span>

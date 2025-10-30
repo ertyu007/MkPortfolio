@@ -34,6 +34,7 @@ export const useProjects = () => {
             isDisliked: false
           };
 
+          // โหลดสถานะจาก localStorage
           const saved = localStorage.getItem(`project_${p.id}`);
           if (saved) {
             const { isLiked, isDisliked } = JSON.parse(saved);
@@ -49,7 +50,6 @@ export const useProjects = () => {
         setProjects(enhancedProjects);
       } catch (err) {
         console.error("❌ Failed to fetch projects:", err);
-        // Fallback data จะถูกจัดการใน getProjects() แล้ว
       } finally {
         setLoading(false);
       }
@@ -57,31 +57,44 @@ export const useProjects = () => {
     fetchProjects();
   }, []);
 
-  // ✅ Like Project
-  const likeProjectById = async (id, isLike) => {
+  // ✅ ฟังก์ชันจัดการ Like ใหม่
+  const likeProjectById = async (id) => {
     if (isProcessing[id]) return;
     
     setIsProcessing(prev => ({ ...prev, [id]: true }));
     
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+
+    // ✅ บันทึกสถานะเดิมสำหรับ rollback
+    const originalProject = { ...project };
+
     try {
-      const action = isLike ? 'like' : 'unlike';
-      
+      const currentStatus = {
+        isLiked: project.isLiked,
+        isDisliked: project.isDisliked
+      };
+
       // ✅ Optimistic update
       setProjects(prev => {
         return prev.map(p => {
           if (p.id === id) {
-            const updated = { 
-              ...p, 
-              isLiked: isLike,
-              isDisliked: isLike ? false : p.isDisliked,
-              like_count: isLike 
+            const newIsLiked = !p.isLiked;
+            const newIsDisliked = newIsLiked ? false : p.isDisliked;
+            
+            const updated = {
+              ...p,
+              isLiked: newIsLiked,
+              isDisliked: newIsDisliked,
+              like_count: newIsLiked 
                 ? (p.like_count || 0) + 1 
                 : Math.max(0, (p.like_count || 0) - 1),
-              dislike_count: isLike && p.isDisliked 
+              dislike_count: newIsLiked && p.isDisliked 
                 ? Math.max(0, (p.dislike_count || 0) - 1)
                 : p.dislike_count
             };
             
+            // บันทึกสถานะลง localStorage
             localStorage.setItem(`project_${id}`, JSON.stringify({ 
               isLiked: updated.isLiked, 
               isDisliked: updated.isDisliked 
@@ -93,13 +106,17 @@ export const useProjects = () => {
         });
       });
 
-      // ✅ Call API
+      // ✅ Call API ถ้าออนไลน์
       if (apiOnline) {
-        const { like_count } = await likeProject(id, action);
+        const result = await likeProject(id, currentStatus);
         
         // ✅ Sync กับ response จาก API
         setProjects(prev => prev.map(p => 
-          p.id === id ? { ...p, like_count } : p
+          p.id === id ? { 
+            ...p, 
+            like_count: result.like_count || p.like_count,
+            dislike_count: result.dislike_count || p.dislike_count
+          } : p
         ));
       }
       
@@ -107,40 +124,46 @@ export const useProjects = () => {
       console.error("❌ Like toggle failed:", err);
       // ✅ Rollback on error
       setProjects(prev => prev.map(p => 
-        p.id === id ? { 
-          ...p, 
-          isLiked: !isLike,
-          like_count: isLike 
-            ? Math.max(0, (p.like_count || 0) - 1)
-            : (p.like_count || 0) + 1
-        } : p
+        p.id === id ? originalProject : p
       ));
     } finally {
       setIsProcessing(prev => ({ ...prev, [id]: false }));
     }
   };
 
-  // ✅ Dislike Project
-  const dislikeProjectById = async (id, isDislike) => {
+  // ✅ ฟังก์ชันจัดการ Dislike ใหม่
+  const dislikeProjectById = async (id) => {
     if (isProcessing[id]) return;
     
     setIsProcessing(prev => ({ ...prev, [id]: true }));
 
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+
+    // ✅ บันทึกสถานะเดิมสำหรับ rollback
+    const originalProject = { ...project };
+
     try {
-      const action = isDislike ? 'dislike' : 'undislike';
-      
+      const currentStatus = {
+        isLiked: project.isLiked,
+        isDisliked: project.isDisliked
+      };
+
       // ✅ Optimistic update
       setProjects(prev => {
         return prev.map(p => {
           if (p.id === id) {
-            const updated = { 
-              ...p, 
-              isDisliked: isDislike,
-              isLiked: isDislike ? false : p.isLiked,
-              dislike_count: isDislike 
+            const newIsDisliked = !p.isDisliked;
+            const newIsLiked = newIsDisliked ? false : p.isLiked;
+            
+            const updated = {
+              ...p,
+              isDisliked: newIsDisliked,
+              isLiked: newIsLiked,
+              dislike_count: newIsDisliked 
                 ? (p.dislike_count || 0) + 1 
                 : Math.max(0, (p.dislike_count || 0) - 1),
-              like_count: isDislike && p.isLiked 
+              like_count: newIsDisliked && p.isLiked 
                 ? Math.max(0, (p.like_count || 0) - 1)
                 : p.like_count
             };
@@ -156,13 +179,17 @@ export const useProjects = () => {
         });
       });
 
-      // ✅ Call API
+      // ✅ Call API ถ้าออนไลน์
       if (apiOnline) {
-        const { dislike_count } = await dislikeProject(id, action);
+        const result = await dislikeProject(id, currentStatus);
         
         // ✅ Sync กับ response จาก API
         setProjects(prev => prev.map(p => 
-          p.id === id ? { ...p, dislike_count } : p
+          p.id === id ? { 
+            ...p, 
+            like_count: result.like_count || p.like_count,
+            dislike_count: result.dislike_count || p.dislike_count
+          } : p
         ));
       }
       
@@ -170,32 +197,18 @@ export const useProjects = () => {
       console.error("❌ Dislike toggle failed:", err);
       // ✅ Rollback on error
       setProjects(prev => prev.map(p => 
-        p.id === id ? { 
-          ...p, 
-          isDisliked: !isDislike,
-          dislike_count: isDislike 
-            ? Math.max(0, (p.dislike_count || 0) - 1)
-            : (p.dislike_count || 0) + 1
-        } : p
+        p.id === id ? originalProject : p
       ));
     } finally {
       setIsProcessing(prev => ({ ...prev, [id]: false }));
     }
   };
 
-  // ✅ ฟังก์ชันสำหรับอัพเดท project โดยตรง
-  const updateProject = (updatedProject) => {
-    setProjects(prev => prev.map(p => 
-      p.id === updatedProject.id ? updatedProject : p
-    ));
-  };
-
   return { 
     projects, 
     likeProject: likeProjectById, 
     dislikeProject: dislikeProjectById, 
-    updateProject,
     loading,
-    apiOnline // ✅ เพิ่มสถานะ API
+    apiOnline
   };
 };

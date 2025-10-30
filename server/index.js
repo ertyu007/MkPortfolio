@@ -18,15 +18,9 @@ const pool = new Pool({
   },
 });
 
-// ✅ Get all projects
 app.get('/api/projects', async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT id, title, description, tags, like_count, dislike_count, image_url, 
-             total_likes, total_dislikes, user_likes, user_dislikes
-      FROM projects 
-      ORDER BY id ASC
-    `);
+    const result = await pool.query('SELECT * FROM projects ORDER BY id ASC');
     res.json(result.rows);
   } catch (err) {
     console.error("GET /api/projects Error:", err);
@@ -34,7 +28,6 @@ app.get('/api/projects', async (req, res) => {
   }
 });
 
-// ✅ Like project
 app.post('/api/projects/:id/like', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
@@ -65,7 +58,7 @@ app.post('/api/projects/:id/like', async (req, res) => {
   }
 });
 
-// ✅ Dislike project
+// ✅ API: Dislike project
 app.post('/api/projects/:id/dislike', async (req, res) => {
   const { id } = req.params;
   const { action } = req.body;
@@ -98,5 +91,5 @@ app.post('/api/projects/:id/dislike', async (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  // console.log(`✅ Server running on port ${PORT}`);
 });
