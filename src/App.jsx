@@ -7,7 +7,6 @@ import About from './pages/About';
 import Skills from './pages/Skills';
 import Portfolio from './pages/Portfolio';
 import Certificates from './pages/Certificates';
-import TikTokVideos from './pages/TiktokVideos';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import { ThemeProvider } from './context/ThemeContext';
@@ -20,10 +19,9 @@ const App = () => {
   const aboutRef = useRef(null);
   const skillsRef = useRef(null);
   const portfolioRef = useRef(null);
-  const certificatesRef = useRef(null); // เปลี่ยนจาก CertificatesRef เป็น certificatesRef
+  const certificatesRef = useRef(null);
   const blogRef = useRef(null);
   const contactRef = useRef(null);
-  const tiktokRef = useRef(null);
 
   const [showWelcome, setShowWelcome] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -65,7 +63,6 @@ const App = () => {
     certificates: certificatesRef, // เปลี่ยนจาก CertificatesRef เป็น certificatesRef
     blog: blogRef,
     contact: contactRef,
-    tiktok: tiktokRef
   };
 
   return (
@@ -77,7 +74,6 @@ const App = () => {
             about: aboutRef,
             skills: skillsRef,
             portfolio: portfolioRef,
-            tiktok: tiktokRef,
             blog: blogRef,
             contact: contactRef
           }}
@@ -91,7 +87,6 @@ const App = () => {
           <div ref={aboutRef} id="about"><About /></div>
           <div ref={skillsRef} id="skills"><Skills /></div>
           <div ref={portfolioRef} id="portfolio"><Portfolio /></div>
-          <div ref={tiktokRef} id="tiktok"><TikTokVideos /></div>
           <div ref={certificatesRef} id="certificates"><Certificates /></div>
           <div ref={blogRef} id="blog"><Blog /></div>
           <div ref={contactRef} id="contact"><Contact /></div>
