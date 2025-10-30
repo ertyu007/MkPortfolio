@@ -5,7 +5,7 @@ import { aiSearch } from '../utils/ai';
 import ProjectCard from '../components/ProjectCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// SVG Icons
+// SVG Icons (ส่วนนี้เหมือนเดิม)
 const SearchIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -45,7 +45,7 @@ const DislikeIcon = ({ isDisliked }) => (
   </svg>
 );
 
-// Animation Variants
+// Animation Variants (ส่วนนี้เหมือนเดิม)
 const modalVariants = {
   hidden: {
     opacity: 0,
@@ -94,7 +94,17 @@ const overlayVariants = {
 };
 
 const Portfolio = () => {
-  const { projects, likeProject, dislikeProject, loading, apiOnline } = useProjects();
+  // ✅ รับค่าทั้งหมดจาก hook รวมถึง pendingSyncCount และ manualSync
+  const { 
+    projects, 
+    likeProject, 
+    dislikeProject, 
+    loading, 
+    apiOnline,
+    manualSync,
+    pendingSyncCount 
+  } = useProjects();
+  
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -102,7 +112,7 @@ const Portfolio = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Debounce search
+  // Debounce search (ส่วนนี้เหมือนเดิม)
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -111,7 +121,7 @@ const Portfolio = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Lock scroll when modal is open
+  // Lock scroll when modal is open (ส่วนนี้เหมือนเดิม)
   useEffect(() => {
     if (selectedProject) {
       document.body.style.overflow = 'hidden';
@@ -127,7 +137,7 @@ const Portfolio = () => {
     };
   }, [selectedProject]);
 
-  // ✅ ค้นหาเมื่อ debouncedSearch หรือ projects เปลี่ยน
+  // ✅ ค้นหาเมื่อ debouncedSearch หรือ projects เปลี่ยน (ส่วนนี้เหมือนเดิม)
   useEffect(() => {
     const performSearch = async () => {
       if (!debouncedSearch.trim()) {
@@ -196,14 +206,23 @@ const Portfolio = () => {
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             ผลงานที่ผ่านการพัฒนาด้วยความตั้งใจ — พร้อมให้คุณสำรวจและประเมิน
           </p>
+          
+          {/* ✅ แก้ไขส่วนนี้ - ใช้ pendingSyncCount และ manualSync ที่รับมาจาก hook */}
           {!apiOnline && (
             <div className="mt-4 inline-flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-lg text-sm">
               <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
-              โหมดออฟไลน์ - กำลังใช้ข้อมูลสำรอง
+              โหมดออฟไลน์ - มี {pendingSyncCount} การเปลี่ยนแปลงที่รอ sync
+              <button 
+                onClick={manualSync}
+                className="ml-2 px-2 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600 transition-colors"
+              >
+                Sync ทันที
+              </button>
             </div>
           )}
         </motion.div>
 
+        {/* ส่วนอื่นๆ เหมือนเดิมทั้งหมด */}
         {/* Search Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

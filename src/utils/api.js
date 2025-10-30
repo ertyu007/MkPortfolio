@@ -19,9 +19,12 @@ export const getProjects = async (retries = 3) => {
   }
 };
 
-// ✅ ฟังก์ชัน Like Project แบบใหม่
+// ✅ ฟังก์ชัน Like Project แบบใหม่ - แก้ไขให้ส่ง action
 export const likeProject = async (id, currentStatus) => {
   try {
+    // กำหนด action ตามสถานะปัจจุบัน
+    const action = currentStatus.isLiked ? 'unlike' : 'like';
+    
     const res = await fetch(`${API_BASE}/api/projects/${id}/like`, {
       method: 'POST',
       headers: { 
@@ -29,8 +32,7 @@ export const likeProject = async (id, currentStatus) => {
         'Accept': 'application/json'
       },
       body: JSON.stringify({ 
-        current_liked: currentStatus.isLiked,
-        current_disliked: currentStatus.isDisliked 
+        action: action // ✅ ส่ง action แทน
       }),
     });
     
@@ -46,9 +48,12 @@ export const likeProject = async (id, currentStatus) => {
   }
 };
 
-// ✅ ฟังก์ชัน Dislike Project แบบใหม่
+// ✅ ฟังก์ชัน Dislike Project แบบใหม่ - แก้ไขให้ส่ง action
 export const dislikeProject = async (id, currentStatus) => {
   try {
+    // กำหนด action ตามสถานะปัจจุบัน
+    const action = currentStatus.isDisliked ? 'undislike' : 'dislike';
+    
     const res = await fetch(`${API_BASE}/api/projects/${id}/dislike`, {
       method: 'POST',
       headers: { 
@@ -56,8 +61,7 @@ export const dislikeProject = async (id, currentStatus) => {
         'Accept': 'application/json'
       },
       body: JSON.stringify({ 
-        current_liked: currentStatus.isLiked,
-        current_disliked: currentStatus.isDisliked 
+        action: action // ✅ ส่ง action แทน
       }),
     });
     
